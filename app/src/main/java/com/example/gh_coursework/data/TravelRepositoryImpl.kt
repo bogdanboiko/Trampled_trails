@@ -21,7 +21,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         TODO("Not yet implemented")
     }
 
-    override suspend fun addRouteDetails(route: List<RoutePointPreviewDomain>) {
+    override suspend fun addRouteDetails(route: RouteDomain) {
         TODO("Not yet implemented")
     }
 

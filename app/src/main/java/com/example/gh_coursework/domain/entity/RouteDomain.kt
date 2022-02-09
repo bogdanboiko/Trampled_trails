@@ -5,4 +5,4 @@ data class RouteDomain(
     val name: String,
     val description: String,
     val rating: Double
-    )
+)
