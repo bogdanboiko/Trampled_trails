@@ -4,4 +4,4 @@ data class PointOfInterestPreviewDomain(
     val pointId: Int,
     val x: Double,
     val y: Double
-    )
+)

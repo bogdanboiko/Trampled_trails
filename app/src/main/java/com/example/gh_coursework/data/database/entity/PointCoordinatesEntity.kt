@@ -4,4 +4,4 @@ data class PointCoordinatesEntity(
     val pointId: Int,
     val x: Double,
     val y: Double
-    )
+)

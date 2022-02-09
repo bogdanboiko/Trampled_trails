@@ -5,4 +5,4 @@ data class PointOfInterestDomain(
     val tag: String,
     val caption: String,
     val description: String
-    )
+)
