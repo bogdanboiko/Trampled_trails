@@ -16,8 +16,18 @@
         android:layout_margin="15dp"
         android:buttonTint="@color/teal_200"
         android:button="@drawable/route_place_checkbox"
+        android:elevation="2dp"
         android:scaleX="0.8"
         android:scaleY="0.8" />
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment_activity_main"
+        android:layout_below="@+id/checkboxRoutePlace"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_graph"/>
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
