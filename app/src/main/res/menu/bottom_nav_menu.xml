@@ -4,14 +4,17 @@
     <item
         android:id="@+id/public_"
         android:icon="@drawable/ic_public"
-        android:title="Public" />
+        android:title="@string/public_menu_item"
+        android:checked="false"/>
 
     <item
-        android:id="@+id/create_new"
+        android:id="@+id/empty_item"
+        android:enabled="false"
         android:title="" />
 
     <item
         android:id="@+id/private_"
         android:icon="@drawable/ic_lock"
-        android:title="Private" />
+        android:title="@string/private_menu_item"
+        android:checked="true"/>
 </menu>

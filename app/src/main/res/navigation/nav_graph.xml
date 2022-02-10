@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/privatePointsFragment">
+    <fragment
+        android:id="@+id/privatePointsFragment"
+        android:name="com.example.gh_coursework.ui.private_point.PrivatePointsFragment"
+        android:label="fragment_private_points"
+        tools:layout="@layout/private_points_fragment">
+    <action
+        android:id="@+id/action_privatePointsFragment_to_privateRoutesFragment"
+        app:destination="@id/privateRoutesFragment"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/privateRoutesFragment"
+        android:name="com.example.gh_coursework.ui.private_route.PrivateRoutesFragment"
+        android:label="fragment_private_routes"
+        tools:layout="@layout/private_route_fragment">
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_privatePointsFragment"
+            app:destination="@id/privatePointsFragment"/>
+    </fragment>
+</navigation>
