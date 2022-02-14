@@ -25,6 +25,7 @@ import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
+import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 
 class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
     private var mapboxMap: MapboxMap? = null
@@ -47,23 +48,52 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configMap()
+        configAddPointButton()
+        configCancelButton()
         view.viewTreeObserver.addOnGlobalLayoutListener {
-            configButton(view.width / 2f, view.height / 2f)
+            configSetPointButton(view.width / 2f, view.height / 2f)
         }
     }
 
-    private fun configButton(width: Float, height: Float) {
+    private fun configAddPointButton() {
+        binding.addPointButton.setOnClickListener {
+            with(binding) {
+                addPointButton.visibility = View.INVISIBLE
+                imageView.visibility = View.VISIBLE
+                setPointButton.visibility = View.VISIBLE
+                cancelPointButton.visibility = View.VISIBLE
+            }
+
+            mapboxMap?.addOnMapClickListener(onMapClickListener)
+        }
+    }
+
+
+    private fun configSetPointButton(width: Float, height: Float) {
         val downTime = SystemClock.uptimeMillis()
-        val eventTime = SystemClock.uptimeMillis() + 100
+        val eventTime = SystemClock.uptimeMillis() + 10
         val downAction = MotionEvent.obtain(
             downTime, eventTime, MotionEvent.ACTION_DOWN,
             width, height, 0)
         val upAction = MotionEvent.obtain(
             downTime, eventTime, MotionEvent.ACTION_UP,
             width, height, 0)
-        binding.addPointButton.setOnClickListener {
+        binding.setPointButton.setOnClickListener {
             binding.mapView.dispatchTouchEvent(downAction)
             binding.mapView.dispatchTouchEvent(upAction)
+        }
+    }
+
+    private fun configCancelButton() {
+        binding.cancelPointButton.setOnClickListener {
+            with(binding) {
+                addPointButton.visibility = View.VISIBLE
+                imageView.visibility = View.INVISIBLE
+                setPointButton.visibility = View.INVISIBLE
+                cancelPointButton.visibility = View.INVISIBLE
+            }
+
+            mapboxMap?.removeOnMapClickListener(onMapClickListener)
         }
     }
 
@@ -73,7 +103,6 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
         pointAnnotationManager = annotationApi?.createPointAnnotationManager()
         mapboxMap = mapView?.getMapboxMap()?.also {
             it.loadStyleUri(Style.MAPBOX_STREETS)
-            it.addOnMapClickListener(onMapClickListener)
         }
     }
 

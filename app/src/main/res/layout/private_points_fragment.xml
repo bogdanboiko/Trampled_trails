@@ -23,6 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 mapbox:layout_constraintEnd_toEndOf="parent"
+                android:visibility="invisible"
                 mapbox:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
                 mapbox:srcCompat="@drawable/ic_def_point" />
@@ -31,10 +32,30 @@
                 android:id="@+id/addPointButton"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="50dp"
                 android:layout_marginEnd="20dp"
                 mapbox:layout_constraintEnd_toEndOf="parent"
                 mapbox:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/setPointButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:visibility="invisible"
+                android:layout_marginTop="50dp"
+                android:layout_marginEnd="20dp"
+                mapbox:layout_constraintEnd_toEndOf="parent"
+                mapbox:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/cancelPointButton"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="invisible"
+                mapbox:layout_constraintEnd_toStartOf="@id/addPointButton"
+                mapbox:layout_constraintTop_toTopOf="@id/addPointButton" />
+
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/centerGuideline"
