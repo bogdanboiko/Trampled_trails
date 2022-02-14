@@ -31,7 +31,6 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
     private var mapboxMap: MapboxMap? = null
     private lateinit var binding: PrivatePointsFragmentBinding
     private var mapView: MapView? = null
-    private var annotationApi: AnnotationPlugin? = null
     private var pointAnnotationManager: PointAnnotationManager? = null
     private val onMapClickListener = OnMapClickListener { point ->
         addAnnotationToMap(point)
@@ -99,7 +98,7 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
 
     private fun configMap() {
         mapView = binding.mapView
-        annotationApi = mapView?.annotations
+        val annotationApi = mapView?.annotations
         pointAnnotationManager = annotationApi?.createPointAnnotationManager()
         mapboxMap = mapView?.getMapboxMap()?.also {
             it.loadStyleUri(Style.MAPBOX_STREETS)
