@@ -55,7 +55,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     //MapBox
-    implementation "com.mapbox.maps:android:10.2.0"
+    implementation "com.mapbox.maps:android:10.3.0"
 
     //Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
