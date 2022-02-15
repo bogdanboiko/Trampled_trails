@@ -15,11 +15,10 @@ fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap? {
         val constantState = sourceDrawable.constantState ?: return null
         val drawable = constantState.newDrawable().mutate()
         val bitmap: Bitmap = Bitmap.createBitmap(
-            drawable.intrinsicWidth, drawable.intrinsicHeight + drawable.intrinsicHeight,
+            drawable.intrinsicWidth, drawable.intrinsicHeight,
             Bitmap.Config.ARGB_8888
         )
         val canvas = Canvas(bitmap)
-        canvas.scale(1f, 0.5f)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.draw(canvas)
         bitmap

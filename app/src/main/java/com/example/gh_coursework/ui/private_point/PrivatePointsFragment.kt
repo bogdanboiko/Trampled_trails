@@ -18,6 +18,7 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.MapView
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.plugin.annotation.AnnotationPlugin
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
@@ -28,10 +29,9 @@ import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 
 class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
-    private var mapboxMap: MapboxMap? = null
+    private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: PrivatePointsFragmentBinding
-    private var mapView: MapView? = null
-    private var pointAnnotationManager: PointAnnotationManager? = null
+    private lateinit var pointAnnotationManager: PointAnnotationManager
     private val onMapClickListener = OnMapClickListener { point ->
         addAnnotationToMap(point)
         return@OnMapClickListener true
@@ -63,7 +63,7 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
                 cancelPointButton.visibility = View.VISIBLE
             }
 
-            mapboxMap?.addOnMapClickListener(onMapClickListener)
+            mapboxMap.addOnMapClickListener(onMapClickListener)
         }
     }
 
@@ -92,15 +92,12 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
                 cancelPointButton.visibility = View.INVISIBLE
             }
 
-            mapboxMap?.removeOnMapClickListener(onMapClickListener)
+            mapboxMap.removeOnMapClickListener(onMapClickListener)
         }
     }
 
     private fun configMap() {
-        mapView = binding.mapView
-        val annotationApi = mapView?.annotations
-        pointAnnotationManager = annotationApi?.createPointAnnotationManager()
-        mapboxMap = mapView?.getMapboxMap()?.also {
+        mapboxMap = binding.mapView.getMapboxMap().also {
             it.loadStyleUri(Style.MAPBOX_STREETS)
         }
     }
@@ -108,7 +105,8 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
     private fun addAnnotationToMap(point: Point) {
         activity?.applicationContext?.let {
             bitmapFromDrawableRes(it, R.drawable.ic_def_point)?.let { image ->
-                pointAnnotationManager?.create(createAnnotationPoint(image, point))
+                pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+                pointAnnotationManager.create(createAnnotationPoint(image, point))
             }
         }
     }
@@ -117,6 +115,7 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
         return PointAnnotationOptions()
             .withPoint(point)
             .withIconImage(bitmap)
+            .withIconAnchor(IconAnchor.BOTTOM)
     }
 
     private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
