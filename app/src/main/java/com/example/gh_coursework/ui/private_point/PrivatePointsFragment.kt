@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.SystemClock
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -12,9 +11,10 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.R
+import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
-import com.example.gh_coursework.databinding.PrivatePointsFragmentBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
@@ -22,21 +22,17 @@ import com.mapbox.maps.Style
 import com.mapbox.maps.ViewAnnotationAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
-import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
-import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 
-class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
+class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var mapboxMap: MapboxMap
-    private lateinit var binding: PrivatePointsFragmentBinding
+    private lateinit var binding: FragmentPrivatePointsBinding
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private val onMapClickListener = OnMapClickListener { point ->
         addAnnotationToMap(point)
@@ -46,7 +42,7 @@ class PrivatePointsFragment : Fragment(R.layout.private_points_fragment) {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        binding = PrivatePointsFragmentBinding.inflate(inflater, container, false)
+        binding = FragmentPrivatePointsBinding.inflate(inflater, container, false)
         return binding.root
     }
 

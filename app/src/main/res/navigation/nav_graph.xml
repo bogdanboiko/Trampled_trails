@@ -8,19 +8,29 @@
         android:id="@+id/privatePointsFragment"
         android:name="com.example.gh_coursework.ui.private_point.PrivatePointsFragment"
         android:label="fragment_private_points"
-        tools:layout="@layout/private_points_fragment">
-    <action
-        android:id="@+id/action_privatePointsFragment_to_privateRoutesFragment"
-        app:destination="@id/privateRoutesFragment"/>
+        tools:layout="@layout/fragment_private_points">
+        <action
+            android:id="@+id/action_privatePointsFragment_to_privateRoutesFragment"
+            app:destination="@id/privateRoutesFragment" />
+        <action
+            android:id="@+id/action_privatePointsFragment_to_pointDetailsFragment"
+            app:destination="@id/pointDetailsFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/privateRoutesFragment"
         android:name="com.example.gh_coursework.ui.private_route.PrivateRoutesFragment"
         android:label="fragment_private_routes"
-        tools:layout="@layout/private_route_fragment">
+        tools:layout="@layout/fragment_private_route">
         <action
             android:id="@+id/action_privateRoutesFragment_to_privatePointsFragment"
-            app:destination="@id/privatePointsFragment"/>
+            app:destination="@id/privatePointsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pointDetailsFragment"
+        android:name="com.example.gh_coursework.ui.point_details.PointDetailsFragment"
+        android:label="fragment_point_details"
+        tools:layout="@layout/fragment_point_details">
+
     </fragment>
 </navigation>
