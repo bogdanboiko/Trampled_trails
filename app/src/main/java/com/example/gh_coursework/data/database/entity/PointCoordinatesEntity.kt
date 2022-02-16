@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "points")
+@Entity(tableName = "point_coordinates")
 data class PointCoordinatesEntity(
     @PrimaryKey
     @ColumnInfo(name = "id")
