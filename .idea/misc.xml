@@ -3,18 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_baseline_clear_24.xml" value="0.185" />
-        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_def_point.xml" value="0.1" />
-        <entry key="..\:/anroidProjects/courcework/app/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="..\:/anroidProjects/courcework/app/src/main/res/layout/fragment_point_details.xml" value="0.1" />
-        <entry key="..\:/anroidProjects/courcework/app/src/main/res/layout/item_annotation_view.xml" value="0.1" />
-        <entry key="..\:/anroidProjects/courcework/app/src/main/res/layout/item_callout_view.xml" value="0.17889492753623187" />
-        <entry key="..\:/anroidProjects/courcework/app/src/main/res/layout/private_points_fragment.xml" value="0.1" />
-        <entry key="..\:/anroidProjects/courcework/app/src/main/res/menu/bottom_nav_menu.xml" value="0.15677083333333333" />
+        <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/activity_main.xml" value="0.22282608695652173" />
+        <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/fragment_private_points.xml" value="0.22282608695652173" />
       </map>
     </option>
   </component>
-  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
