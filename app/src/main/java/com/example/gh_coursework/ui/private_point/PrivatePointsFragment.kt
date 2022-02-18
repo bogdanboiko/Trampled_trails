@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import com.example.gh_coursework.OnAddButtonPressed
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
@@ -25,15 +25,15 @@ import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
-import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 
-class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
+class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddButtonPressed {
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
     private lateinit var pointAnnotationManager: PointAnnotationManager
+    private lateinit var center: Pair<Float, Float>
     private val onMapClickListener = OnMapClickListener { point ->
         addAnnotationToMap(point)
         return@OnMapClickListener true
@@ -49,10 +49,8 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configMap()
-        configAddPointButton()
-        configCancelButton()
-        view.viewTreeObserver.addOnGlobalLayoutListener {
-            configSetPointButton(view.width / 2f, view.height / 2f)
+        view.viewTreeObserver?.addOnGlobalLayoutListener {
+            center = Pair(view.width / 2f, view.height / 2f)
         }
     }
 
@@ -61,48 +59,23 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             viewAnnotationManager = binding.mapView.viewAnnotationManager
             it.loadStyleUri(Style.MAPBOX_STREETS)
         }
+
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
     }
 
-    private fun configAddPointButton() {
-        binding.addPointButton.setOnClickListener {
-            with(binding) {
-                addPointButton.visibility = View.INVISIBLE
-                imageView.visibility = View.VISIBLE
-                setPointButton.visibility = View.VISIBLE
-                cancelPointButton.visibility = View.VISIBLE
-            }
-
-            mapboxMap.addOnMapClickListener(onMapClickListener)
-        }
-    }
-
-    private fun configCancelButton() {
-        binding.cancelPointButton.setOnClickListener {
-            with(binding) {
-                addPointButton.visibility = View.VISIBLE
-                imageView.visibility = View.INVISIBLE
-                setPointButton.visibility = View.INVISIBLE
-                cancelPointButton.visibility = View.INVISIBLE
-            }
-
-            mapboxMap.removeOnMapClickListener(onMapClickListener)
-        }
-    }
-
-    private fun configSetPointButton(width: Float, height: Float) {
+    private fun executeClickAtPoint() {
         val downTime = SystemClock.uptimeMillis()
         val eventTime = SystemClock.uptimeMillis() + 10
         val downAction = MotionEvent.obtain(
             downTime, eventTime, MotionEvent.ACTION_DOWN,
-            width, height, 0)
+            center.first , center.second, 0
+        )
         val upAction = MotionEvent.obtain(
             downTime, eventTime, MotionEvent.ACTION_UP,
-            width, height, 0)
-        binding.setPointButton.setOnClickListener {
-            binding.mapView.dispatchTouchEvent(downAction)
-            binding.mapView.dispatchTouchEvent(upAction)
-        }
+            center.first , center.second, 0
+        )
+        binding.mapView.dispatchTouchEvent(downAction)
+        binding.mapView.dispatchTouchEvent(upAction)
     }
 
     private fun addAnnotationToMap(point: Point) {
@@ -134,7 +107,8 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         ItemAnnotationViewBinding.bind(viewAnnotation).apply {
             textNativeView.text = "lat=%.2f\nlon=%.2f".format(
                 pointAnnotation.geometry.latitude(),
-                pointAnnotation.geometry.longitude())
+                pointAnnotation.geometry.longitude()
+            )
 
             closeNativeView.setOnClickListener {
                 viewAnnotationManager.removeViewAnnotation(viewAnnotation)
@@ -151,4 +125,13 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
 
     private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
         convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
+
+    override fun enableCreatorMod() {
+        binding.centralPointer.visibility = View.VISIBLE
+        mapboxMap.addOnMapClickListener(onMapClickListener)
+    }
+
+    override fun onAddButtonPressed() {
+        executeClickAtPoint()
+    }
 }
