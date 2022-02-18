@@ -63,6 +63,15 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
     }
 
+    override fun enableCreatorMod() {
+        binding.centralPointer.visibility = View.VISIBLE
+        mapboxMap.addOnMapClickListener(onMapClickListener)
+    }
+
+    override fun onAddButtonPressed() {
+        executeClickAtPoint()
+    }
+
     private fun executeClickAtPoint() {
         val downTime = SystemClock.uptimeMillis()
         val eventTime = SystemClock.uptimeMillis() + 10
@@ -125,13 +134,4 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
 
     private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
         convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
-
-    override fun enableCreatorMod() {
-        binding.centralPointer.visibility = View.VISIBLE
-        mapboxMap.addOnMapClickListener(onMapClickListener)
-    }
-
-    override fun onAddButtonPressed() {
-        executeClickAtPoint()
-    }
 }
