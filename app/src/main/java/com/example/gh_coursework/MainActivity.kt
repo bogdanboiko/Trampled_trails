@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         configCheckBox()
         configFabButton()
+        configCancelButton()
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()
