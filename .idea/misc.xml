@@ -5,6 +5,10 @@
       <map>
         <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/activity_main.xml" value="0.22282608695652173" />
         <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/fragment_private_points.xml" value="0.22282608695652173" />
+        <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/fragment_private_route.xml" value="0.21784420289855072" />
+        <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/mapbox_activity_multiple_waypoints.xml" value="0.5938748335552596" />
+        <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/mapbox_example.xml" value="0.2128623188405797" />
+        <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/mapboxexample.xml" value="0.20199275362318841" />
       </map>
     </option>
   </component>
