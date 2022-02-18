@@ -1,6 +1,5 @@
 package com.example.gh_coursework
 
-import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -9,12 +8,12 @@ import com.example.gh_coursework.databinding.ActivityMainBinding
 import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 
 interface OnAddButtonPressed {
-    fun enableCreatorMod()
+    fun switchMapMod(mapState: MapState)
     fun onAddButtonPressed()
 }
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
     private var mapState: MapState = MapState.PRESENTATION
     private var navHostFragment: Fragment? = null
 
@@ -32,9 +31,11 @@ class MainActivity : AppCompatActivity() {
             if (mapState == MapState.PRESENTATION) {
                 binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_confirm))
                 mapState = MapState.CREATOR
-                (navHostFragment?.childFragmentManager?.fragments?.get(0) as OnAddButtonPressed).enableCreatorMod()
+                (navHostFragment?.childFragmentManager?.fragments?.get(0) as OnAddButtonPressed)
+                    .switchMapMod(mapState)
             } else if (mapState == MapState.CREATOR) {
-                (navHostFragment?.childFragmentManager?.fragments?.get(0) as OnAddButtonPressed).onAddButtonPressed()
+                (navHostFragment?.childFragmentManager?.fragments?.get(0) as OnAddButtonPressed)
+                    .onAddButtonPressed()
             }
         }
     }
@@ -61,9 +62,9 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+}
 
-    enum class MapState {
-        CREATOR,
-        PRESENTATION
-    }
+enum class MapState {
+    CREATOR,
+    PRESENTATION
 }

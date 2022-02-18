@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
+import com.example.gh_coursework.MapState
 import com.example.gh_coursework.OnAddButtonPressed
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
@@ -25,6 +26,7 @@ import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
+import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 
@@ -63,9 +65,14 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
     }
 
-    override fun enableCreatorMod() {
-        binding.centralPointer.visibility = View.VISIBLE
-        mapboxMap.addOnMapClickListener(onMapClickListener)
+    override fun switchMapMod(mapState: MapState) {
+        if (mapState == MapState.CREATOR) {
+            binding.centralPointer.visibility = View.VISIBLE
+            mapboxMap.addOnMapClickListener(onMapClickListener)
+        } else {
+            binding.centralPointer.visibility = View.INVISIBLE
+            mapboxMap.removeOnMapClickListener(onMapClickListener)
+        }
     }
 
     override fun onAddButtonPressed() {
