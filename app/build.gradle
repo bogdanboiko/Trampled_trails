@@ -19,6 +19,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    kotlin.sourceSets.all {
+        languageSettings.useExperimentalAnnotation("kotlin.RequiresOptIn")
+    }
+
     buildTypes {
         release {
             buildConfigField "String", "BASE_URL", "\"/\""
@@ -56,6 +60,14 @@ dependencies {
 
     //MapBox
     implementation "com.mapbox.maps:android:10.3.0"
+
+    implementation "com.mapbox.navigation:android:2.2.2"
+    implementation("com.mapbox.navigation:core:2.2.2") {
+        exclude group: "com.mapbox.common", module: "logger"
+    }
+
+    compileOnly("com.mapbox.base:annotations:0.5.0")
+    kapt("com.mapbox.base:annotations-processor:0.5.0")
 
     //Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
