@@ -5,6 +5,19 @@
       <map>
         <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/activity_main.xml" value="0.22282608695652173" />
         <entry key="..\:/Users/pashk/AndroidStudioProjects/gh_coursework/app/src/main/res/layout/fragment_private_points.xml" value="0.22282608695652173" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/bottom_nav_color_transparent.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_add.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_close_annotation_view.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_confirm.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_def_point.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_launcher_background.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_lock.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_places.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_public.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/ic_routes.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/drawable/route_place_checkbox.xml" value="0.136" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/layout/fragment_point_details.xml" value="0.1" />
+        <entry key="..\:/anroidProjects/courcework/app/src/main/res/layout/fragment_private_points.xml" value="0.1" />
       </map>
     </option>
   </component>
