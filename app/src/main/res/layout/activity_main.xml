@@ -24,8 +24,11 @@
     <Button
         android:id="@+id/cancelButton"
         android:visibility="invisible"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@drawable/ic_close"
+        android:layout_width="50dp"
+        android:layout_margin="15dp"
+        android:layout_height="50dp"
         android:elevation="2dp" />
 
     <androidx.fragment.app.FragmentContainerView

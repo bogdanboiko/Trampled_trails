@@ -59,8 +59,10 @@ class MainActivity : AppCompatActivity() {
 
         binding.checkboxRoutePlace.setOnCheckedChangeListener { _, b ->
             if (b) {
-                navController.navigate(PrivatePointsFragmentDirections
-                            .actionPrivatePointsFragmentToPrivateRoutesFragment())
+                navController.navigate(
+                    PrivatePointsFragmentDirections
+                        .actionPrivatePointsFragmentToPrivateRoutesFragment()
+                )
             } else {
                 navController.popBackStack()
             }
