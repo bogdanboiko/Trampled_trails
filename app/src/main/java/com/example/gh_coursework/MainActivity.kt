@@ -7,37 +7,49 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.findNavController
+import android.view.View
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.databinding.ActivityMainBinding
 import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import android.annotation.SuppressLint
-import androidx.fragment.app.Fragment
 
 interface OnAddButtonPressed {
-    fun enableCreatorMod()
+    fun switchMapMod(mapState: MapState)
     fun onAddButtonPressed()
 }
 
 class MainActivity : AppCompatActivity(), PermissionsListener {
-    lateinit var binding: ActivityMainBinding
     private val permissionsManager = PermissionsManager(this)
+    private lateinit var binding: ActivityMainBinding
     private var mapState: MapState = MapState.PRESENTATION
-    private var navHostFragment: Fragment? = null
+    private lateinit var navHostFragment: NavHostFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_activity_main)
+        navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         configCheckBox()
-         configFabButton()
+        configFabButton()
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()
         } else {
             permissionsManager.requestLocationPermissions(this)
+        }
+    }
+
+    private fun configCancelButton() {
+        binding.cancelButton.setOnClickListener {
+            mapState = MapState.PRESENTATION
+            (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
+                .switchMapMod(mapState)
+            binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_add))
+            binding.cancelButton.visibility = View.INVISIBLE
+        }
     }
 
     private fun configFabButton() {
@@ -45,23 +57,25 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
             if (mapState == MapState.PRESENTATION) {
                 binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_confirm))
                 mapState = MapState.CREATOR
-                (navHostFragment?.childFragmentManager?.fragments?.get(0) as OnAddButtonPressed).enableCreatorMod()
+                (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
+                    .switchMapMod(mapState)
+                binding.cancelButton.visibility = View.VISIBLE
             } else if (mapState == MapState.CREATOR) {
-                (navHostFragment?.childFragmentManager?.fragments?.get(0) as OnAddButtonPressed).onAddButtonPressed()
+                (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
+                    .onAddButtonPressed()
             }
         }
     }
 
     private fun configCheckBox() {
-        val navController = binding.navHostFragmentActivityMain.findNavController()
-        
+        val navController = navHostFragment.findNavController()
+
         binding.checkboxRoutePlace.setOnCheckedChangeListener { _, b ->
             if (b) {
-                navController
-                    .navigate(
-                        PrivatePointsFragmentDirections
-                            .actionPrivatePointsFragmentToPrivateRoutesFragment()
-                    )
+                navController.navigate(
+                    PrivatePointsFragmentDirections
+                        .actionPrivatePointsFragmentToPrivateRoutesFragment()
+                )
             } else {
                 navController
                     .navigate(
@@ -125,9 +139,10 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
                 10
             )
         }
-        
-    enum class MapState {
-        CREATOR,
-        PRESENTATION
     }
+}
+
+enum class MapState {
+    CREATOR,
+    PRESENTATION
 }
