@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         setContentView(binding.root)
         navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
-        configCheckBox()
+        //configCheckBox()
         configFabButton()
         configCancelButton()
 
@@ -68,34 +68,24 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         }
     }
 
-    private fun configCheckBox() {
-        val navController = navHostFragment.findNavController()
-
-        binding.checkboxRoutePlace.setOnCheckedChangeListener { _, b ->
-            if (b) {
-                navController.navigate(
-                    PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPrivateRoutesFragment()
-                )
-            } else {
-                navController
-                    .navigate(
-                        PrivatePointsFragmentDirections
-                            .actionPrivatePointsFragmentToPrivateRoutesFragment()
-                    )
-            }
-        }
-    }
-
-    override fun onBackPressed() {
-        with(binding) {
-            if (!checkboxRoutePlace.isChecked) {
-                finishAffinity()
-            } else {
-                checkboxRoutePlace.isChecked = !checkboxRoutePlace.isChecked
-            }
-        }
-    }
+//    private fun configCheckBox() {
+//        val navController = navHostFragment.findNavController()
+//
+//        binding.checkboxRoutePlace.setOnCheckedChangeListener { _, b ->
+//            if (b) {
+//                navController.navigate(
+//                    PrivatePointsFragmentDirections
+//                        .actionPrivatePointsFragmentToPrivateRoutesFragment()
+//                )
+//            } else {
+//                navController
+//                    .navigate(
+//                        PrivatePointsFragmentDirections
+//                            .actionPrivatePointsFragmentToPrivateRoutesFragment()
+//                    )
+//            }
+//        }
+//    }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         Toast.makeText(

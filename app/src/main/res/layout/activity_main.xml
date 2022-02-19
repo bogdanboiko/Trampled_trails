@@ -8,18 +8,17 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <CheckBox
-        android:id="@+id/checkboxRoutePlace"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:id="@+id/btnRoutePlaceChanger"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_margin="15dp"
-        android:button="@drawable/route_place_checkbox"
-        android:buttonTint="@color/teal_200"
-        android:elevation="2dp"
-        android:scaleX="0.8"
-        android:scaleY="0.8" />
+        android:layout_marginTop="25dp"
+        android:layout_marginStart="15dp"
+        android:background="@drawable/ic_points"
+        android:backgroundTint="@color/teal_200"
+        android:elevation="2dp"/>
 
     <Button
         android:id="@+id/cancelButton"
