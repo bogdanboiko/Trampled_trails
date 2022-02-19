@@ -38,14 +38,29 @@
     </com.mapbox.maps.MapView>
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/multipleWaypointResetRouteButton"
+        android:id="@+id/resetRouteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="60dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="70dp"
+        android:paddingStart="17dp"
         android:text="Reset"
         android:visibility="invisible"
         app:icon="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/undoPointCreatingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="70dp"
+        android:paddingStart="20dp"
+        android:text="Undo"
+        android:visibility="invisible"
+        app:iconGravity="end"
+        app:icon="@drawable/ic_undo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
