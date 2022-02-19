@@ -9,7 +9,7 @@
     tools:context=".MainActivity">
 
     <ImageButton
-        android:id="@+id/btnRoutePlaceChanger"
+        android:id="@+id/mapRoutePointModSwitcher"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentEnd="true"
