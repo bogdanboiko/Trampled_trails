@@ -3,6 +3,7 @@ package com.example.gh_coursework
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -12,6 +13,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.databinding.ActivityMainBinding
 import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
+import com.example.gh_coursework.ui.private_route.PrivateRoutesFragmentDirections
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 
@@ -32,7 +34,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         setContentView(binding.root)
         navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
-        //configCheckBox()
+        configNavigation()
         configFabButton()
         configCancelButton()
 
@@ -68,24 +70,36 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
         }
     }
 
-//    private fun configCheckBox() {
-//        val navController = navHostFragment.findNavController()
-//
-//        binding.checkboxRoutePlace.setOnCheckedChangeListener { _, b ->
-//            if (b) {
-//                navController.navigate(
-//                    PrivatePointsFragmentDirections
-//                        .actionPrivatePointsFragmentToPrivateRoutesFragment()
-//                )
-//            } else {
-//                navController
-//                    .navigate(
-//                        PrivatePointsFragmentDirections
-//                            .actionPrivatePointsFragmentToPrivateRoutesFragment()
-//                    )
-//            }
-//        }
-//    }
+    private fun configNavigation() {
+        val navController = navHostFragment.findNavController()
+
+        binding.mapRoutePointModSwitcher.setOnClickListener {
+            if (navController.currentDestination?.id == R.id.privatePointsFragment) {
+                if (!navController.popBackStack(R.id.privateRoutesFragment, false)) {
+                    Log.e("e", "routes not popped")
+                    navController.navigate(
+                        PrivatePointsFragmentDirections
+                            .actionPrivatePointsFragmentToPrivateRoutesFragment()
+                    )
+                }
+
+                binding.mapRoutePointModSwitcher.background =
+                    applicationContext.getDrawable(R.drawable.ic_routes)
+            } else if (navController.currentDestination?.id == R.id.privateRoutesFragment) {
+                if (!navController.popBackStack(R.id.privatePointsFragment, false)) {
+                    Log.e("e", "points not popped")
+                    navController
+                        .navigate(
+                            PrivateRoutesFragmentDirections
+                                .actionPrivateRoutesFragmentToPrivatePointsFragment()
+                        )
+                }
+
+                binding.mapRoutePointModSwitcher.background =
+                    applicationContext.getDrawable(R.drawable.ic_points)
+            }
+        }
+    }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         Toast.makeText(
