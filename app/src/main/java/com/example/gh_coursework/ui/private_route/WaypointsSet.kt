@@ -10,6 +10,10 @@ class WaypointsSet {
         waypoints.add(point)
     }
 
+    fun undoLastPointCreation() {
+        waypoints.remove(waypoints[waypoints.lastIndex])
+    }
+
     fun clear() {
         waypoints.clear()
     }

@@ -13,6 +13,8 @@ import com.example.gh_coursework.MapState
 import com.example.gh_coursework.OnAddButtonPressed
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
+import com.mapbox.api.directions.v5.models.DirectionsRoute
+import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxMap
@@ -24,7 +26,11 @@ import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
+import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
 import com.mapbox.navigation.base.options.NavigationOptions
+import com.mapbox.navigation.base.route.RouterCallback
+import com.mapbox.navigation.base.route.RouterFailure
+import com.mapbox.navigation.base.route.RouterOrigin
 import com.mapbox.navigation.core.MapboxNavigation
 import com.mapbox.navigation.core.MapboxNavigationProvider
 import com.mapbox.navigation.core.directions.session.RoutesObserver
@@ -45,13 +51,12 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private lateinit var mapboxMap: MapboxMap
     private lateinit var routeLineApi: MapboxRouteLineApi
     private lateinit var routeLineView: MapboxRouteLineView
-    private lateinit var routeHelper: RoutesHelper
     private val navigationLocationProvider = NavigationLocationProvider()
     private val addedWaypoints = WaypointsSet()
 
     private lateinit var center: Pair<Float, Float>
     private val onMapClickListener = OnMapClickListener { point ->
-        routeHelper.addWaypoint(point)
+        addWaypoint(point)
         return@OnMapClickListener true
     }
 
@@ -127,8 +132,6 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         initMapboxNavigation()
         initRouteLine()
 
-        routeHelper = RoutesHelper(addedWaypoints, mapboxNavigation, binding)
-
         view.viewTreeObserver?.addOnGlobalLayoutListener {
             center = Pair(view.width / 2f, view.height / 2f)
         }
@@ -137,6 +140,9 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         mapboxMap.loadStyleUri(Style.MAPBOX_STREETS)
     }
 
+    /*
+    Map config
+     */
     private fun configMap() {
         mapboxMap = binding.mapView.getMapboxMap()
         binding.mapView.location.apply {
@@ -189,6 +195,37 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         }
     }
 
+    private fun buildRoute() {
+        mapboxNavigation.requestRoutes(
+            RouteOptions.builder()
+                .applyDefaultNavigationOptions()
+                .coordinatesList(addedWaypoints.coordinatesList())
+                .build(),
+            object : RouterCallback {
+                override fun onRoutesReady(
+                    routes: List<DirectionsRoute>,
+                    routerOrigin: RouterOrigin
+                ) {
+                    setRoute(routes)
+                }
+
+                override fun onFailure(
+                    reasons: List<RouterFailure>,
+                    routeOptions: RouteOptions
+                ) {
+                    // no impl
+                }
+
+                override fun onCanceled(routeOptions: RouteOptions, routerOrigin: RouterOrigin) {
+                    // no impl
+                }
+            }
+        )
+    }
+
+    /*
+    Creating route point on screen
+     */
     override fun onAddButtonPressed() {
         executeClickAtPoint()
     }
@@ -206,5 +243,56 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         )
         binding.mapView.dispatchTouchEvent(downAction)
         binding.mapView.dispatchTouchEvent(upAction)
+    }
+
+    /*
+    Adding point to points list, route build and set up
+     */
+    private fun addWaypoint(destination: Point) {
+        addedWaypoints.addRegular(destination)
+
+        buildRoute()
+    }
+
+    fun setRoute(routes: List<DirectionsRoute>) {
+        mapboxNavigation.setRoutes(routes)
+
+        binding.resetRouteButton.apply {
+            show()
+            setOnClickListener {
+                resetCurrentRoute(mapboxNavigation)
+                hide()
+            }
+        }
+
+        binding.undoPointCreatingButton.apply {
+            show()
+            setOnClickListener {
+                undoPointCreating()
+
+                if (routes.isEmpty()) {
+                    hide()
+                }
+            }
+        }
+    }
+
+    /*
+    Reset route or undo point creation
+     */
+    private fun resetCurrentRoute(mapboxNavigation: MapboxNavigation) {
+        if (mapboxNavigation.getRoutes().isNotEmpty()) {
+            mapboxNavigation.setRoutes(emptyList())
+            addedWaypoints.clear()
+        }
+    }
+
+    private fun undoPointCreating() {
+        if (addedWaypoints.coordinatesList().size > 2) {
+            addedWaypoints.undoLastPointCreation()
+            buildRoute()
+        } else if (addedWaypoints.coordinatesList().size == 2) {
+            resetCurrentRoute(mapboxNavigation)
+        }
     }
 }
