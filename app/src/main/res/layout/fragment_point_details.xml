@@ -77,18 +77,26 @@
                 android:id="@+id/pointCaptionText"
                 android:layout_width="match_parent"
                 android:enabled="false"
+                android:textStyle="bold"
+                android:textColorHint="@color/black"
+                android:layout_margin="10dp"
+                android:background="@color/transparent"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textColor="@color/black"
-                android:lineSpacingExtra="8dp" />
+                android:lineSpacingExtra="2dp" />
             <EditText
                 android:id="@+id/pointDescriptionText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="18sp"
+                android:textSize="16sp"
+                android:layout_margin="10dp"
+                android:paddingBottom="10dp"
+                android:textColorHint="@color/black"
+                android:background="@color/transparent"
                 android:enabled="false"
                 android:textColor="@color/black"
-                android:lineSpacingExtra="8dp" />
+                android:lineSpacingExtra="2dp" />
 
         </LinearLayout>
 
@@ -101,4 +109,14 @@
         app:layout_anchor="@id/pointDetailsAppBar"
         app:layout_anchorGravity="bottom|right|end"
         />
+
+    <ImageButton
+        android:id="@+id/confirmEditButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_confirm"
+        android:layout_gravity="bottom|end"
+        android:background="@color/white"
+        android:layout_margin="20dp"
+        android:visibility="invisible"/>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
