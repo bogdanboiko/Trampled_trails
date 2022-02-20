@@ -59,8 +59,10 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
                 binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_confirm))
             }
 
-            (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
-                .switchMapMod(it)
+            if (navHostFragment.childFragmentManager.fragments[0] is OnAddButtonPressed) {
+                (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
+                    .switchMapMod(it)
+            }
         }
     }
 
