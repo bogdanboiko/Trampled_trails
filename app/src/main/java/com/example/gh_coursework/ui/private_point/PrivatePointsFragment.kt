@@ -17,6 +17,7 @@ import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
+import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
@@ -80,18 +81,9 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     }
 
     private fun executeClickAtPoint() {
-        val downTime = SystemClock.uptimeMillis()
-        val eventTime = SystemClock.uptimeMillis() + 10
-        val downAction = MotionEvent.obtain(
-            downTime, eventTime, MotionEvent.ACTION_DOWN,
-            center.first , center.second, 0
-        )
-        val upAction = MotionEvent.obtain(
-            downTime, eventTime, MotionEvent.ACTION_UP,
-            center.first , center.second, 0
-        )
-        binding.mapView.dispatchTouchEvent(downAction)
-        binding.mapView.dispatchTouchEvent(upAction)
+        val clickEvent = createOnMapClickEvent(center)
+        binding.mapView.dispatchTouchEvent(clickEvent.first)
+        binding.mapView.dispatchTouchEvent(clickEvent.second)
     }
 
     private fun addAnnotationToMap(point: Point) {
