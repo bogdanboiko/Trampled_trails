@@ -1,6 +1,7 @@
 package com.example.gh_coursework.ui.point_details
 
 import android.os.Bundle
+import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,7 +28,37 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.GONE)
+        configToolBar()
+        configConfirmButton()
     }
+
+    private fun configConfirmButton() {
+        with(binding) {
+            confirmEditButton.setOnClickListener {
+                pointCaptionText.isEnabled = false
+                pointCaptionText.isFocusable = false
+                pointDescriptionText.isEnabled = false
+                pointDescriptionText.isFocusable = false
+                confirmEditButton.visibility = View.INVISIBLE
+            }
+        }
+    }
+
+    private fun configToolBar() {
+        with(binding) {
+            pointDetailsEditButton.setOnClickListener {
+                pointCaptionText.isEnabled = true
+                pointCaptionText.hint = "Put in point caption..."
+                pointCaptionText.isFocusable = true
+                pointDescriptionText.isEnabled = true
+                pointDescriptionText.hint = "Put in point description..."
+                pointDescriptionText.isFocusable = true
+                confirmEditButton.visibility = View.VISIBLE
+            }
+        }
+    }
+
+
 
     override fun onDetach() {
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.VISIBLE)
