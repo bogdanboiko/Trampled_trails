@@ -29,8 +29,8 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.GONE)
     }
 
-    override fun onPause() {
+    override fun onDetach() {
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.VISIBLE)
-        super.onPause()
+        super.onDetach()
     }
 }
