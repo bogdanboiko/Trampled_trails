@@ -12,6 +12,7 @@ import android.view.View
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.databinding.ActivityMainBinding
+import com.example.gh_coursework.ui.point_details.OnSwitchActivityLayoutVisibility
 import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.PrivateRoutesFragmentDirections
 import com.mapbox.android.core.permissions.PermissionsListener
@@ -22,7 +23,7 @@ interface OnAddButtonPressed {
     fun onAddButtonPressed()
 }
 
-class MainActivity : AppCompatActivity(), PermissionsListener {
+class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityLayoutVisibility {
     private val permissionsManager = PermissionsManager(this)
     private lateinit var binding: ActivityMainBinding
     private var mapState: MapState = MapState.PRESENTATION
@@ -143,6 +144,14 @@ class MainActivity : AppCompatActivity(), PermissionsListener {
                 permissionsNeeded.toTypedArray(),
                 10
             )
+        }
+    }
+
+    override fun switchActivityLayoutState(state: Int) {
+        with(binding) {
+            bottomAppBar.visibility = state
+            fab.visibility = state
+            mapRoutePointModSwitcher.visibility = state
         }
     }
 }
