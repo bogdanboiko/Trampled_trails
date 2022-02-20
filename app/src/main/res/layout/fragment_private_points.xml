@@ -11,28 +11,22 @@
         android:layout_height="match_parent"
         mapbox:mapbox_cameraTargetLat="49.4421"
         mapbox:mapbox_cameraTargetLng="32.06"
-        mapbox:mapbox_cameraZoom="11.0">
+        mapbox:mapbox_cameraZoom="11.0"/>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/centralPointer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        android:visibility="invisible"
+        mapbox:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
+        mapbox:srcCompat="@drawable/ic_def_point" />
 
-            <ImageView
-                android:id="@+id/centralPointer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                mapbox:layout_constraintEnd_toEndOf="parent"
-                android:visibility="invisible"
-                mapbox:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
-                mapbox:srcCompat="@drawable/ic_def_point" />
-
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/centerGuideline"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.5"/>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.mapbox.maps.MapView>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/centerGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5"/>
 </androidx.constraintlayout.widget.ConstraintLayout>
