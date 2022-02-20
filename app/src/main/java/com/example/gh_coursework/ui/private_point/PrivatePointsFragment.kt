@@ -3,14 +3,13 @@ package com.example.gh_coursework.ui.private_point
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.os.SystemClock
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.OnAddButtonPressed
 import com.example.gh_coursework.R
@@ -113,13 +112,23 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
                 )
 
         ItemAnnotationViewBinding.bind(viewAnnotation).apply {
-            textNativeView.text = "lat=%.2f\nlon=%.2f".format(
-                pointAnnotation.geometry.latitude(),
-                pointAnnotation.geometry.longitude()
-            )
+            pointCaptionText.text = "Preview sample caption"
+            previewDescriptionText.text = "Preview point description"
+
+            viewDetailsButton.setOnClickListener {
+                findNavController().navigate(
+                    PrivatePointsFragmentDirections
+                    .actionPrivatePointsFragmentToPointDetailsFragment()
+                )
+            }
 
             closeNativeView.setOnClickListener {
                 viewAnnotationManager.removeViewAnnotation(viewAnnotation)
+            }
+
+            deleteButton.setOnClickListener {
+                viewAnnotationManager.removeViewAnnotation(viewAnnotation)
+                pointAnnotationManager.delete(pointAnnotation)
             }
         }
     }

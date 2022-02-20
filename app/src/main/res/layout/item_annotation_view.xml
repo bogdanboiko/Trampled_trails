@@ -28,7 +28,7 @@
         app:layout_constraintTop_toBottomOf="@id/pointCaptionText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/editButton">
+        app:layout_constraintBottom_toTopOf="@id/viewDetailsButton">
 
         <TextView
             android:id="@+id/previewDescriptionText"
@@ -56,7 +56,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/editButton"
+        android:id="@+id/viewDetailsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_view"
@@ -73,7 +73,7 @@
         android:src="@drawable/ic_delete"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/editButton"
+        app:layout_constraintStart_toEndOf="@id/viewDetailsButton"
         app:layout_constraintTop_toBottomOf="@id/descriptionScroll" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
