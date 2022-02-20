@@ -3,12 +3,13 @@ package com.example.gh_coursework
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.view.View
+import androidx.lifecycle.MutableLiveData
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.databinding.ActivityMainBinding
@@ -17,6 +18,7 @@ import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirection
 import com.example.gh_coursework.ui.private_route.PrivateRoutesFragmentDirections
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import kotlin.collections.ArrayList
 
 interface OnAddButtonPressed {
     fun switchMapMod(mapState: MapState)
@@ -24,9 +26,10 @@ interface OnAddButtonPressed {
 }
 
 class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityLayoutVisibility {
+    private lateinit var navController: NavController
     private val permissionsManager = PermissionsManager(this)
     private lateinit var binding: ActivityMainBinding
-    private var mapState: MapState = MapState.PRESENTATION
+    private var mapState = MutableLiveData(MapState.PRESENTATION)
     private lateinit var navHostFragment: NavHostFragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
         configNavigation()
         configFabButton()
         configCancelButton()
+        configMapStateObserver()
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()
@@ -46,25 +50,43 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
         }
     }
 
+    private fun configMapStateObserver() {
+        mapState.observe(this) {
+            if (it == MapState.PRESENTATION) {
+                binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_add))
+                binding.cancelButton.visibility = View.INVISIBLE
+            } else if (it == MapState.CREATOR) {
+                binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_confirm))
+            }
+
+            (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
+                .switchMapMod(it)
+        }
+    }
+
+    private fun configMapTypeSwitcherButton() {
+        if (navController.currentDestination?.id == R.id.privatePointsFragment) {
+            binding.mapRoutePointModSwitcher.background =
+                applicationContext.getDrawable(R.drawable.ic_points)
+        } else if (navController.currentDestination?.id == R.id.privateRoutesFragment) {
+            binding.mapRoutePointModSwitcher.background =
+                applicationContext.getDrawable(R.drawable.ic_routes)
+        }
+    }
+
     private fun configCancelButton() {
         binding.cancelButton.setOnClickListener {
-            mapState = MapState.PRESENTATION
-            (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
-                .switchMapMod(mapState)
-            binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_add))
+            mapState.value = MapState.PRESENTATION
             binding.cancelButton.visibility = View.INVISIBLE
         }
     }
 
     private fun configFabButton() {
         binding.fab.setOnClickListener {
-            if (mapState == MapState.PRESENTATION) {
-                binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_confirm))
-                mapState = MapState.CREATOR
-                (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
-                    .switchMapMod(mapState)
+            if (mapState.value == MapState.PRESENTATION) {
+                mapState.value = MapState.CREATOR
                 binding.cancelButton.visibility = View.VISIBLE
-            } else if (mapState == MapState.CREATOR) {
+            } else if (mapState.value == MapState.CREATOR) {
                 (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
                     .onAddButtonPressed()
             }
@@ -72,34 +94,37 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
     }
 
     private fun configNavigation() {
-        val navController = navHostFragment.findNavController()
+        navController = navHostFragment.findNavController()
 
         binding.mapRoutePointModSwitcher.setOnClickListener {
+
             if (navController.currentDestination?.id == R.id.privatePointsFragment) {
                 if (!navController.popBackStack(R.id.privateRoutesFragment, false)) {
-                    Log.e("e", "routes not popped")
                     navController.navigate(
                         PrivatePointsFragmentDirections
                             .actionPrivatePointsFragmentToPrivateRoutesFragment()
                     )
                 }
 
-                binding.mapRoutePointModSwitcher.background =
-                    applicationContext.getDrawable(R.drawable.ic_routes)
             } else if (navController.currentDestination?.id == R.id.privateRoutesFragment) {
                 if (!navController.popBackStack(R.id.privatePointsFragment, false)) {
-                    Log.e("e", "points not popped")
                     navController
                         .navigate(
                             PrivateRoutesFragmentDirections
                                 .actionPrivateRoutesFragmentToPrivatePointsFragment()
                         )
                 }
-
-                binding.mapRoutePointModSwitcher.background =
-                    applicationContext.getDrawable(R.drawable.ic_points)
             }
+
+            configMapTypeSwitcherButton()
+            mapState.value = MapState.PRESENTATION
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        configMapTypeSwitcherButton()
+        mapState.value = MapState.PRESENTATION
     }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
