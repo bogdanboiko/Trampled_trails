@@ -3,11 +3,11 @@ package com.example.gh_coursework
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import android.view.View
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -18,7 +18,6 @@ import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirection
 import com.example.gh_coursework.ui.private_route.PrivateRoutesFragmentDirections
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import kotlin.collections.ArrayList
 
 interface OnAddButtonPressed {
     fun switchMapMod(mapState: MapState)
@@ -179,6 +178,7 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
             bottomAppBar.visibility = state
             fab.visibility = state
             mapRoutePointModSwitcher.visibility = state
+            cancelButton.visibility = View.INVISIBLE
         }
     }
 }
