@@ -34,6 +34,7 @@
                 android:layout_height="0dp"
                 android:orientation="horizontal"
                 app:layout_constraintGuide_percent="0.5"/>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.mapbox.maps.MapView>
 
@@ -63,4 +64,26 @@
         app:icon="@drawable/ic_undo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <com.rm.rmswitch.RMSwitch
+        android:id="@+id/your_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:rotation="90"
+        android:scaleX="1.3"
+        android:scaleY="1.3"
+        app:checked="true"
+        app:enabled="true"
+        app:forceAspectRatio="false"
+        app:layout_constraintBottom_toTopOf="@+id/undoPointCreatingButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:switchBkgCheckedColor="@color/purple_200"
+        app:switchBkgNotCheckedColor="@color/purple_200"
+        app:switchDesign="android"
+        app:switchToggleCheckedColor="@color/teal_200"
+        app:switchToggleCheckedImage="@drawable/ic_pin_default_rotated"
+        app:switchToggleNotCheckedColor="@color/teal_200"
+        app:switchToggleNotCheckedImage="@drawable/ic_pin_text_rotated" />
 </androidx.constraintlayout.widget.ConstraintLayout>
