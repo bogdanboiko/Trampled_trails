@@ -4,10 +4,14 @@ import com.mapbox.geojson.Point
 
 class WaypointsSet {
 
-    private val waypoints = mutableListOf<Point>()
+    private val waypoints = mutableListOf<Waypoint>()
 
     fun addRegular(point: Point) {
-        waypoints.add(point)
+        waypoints.add(Waypoint(point, WaypointType.Regular))
+    }
+
+    fun addNamed(point: Point, name: String, description: String) {
+        waypoints.add(Waypoint(point, WaypointType.Named(name, description)))
     }
 
     fun undoLastPointCreation() {
@@ -19,6 +23,15 @@ class WaypointsSet {
     }
 
     fun coordinatesList(): List<Point> {
-        return waypoints
+        return waypoints.map {it.point}
     }
+
+    private sealed class WaypointType {
+        data class Named(
+            val title: String,
+            val description: String) : WaypointType()
+        object Regular : WaypointType()
+    }
+
+    private data class Waypoint(val point: Point, val type: WaypointType)
 }
