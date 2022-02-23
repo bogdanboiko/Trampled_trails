@@ -66,6 +66,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private val addedWaypoints = WaypointsSet()
 
     private lateinit var center: Pair<Float, Float>
+    @OptIn(MapboxExperimental::class)
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private val regularOnMapClickListener = OnMapClickListener { point ->
@@ -245,7 +246,6 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
                 .applyDefaultNavigationOptions()
                 .profile(PROFILE_WALKING)
                 .coordinatesList(addedWaypoints.coordinatesList())
-                .waypointNamesList(addedWaypoints.waypointsNames())
                 .build(),
             object : RouterCallback {
                 override fun onRoutesReady(
