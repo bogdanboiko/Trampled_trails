@@ -1,30 +1,41 @@
 package com.example.gh_coursework.ui.private_route
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
-import android.os.SystemClock
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.OnAddButtonPressed
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
+import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
+import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
+import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
+import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
-import com.mapbox.maps.MapboxMap
-import com.mapbox.maps.Style
+import com.mapbox.maps.*
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
+import com.mapbox.maps.plugin.annotation.annotations
+import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.viewannotation.ViewAnnotationManager
+import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
 import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
 import com.mapbox.navigation.base.options.NavigationOptions
@@ -55,8 +66,16 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private val addedWaypoints = WaypointsSet()
 
     private lateinit var center: Pair<Float, Float>
-    private val onMapClickListener = OnMapClickListener { point ->
-        addWaypoint(point)
+    @OptIn(MapboxExperimental::class)
+    private lateinit var viewAnnotationManager: ViewAnnotationManager
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private val regularOnMapClickListener = OnMapClickListener { point ->
+        addWaypoint(point, true)
+        return@OnMapClickListener true
+    }
+    private val namedOnMapClickListener = OnMapClickListener { point ->
+        addWaypoint(point, false)
+        addAnnotationToMap(point)
         return@OnMapClickListener true
     }
 
@@ -143,17 +162,24 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     /*
     Map config
      */
+    @OptIn(MapboxExperimental::class)
     private fun configMap() {
-        mapboxMap = binding.mapView.getMapboxMap()
+        mapboxMap = binding.mapView.getMapboxMap().also {
+            viewAnnotationManager = binding.mapView.viewAnnotationManager
+            it.loadStyleUri(Style.MAPBOX_STREETS)
+        }
+
         binding.mapView.location.apply {
             setLocationProvider(navigationLocationProvider)
             enabled = true
         }
+
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
     }
 
     private fun initMapboxNavigation() {
         mapboxNavigation = MapboxNavigationProvider.create(
-            NavigationOptions.Builder(activity!!.applicationContext)
+            NavigationOptions.Builder(requireActivity().applicationContext)
                 .accessToken(getString(R.string.mapbox_access_token))
                 .build()
         )
@@ -161,7 +187,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
 
     private fun initRouteLine() {
         val mapboxRouteLineOptions =
-            MapboxRouteLineOptions.Builder(activity!!.applicationContext)
+            MapboxRouteLineOptions.Builder(requireActivity().applicationContext)
                 .withRouteLineBelowLayerId("road-label")
                 .build()
         routeLineApi = MapboxRouteLineApi(mapboxRouteLineOptions)
@@ -188,10 +214,29 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     override fun switchMapMod(mapState: MapState) {
         if (mapState == MapState.CREATOR) {
             binding.centralPointer.visibility = View.VISIBLE
-            mapboxMap.addOnMapClickListener(onMapClickListener)
+
+            mapboxMap.addOnMapClickListener(regularOnMapClickListener)
+
+            binding.pointTypeSwitchButton.addSwitchObserver { _, isChecked ->
+                if (isChecked) {
+                    mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
+                    mapboxMap.addOnMapClickListener(regularOnMapClickListener)
+
+                    binding.centralPointer.setImageResource(R.drawable.ic_pin_default)
+                } else {
+                    mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
+                    mapboxMap.addOnMapClickListener(namedOnMapClickListener)
+
+                    binding.centralPointer.setImageResource(R.drawable.ic_pin_text)
+                }
+            }
         } else {
             binding.centralPointer.visibility = View.INVISIBLE
-            mapboxMap.removeOnMapClickListener(onMapClickListener)
+            binding.undoPointCreatingButton.visibility = View.INVISIBLE
+            binding.resetRouteButton.visibility = View.INVISIBLE
+
+            mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
+            mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
         }
     }
 
@@ -199,6 +244,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         mapboxNavigation.requestRoutes(
             RouteOptions.builder()
                 .applyDefaultNavigationOptions()
+                .profile(PROFILE_WALKING)
                 .coordinatesList(addedWaypoints.coordinatesList())
                 .build(),
             object : RouterCallback {
@@ -231,25 +277,20 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     }
 
     private fun executeClickAtPoint() {
-        val downTime = SystemClock.uptimeMillis()
-        val eventTime = SystemClock.uptimeMillis() + 10
-        val downAction = MotionEvent.obtain(
-            downTime, eventTime, MotionEvent.ACTION_DOWN,
-            center.first, center.second, 0
-        )
-        val upAction = MotionEvent.obtain(
-            downTime, eventTime, MotionEvent.ACTION_UP,
-            center.first, center.second, 0
-        )
-        binding.mapView.dispatchTouchEvent(downAction)
-        binding.mapView.dispatchTouchEvent(upAction)
+        val clickEvent = createOnMapClickEvent(center)
+        binding.mapView.dispatchTouchEvent(clickEvent.first)
+        binding.mapView.dispatchTouchEvent(clickEvent.second)
     }
 
     /*
     Adding point to points list, route build and set up
      */
-    private fun addWaypoint(destination: Point) {
-        addedWaypoints.addRegular(destination)
+    private fun addWaypoint(point: Point, isChecked: Boolean) {
+        if (isChecked) {
+            addedWaypoints.addRegular(point)
+        } else {
+            addedWaypoints.addNamed(point, "Name", "Description")
+        }
 
         buildRoute()
     }
@@ -285,6 +326,9 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             mapboxNavigation.setRoutes(emptyList())
             addedWaypoints.clear()
         }
+
+        binding.undoPointCreatingButton.visibility = View.INVISIBLE
+        binding.resetRouteButton.visibility = View.INVISIBLE
     }
 
     private fun undoPointCreating() {
@@ -295,4 +339,63 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             resetCurrentRoute(mapboxNavigation)
         }
     }
+
+    private fun addAnnotationToMap(point: Point) {
+        activity?.applicationContext?.let {
+            bitmapFromDrawableRes(it, R.drawable.ic_pin_text)?.let { image ->
+                pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
+                    prepareViewAnnotation(annotation)
+                    true
+                })
+
+                pointAnnotationManager.create(createAnnotationPoint(image, point))
+            }
+        }
+    }
+
+    @OptIn(MapboxExperimental::class)
+    private fun prepareViewAnnotation(pointAnnotation: PointAnnotation) {
+        val viewAnnotation =
+            viewAnnotationManager.getViewAnnotationByFeatureId(pointAnnotation.featureIdentifier)
+                ?: viewAnnotationManager.addViewAnnotation(
+                    resId = R.layout.item_annotation_view,
+                    options = viewAnnotationOptions {
+                        geometry(pointAnnotation.geometry)
+                        anchor(ViewAnnotationAnchor.BOTTOM)
+                        associatedFeatureId(pointAnnotation.featureIdentifier)
+                        offsetY(pointAnnotation.iconImageBitmap?.height)
+                    }
+                )
+
+        ItemAnnotationViewBinding.bind(viewAnnotation).apply {
+            pointCaptionText.text = "Preview sample caption"
+            previewDescriptionText.text = "Preview point description"
+
+            viewDetailsButton.setOnClickListener {
+                findNavController().navigate(
+                    PrivatePointsFragmentDirections
+                        .actionPrivatePointsFragmentToPointDetailsFragment()
+                )
+            }
+
+            closeNativeView.setOnClickListener {
+                viewAnnotationManager.removeViewAnnotation(viewAnnotation)
+            }
+
+            deleteButton.setOnClickListener {
+                viewAnnotationManager.removeViewAnnotation(viewAnnotation)
+                pointAnnotationManager.delete(pointAnnotation)
+            }
+        }
+    }
+
+    private fun createAnnotationPoint(bitmap: Bitmap, point: Point): PointAnnotationOptions {
+        return PointAnnotationOptions()
+            .withPoint(point)
+            .withIconImage(bitmap)
+            .withIconAnchor(IconAnchor.BOTTOM)
+    }
+
+    private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
+        convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
 }
