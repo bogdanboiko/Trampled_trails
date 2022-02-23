@@ -26,7 +26,9 @@
                 android:visibility="invisible"
                 mapbox:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
-                mapbox:srcCompat="@drawable/ic_def_point" />
+                android:scaleX="0.7"
+                android:scaleY="0.7"
+                mapbox:srcCompat="@drawable/ic_pin_default" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/centerGuideline"
@@ -66,7 +68,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.rm.rmswitch.RMSwitch
-        android:id="@+id/your_id"
+        android:id="@+id/pointTypeSwitchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="5dp"
