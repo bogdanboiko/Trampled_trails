@@ -28,7 +28,7 @@
                 app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
                 android:scaleX="0.7"
                 android:scaleY="0.7"
-                mapbox:srcCompat="@drawable/ic_pin_default" />
+                mapbox:srcCompat="@drawable/ic_pin_route" />
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/centerGuideline"
