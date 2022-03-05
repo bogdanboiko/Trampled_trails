@@ -36,9 +36,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         with(binding) {
             confirmEditButton.setOnClickListener {
                 pointCaptionText.isEnabled = false
-                pointCaptionText.isFocusable = false
                 pointDescriptionText.isEnabled = false
-                pointDescriptionText.isFocusable = false
                 confirmEditButton.visibility = View.INVISIBLE
             }
         }
@@ -48,11 +46,9 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         with(binding) {
             pointDetailsEditButton.setOnClickListener {
                 pointCaptionText.isEnabled = true
-                pointCaptionText.hint = "Put in point caption..."
-                pointCaptionText.isFocusable = true
                 pointDescriptionText.isEnabled = true
+                pointCaptionText.hint = "Put in point caption..."
                 pointDescriptionText.hint = "Put in point description..."
-                pointDescriptionText.isFocusable = true
                 confirmEditButton.visibility = View.VISIBLE
             }
         }
