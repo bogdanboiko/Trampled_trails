@@ -214,29 +214,35 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     override fun switchMapMod(mapState: MapState) {
         if (mapState == MapState.CREATOR) {
             binding.centralPointer.visibility = View.VISIBLE
+            binding.pointTypeSwitchButton.visibility = View.VISIBLE
 
-            mapboxMap.addOnMapClickListener(regularOnMapClickListener)
+            swapOnMapClickListener(binding.pointTypeSwitchButton.isChecked)
 
             binding.pointTypeSwitchButton.addSwitchObserver { _, isChecked ->
-                if (isChecked) {
-                    mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
-                    mapboxMap.addOnMapClickListener(regularOnMapClickListener)
-
-                    binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
-                } else {
-                    mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
-                    mapboxMap.addOnMapClickListener(namedOnMapClickListener)
-
-                    binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
-                }
+                swapOnMapClickListener(isChecked)
             }
         } else {
             binding.centralPointer.visibility = View.INVISIBLE
             binding.undoPointCreatingButton.visibility = View.INVISIBLE
             binding.resetRouteButton.visibility = View.INVISIBLE
+            binding.pointTypeSwitchButton.visibility = View.INVISIBLE
 
             mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
             mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
+        }
+    }
+
+    private fun swapOnMapClickListener(isChecked: Boolean) {
+        if (isChecked) {
+            mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
+            mapboxMap.addOnMapClickListener(regularOnMapClickListener)
+
+            binding.centralPointer.setImageResource(R.drawable.ic_pin_default)
+        } else {
+            mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
+            mapboxMap.addOnMapClickListener(namedOnMapClickListener)
+
+            binding.centralPointer.setImageResource(R.drawable.ic_pin_text)
         }
     }
 
