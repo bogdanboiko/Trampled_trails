@@ -85,7 +85,7 @@
         app:switchBkgNotCheckedColor="@color/purple_200"
         app:switchDesign="android"
         app:switchToggleCheckedColor="@color/teal_200"
-        app:switchToggleCheckedImage="@drawable/ic_pin_default_rotated"
+        app:switchToggleCheckedImage="@drawable/ic_pin_route_rotated"
         app:switchToggleNotCheckedColor="@color/teal_200"
-        app:switchToggleNotCheckedImage="@drawable/ic_pin_text_rotated" />
+        app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -21,7 +21,7 @@
         android:visibility="invisible"
         mapbox:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
-        mapbox:srcCompat="@drawable/ic_def_point" />
+        mapbox:srcCompat="@drawable/ic_pin_point" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/centerGuideline"

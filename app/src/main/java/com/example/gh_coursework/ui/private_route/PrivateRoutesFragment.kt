@@ -348,7 +348,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
 
     private fun addAnnotationToMap(point: Point) {
         activity?.applicationContext?.let {
-            bitmapFromDrawableRes(it, R.drawable.ic_pin_text)?.let { image ->
+            bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
                 pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
                     prepareViewAnnotation(annotation)
                     true
