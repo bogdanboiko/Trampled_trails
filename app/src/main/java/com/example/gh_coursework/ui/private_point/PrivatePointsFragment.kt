@@ -8,7 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.graphics.scale
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.MapState
@@ -30,7 +29,6 @@ import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
-import kotlin.math.roundToInt
 
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddButtonPressed {
     private lateinit var viewAnnotationManager: ViewAnnotationManager
@@ -120,7 +118,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections
-                    .actionPrivatePointsFragmentToPointDetailsFragment()
+                        .actionPrivatePointsFragmentToPointDetailsFragment()
                 )
             }
 
