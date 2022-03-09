@@ -19,7 +19,6 @@ import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
@@ -237,12 +236,12 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
             mapboxMap.addOnMapClickListener(regularOnMapClickListener)
 
-            binding.centralPointer.setImageResource(R.drawable.ic_pin_default)
+            binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
         } else {
             mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
             mapboxMap.addOnMapClickListener(namedOnMapClickListener)
 
-            binding.centralPointer.setImageResource(R.drawable.ic_pin_text)
+            binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
         }
     }
 
@@ -379,8 +378,8 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
 
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
-                    PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment()
+                    PrivateRoutesFragmentDirections
+                        .actionPrivateRoutesFragmentToPointDetailsFragment()
                 )
             }
 
