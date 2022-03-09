@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_privateRoutesFragment_to_privatePointsFragment"
             app:destination="@id/privatePointsFragment" />
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_pointDetailsFragment"
+            app:destination="@id/pointDetailsFragment" />
     </fragment>
     <fragment
         android:id="@+id/pointDetailsFragment"

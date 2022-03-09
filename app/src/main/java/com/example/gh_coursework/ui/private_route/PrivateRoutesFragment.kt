@@ -19,7 +19,6 @@ import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
@@ -214,29 +213,35 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     override fun switchMapMod(mapState: MapState) {
         if (mapState == MapState.CREATOR) {
             binding.centralPointer.visibility = View.VISIBLE
+            binding.pointTypeSwitchButton.visibility = View.VISIBLE
 
-            mapboxMap.addOnMapClickListener(regularOnMapClickListener)
+            swapOnMapClickListener(binding.pointTypeSwitchButton.isChecked)
 
             binding.pointTypeSwitchButton.addSwitchObserver { _, isChecked ->
-                if (isChecked) {
-                    mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
-                    mapboxMap.addOnMapClickListener(regularOnMapClickListener)
-
-                    binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
-                } else {
-                    mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
-                    mapboxMap.addOnMapClickListener(namedOnMapClickListener)
-
-                    binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
-                }
+                swapOnMapClickListener(isChecked)
             }
         } else {
             binding.centralPointer.visibility = View.INVISIBLE
             binding.undoPointCreatingButton.visibility = View.INVISIBLE
             binding.resetRouteButton.visibility = View.INVISIBLE
+            binding.pointTypeSwitchButton.visibility = View.INVISIBLE
 
             mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
             mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
+        }
+    }
+
+    private fun swapOnMapClickListener(isChecked: Boolean) {
+        if (isChecked) {
+            mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
+            mapboxMap.addOnMapClickListener(regularOnMapClickListener)
+
+            binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
+        } else {
+            mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
+            mapboxMap.addOnMapClickListener(namedOnMapClickListener)
+
+            binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
         }
     }
 
@@ -373,8 +378,8 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
 
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
-                    PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment()
+                    PrivateRoutesFragmentDirections
+                        .actionPrivateRoutesFragmentToPointDetailsFragment()
                 )
             }
 
