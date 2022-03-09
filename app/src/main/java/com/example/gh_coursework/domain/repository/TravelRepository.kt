@@ -11,7 +11,7 @@ interface TravelRepository {
     suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain)
     suspend fun addRoute(route: RouteDomain)
     suspend fun addRouteDetails(route: RouteDomain)
-    fun getPointOfInterestPreview(id: Int): Flow<PointPreviewDomain>
+    fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
     fun getRoutePreview(routeId: Int): Flow<List<RoutePointPreviewDomain>>
     fun getPointOfInterestDetails(id: Int): Flow<PointDomain>
     fun getRouteDetails(routeId: Int): Flow<RouteDomain>
