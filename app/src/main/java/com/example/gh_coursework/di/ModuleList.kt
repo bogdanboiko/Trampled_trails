@@ -5,10 +5,9 @@ val ModuleList = listOf(
     networkModule,
     retrofitModule,
     apiModule,
-    viewModelModule,
     localDataBaseModule,
     datasourceModule,
     repositoryModule,
     pointUseCasesModule,
-    routeUseCasesModule
+    viewModelModule
 )
