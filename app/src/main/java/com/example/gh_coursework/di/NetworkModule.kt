@@ -17,8 +17,6 @@ val networkModule = module {
     single {
         MoshiConverterFactory.create(get())
     }
-
-    TODO("Interceptor, okhttpclient")
 }
 
 val retrofitModule = module {
@@ -29,5 +27,4 @@ val retrofitModule = module {
 }
 
 val apiModule = module {
-    TODO("Service build")
 }

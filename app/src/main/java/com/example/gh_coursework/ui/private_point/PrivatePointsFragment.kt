@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.OnAddButtonPressed
@@ -17,6 +18,7 @@ import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
@@ -29,8 +31,11 @@ import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddButtonPressed {
+    private val viewModel: PointViewModel by viewModel()
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
@@ -38,6 +43,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     private lateinit var center: Pair<Float, Float>
     private val onMapClickListener = OnMapClickListener { point ->
         addAnnotationToMap(point)
+        viewModel.addPoint(PrivatePointModel(null, point.longitude(), point.latitude()))
         return@OnMapClickListener true
     }
 
@@ -51,6 +57,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configMap()
+        fetchPoints()
         view.viewTreeObserver?.addOnGlobalLayoutListener {
             center = Pair(view.width / 2f, view.height / 2f)
         }
@@ -63,6 +70,16 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
         }
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+    }
+
+    private fun fetchPoints() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.points.collect { data ->
+                data.forEach {
+                    addAnnotationToMap(Point.fromLngLat(it.x, it.y))
+                }
+            }
+        }
     }
 
     override fun switchMapMod(mapState: MapState) {

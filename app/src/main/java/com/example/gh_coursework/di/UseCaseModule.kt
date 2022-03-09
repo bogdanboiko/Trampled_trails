@@ -1,11 +1,18 @@
 package com.example.gh_coursework.di
 
+import com.example.gh_coursework.domain.repository.TravelRepository
+import com.example.gh_coursework.domain.usecase.AddPointPreviewUseCase
+import com.example.gh_coursework.domain.usecase.AddPointPreviewUseCaseImpl
+import com.example.gh_coursework.domain.usecase.GetPointsPreviewUseCase
+import com.example.gh_coursework.domain.usecase.GetPointsPreviewUseCaseImpl
 import org.koin.dsl.module
 
 val pointUseCasesModule = module {
-    TODO("points use cases")
-}
+    single<AddPointPreviewUseCase> {
+        AddPointPreviewUseCaseImpl(get())
+    }
 
-val routeUseCasesModule = module {
-    TODO("Routes use cases")
+    single<GetPointsPreviewUseCase> {
+        GetPointsPreviewUseCaseImpl(get())
+    }
 }
