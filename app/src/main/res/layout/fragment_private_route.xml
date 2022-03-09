@@ -25,9 +25,7 @@
                 mapbox:layout_constraintEnd_toEndOf="parent"
                 android:visibility="invisible"
                 mapbox:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
-                android:scaleX="0.7"
-                android:scaleY="0.7" />
+                app:layout_constraintBottom_toTopOf="@+id/centerGuideline"/>
 
             <androidx.constraintlayout.widget.Guideline
                 android:id="@+id/centerGuideline"
