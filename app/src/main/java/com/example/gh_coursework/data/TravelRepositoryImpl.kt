@@ -14,7 +14,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
     }
 
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
-        TODO("Not yet implemented")
+        localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
     override suspend fun addRoute(route: RouteDomain) {
@@ -25,9 +25,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         TODO("Not yet implemented")
     }
 
-    override fun getPointOfInterestPreview(id: Int): Flow<PointPreviewDomain> {
-        TODO("Not yet implemented")
-    }
+    override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()
 
     override fun getRoutePreview(routeId: Int): Flow<List<RoutePointPreviewDomain>> {
         TODO("Not yet implemented")
