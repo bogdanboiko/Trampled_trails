@@ -1,9 +1,6 @@
 package com.example.gh_coursework.data.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -14,4 +11,7 @@ abstract class PointPreviewDao {
 
     @Query("SELECT * FROM point_coordinates")
     abstract fun getPointPreview() : Flow<List<PointCoordinatesEntity>>
+
+    @Query("DELETE FROM point_coordinates WHERE id = :pointId")
+    abstract fun deletePoint(pointId: Int)
 }
