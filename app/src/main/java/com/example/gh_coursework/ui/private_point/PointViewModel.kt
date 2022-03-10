@@ -3,6 +3,7 @@ package com.example.gh_coursework.ui.private_point
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.AddPointPreviewUseCase
+import com.example.gh_coursework.domain.usecase.DeletePointUseCase
 import com.example.gh_coursework.domain.usecase.GetPointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.GetPointsPreviewUseCase
 import com.example.gh_coursework.ui.private_point.mapper.mapPointDetailsDomainToModel
@@ -18,7 +19,8 @@ import kotlinx.coroutines.launch
 class PointViewModel(
     private val addPointPreviewUseCase: AddPointPreviewUseCase,
     private val getPointsPreviewUseCase: GetPointsPreviewUseCase,
-    private val getPointDetailsUseCase: GetPointDetailsUseCase
+    private val getPointDetailsUseCase: GetPointDetailsUseCase,
+    private val deletePointUseCase: DeletePointUseCase
 ) : ViewModel() {
     val points =
         getPointsPreviewUseCase.invoke().map { pointList -> pointList.map(::mapPointDomainToModel) }
@@ -29,7 +31,13 @@ class PointViewModel(
         }
     }
 
-    fun getPointDetailsPreview(pointId: Int?): Flow<PrivatePointDetailsPreviewModel?> {
-        return getPointDetailsUseCase.invoke(pointId!!).map { details -> mapPointDetailsDomainToModel(details) }
+    fun getPointDetailsPreview(pointId: Int): Flow<PrivatePointDetailsPreviewModel?> {
+        return getPointDetailsUseCase.invoke(pointId).map { details -> mapPointDetailsDomainToModel(details) }
+    }
+
+    fun deletePoint(pointId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deletePointUseCase.invoke(pointId)
+        }
     }
 }

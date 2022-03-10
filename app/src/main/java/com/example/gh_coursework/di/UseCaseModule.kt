@@ -19,4 +19,8 @@ val pointUseCasesModule = module {
     single<AddPointDetailsUseCase> {
         AddPointDetailsUseCaseImpl(get())
     }
+
+    single<DeletePointUseCase> {
+        DeletePointUseCaseImpl(get())
+    }
 }

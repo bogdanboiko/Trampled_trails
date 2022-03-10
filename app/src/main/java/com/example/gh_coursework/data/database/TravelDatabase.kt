@@ -13,7 +13,7 @@ import com.example.gh_coursework.data.database.entity.RoutePointEntity
 @Database(entities = [PointCoordinatesEntity::class,
                      PointDetailsEntity::class,
                      RouteDetailsEntity::class,
-                     RoutePointEntity::class], version = 1)
+                     RoutePointEntity::class], version = 2)
 abstract class TravelDatabase: RoomDatabase() {
     abstract fun getPointPreviewDao(): PointPreviewDao
     abstract fun getRoutePreviewDao(): RoutePreviewDao
