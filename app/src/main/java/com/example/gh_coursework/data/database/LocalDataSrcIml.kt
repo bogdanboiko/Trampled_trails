@@ -18,8 +18,8 @@ import kotlinx.coroutines.flow.map
 class LocalDataSrcIml(private val pointDao: PointPreviewDao,
                       private val routeDao: RoutePreviewDao,
                       private val pointDetailsDao: PointDetailsDao) : TravelDatasource.Local {
-    override suspend fun addPointOfInterestDetails(poi: PointDetailsDomain) {
-        pointDetailsDao.addPointDetails(mapPointDetailsDomainToEntity(poi))
+    override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
+        pointDetailsDao.updateOrInsertPointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {

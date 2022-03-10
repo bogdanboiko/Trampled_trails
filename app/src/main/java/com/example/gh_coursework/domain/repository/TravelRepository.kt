@@ -7,7 +7,7 @@ import com.example.gh_coursework.domain.entity.RoutePointPreviewDomain
 import kotlinx.coroutines.flow.Flow
 
 interface TravelRepository {
-    suspend fun addPointOfInterestDetails(poi: PointDetailsDomain)
+    suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain)
     suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain)
     suspend fun addRoute(route: RouteDomain)
     suspend fun addRouteDetails(route: RouteDomain)

@@ -9,8 +9,8 @@ import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) : TravelRepository {
-    override suspend fun addPointOfInterestDetails(poi: PointDetailsDomain) {
-        localDataSrcIml.addPointOfInterestDetails(poi)
+    override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
+        localDataSrcIml.addOrUpdatePointOfInterestDetails(poi)
     }
 
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
