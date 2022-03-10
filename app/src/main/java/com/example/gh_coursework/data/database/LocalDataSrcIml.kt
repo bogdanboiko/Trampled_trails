@@ -34,6 +34,10 @@ class LocalDataSrcIml(private val pointDao: PointPreviewDao,
         TODO("Not yet implemented")
     }
 
+    override suspend fun deletePoint(pointId: Int) {
+        pointDao.deletePoint(pointId)
+    }
+
 
     override fun getPointOfInterestPreview() : Flow<List<PointPreviewDomain>> {
         return pointDao.getPointPreview().map { pointPreview -> pointPreview.map(::mapPointEntityToDomain) }

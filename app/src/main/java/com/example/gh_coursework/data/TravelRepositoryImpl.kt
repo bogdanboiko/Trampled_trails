@@ -17,6 +17,10 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
+    override suspend fun deletePoint(pointId: Int) {
+        localDataSrcIml.deletePoint(pointId)
+    }
+
     override suspend fun addRoute(route: RouteDomain) {
         TODO("Not yet implemented")
     }

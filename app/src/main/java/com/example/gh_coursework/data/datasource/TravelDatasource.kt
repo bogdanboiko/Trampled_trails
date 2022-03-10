@@ -12,6 +12,7 @@ interface TravelDatasource {
         suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain)
         suspend fun addRoute(route: RouteDomain)
         suspend fun addRouteDetails(route: RouteDomain)
+        suspend fun deletePoint(pointId: Int)
         fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
         fun getRoutePreview(routeId: Int): Flow<List<RoutePointPreviewDomain>>
         fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?>
