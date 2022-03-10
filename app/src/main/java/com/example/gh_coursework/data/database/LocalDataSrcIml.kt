@@ -44,7 +44,7 @@ class LocalDataSrcIml(private val pointDao: PointPreviewDao,
     }
 
 
-    override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain> {
+    override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?> {
         return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
     }
 

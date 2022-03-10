@@ -14,7 +14,7 @@ interface TravelDatasource {
         suspend fun addRouteDetails(route: RouteDomain)
         fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
         fun getRoutePreview(routeId: Int): Flow<List<RoutePointPreviewDomain>>
-        fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain>
+        fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?>
         fun getRouteDetails(routeId: Int): Flow<RouteDomain>
     }
 
