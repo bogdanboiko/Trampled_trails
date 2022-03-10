@@ -1,19 +1,26 @@
 package com.example.gh_coursework.ui.point_details
 
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.navArgs
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
+import com.example.gh_coursework.ui.point_details.entity.PointDetailsModel
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 interface OnSwitchActivityLayoutVisibility {
     fun switchActivityLayoutState(state: Int)
 }
 
 class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
+    private val arguments by navArgs<PointDetailsFragmentArgs>()
+    private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
 
     override fun onCreateView(
@@ -30,6 +37,18 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.GONE)
         configToolBar()
         configConfirmButton()
+        configData()
+    }
+
+    private fun configData() {
+        with(binding) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.pointDetails.collect {
+                    pointCaptionText.setText(it?.caption)
+                    pointDescriptionText.setText(it?.description)
+                }
+            }
+        }
     }
 
     private fun configConfirmButton() {
@@ -38,6 +57,14 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 pointCaptionText.isEnabled = false
                 pointDescriptionText.isEnabled = false
                 confirmEditButton.visibility = View.INVISIBLE
+                viewModel.addPointDetails(
+                    PointDetailsModel(
+                        arguments.pointId,
+                        "default",
+                        pointCaptionText.text.toString(),
+                        pointDescriptionText.text.toString()
+                    )
+                )
             }
         }
     }
@@ -53,7 +80,6 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
             }
         }
     }
-
 
 
     override fun onDetach() {

@@ -379,7 +379,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections
-                        .actionPrivateRoutesFragmentToPointDetailsFragment()
+                        .actionPrivateRoutesFragmentToPointDetailsFragment(0)
                 )
             }
 

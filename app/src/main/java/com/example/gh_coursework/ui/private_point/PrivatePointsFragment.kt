@@ -21,6 +21,8 @@ import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
+import com.google.gson.JsonElement
+import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
@@ -46,7 +48,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     private val onMapClickListener = OnMapClickListener { point ->
         val newPoint = PrivatePointModel(null, point.longitude(), point.latitude())
         viewModel.addPoint(newPoint)
-        addAnnotationToMap(newPoint)
         return@OnMapClickListener true
     }
 
@@ -106,12 +107,15 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     }
 
     private fun addAnnotationToMap(point: PrivatePointModel) {
+        Log.e("e", point.pointId.toString())
         activity?.applicationContext?.let {
             bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
                 pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
                     viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.getPointDetailsPreview(point.pointId).collect { details ->
-                            prepareViewAnnotation(annotation, details, point.pointId)
+                        viewModel.getPointDetailsPreview(annotation.getData()?.asInt).collect { details ->
+                            Log.e("e", point.pointId.toString())
+                            Log.e("e", details.toString())
+                            prepareViewAnnotation(annotation, details, annotation.getData()?.asInt)
                         }
                     }
 
@@ -122,7 +126,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
                     createAnnotationPoint(
                         image,
                         Point.fromLngLat(point.x, point.y)
-                    )
+                    ).withData(JsonPrimitive(point.pointId))
                 )
             }
         }
@@ -152,7 +156,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment()
+                        .actionPrivatePointsFragmentToPointDetailsFragment(pointId!!)
                 )
             }
 
