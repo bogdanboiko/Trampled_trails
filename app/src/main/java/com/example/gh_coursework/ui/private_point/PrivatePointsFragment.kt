@@ -3,6 +3,7 @@ package com.example.gh_coursework.ui.private_point
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
@@ -42,8 +44,9 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var center: Pair<Float, Float>
     private val onMapClickListener = OnMapClickListener { point ->
-        addAnnotationToMap(point)
-        viewModel.addPoint(PrivatePointModel(null, point.longitude(), point.latitude()))
+        val newPoint = PrivatePointModel(null, point.longitude(), point.latitude())
+        viewModel.addPoint(newPoint)
+        addAnnotationToMap(newPoint)
         return@OnMapClickListener true
     }
 
@@ -76,7 +79,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.points.collect { data ->
                 data.forEach {
-                    addAnnotationToMap(Point.fromLngLat(it.x, it.y))
+                    addAnnotationToMap(it)
                 }
             }
         }
@@ -102,20 +105,34 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
         binding.mapView.dispatchTouchEvent(clickEvent.second)
     }
 
-    private fun addAnnotationToMap(point: Point) {
+    private fun addAnnotationToMap(point: PrivatePointModel) {
         activity?.applicationContext?.let {
             bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
                 pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
-                    prepareViewAnnotation(annotation)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        viewModel.getPointDetailsPreview(point.pointId).collect { details ->
+                            prepareViewAnnotation(annotation, details, point.pointId)
+                        }
+                    }
+
                     true
                 })
 
-                pointAnnotationManager.create(createAnnotationPoint(image, point))
+                pointAnnotationManager.create(
+                    createAnnotationPoint(
+                        image,
+                        Point.fromLngLat(point.x, point.y)
+                    )
+                )
             }
         }
     }
 
-    private fun prepareViewAnnotation(pointAnnotation: PointAnnotation) {
+    private fun prepareViewAnnotation(
+        pointAnnotation: PointAnnotation,
+        details: PrivatePointDetailsPreviewModel?,
+        pointId: Int?
+    ) {
         val viewAnnotation =
             viewAnnotationManager.getViewAnnotationByFeatureId(pointAnnotation.featureIdentifier)
                 ?: viewAnnotationManager.addViewAnnotation(
@@ -129,8 +146,8 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
                 )
 
         ItemAnnotationViewBinding.bind(viewAnnotation).apply {
-            pointCaptionText.text = "Preview sample caption"
-            previewDescriptionText.text = "Preview point description"
+            pointCaptionText.text = details?.caption
+            previewDescriptionText.text = details?.description
 
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
