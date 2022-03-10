@@ -10,7 +10,7 @@ val datasourceModule = module {
    // TODO("Remote datasource impl")
 
     single<TravelDatasource.Local> {
-        LocalDataSrcIml(get(), get())
+        LocalDataSrcIml(get(), get(), get())
     }
 }
 
