@@ -1,11 +1,14 @@
 package com.example.gh_coursework.data.database
 
+import com.example.gh_coursework.data.database.dao.PointDetailsDao
 import com.example.gh_coursework.data.database.dao.PointPreviewDao
 import com.example.gh_coursework.data.database.dao.RoutePreviewDao
+import com.example.gh_coursework.data.database.mapper.mapPointDetailsDomainToEntity
+import com.example.gh_coursework.data.database.mapper.mapPointDetailsEntityToDomain
 import com.example.gh_coursework.data.database.mapper.mapPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.mapPointEntityToDomain
 import com.example.gh_coursework.data.datasource.TravelDatasource
-import com.example.gh_coursework.domain.entity.PointDomain
+import com.example.gh_coursework.domain.entity.PointDetailsDomain
 import com.example.gh_coursework.domain.entity.PointPreviewDomain
 import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.domain.entity.RoutePointPreviewDomain
@@ -13,9 +16,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class LocalDataSrcIml(private val pointDao: PointPreviewDao,
-                      private val routeDao: RoutePreviewDao) : TravelDatasource.Local {
-    override suspend fun addPointOfInterestDetails(poi: PointDomain) {
-        TODO("Not yet implemented")
+                      private val routeDao: RoutePreviewDao,
+                      private val pointDetailsDao: PointDetailsDao) : TravelDatasource.Local {
+    override suspend fun addPointOfInterestDetails(poi: PointDetailsDomain) {
+        pointDetailsDao.addPointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
@@ -40,8 +44,8 @@ class LocalDataSrcIml(private val pointDao: PointPreviewDao,
     }
 
 
-    override fun getPointOfInterestDetails(id: Int): Flow<PointDomain> {
-        TODO("Not yet implemented")
+    override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain> {
+        return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
     }
 
     override fun getRouteDetails(routeId: Int): Flow<RouteDomain> {

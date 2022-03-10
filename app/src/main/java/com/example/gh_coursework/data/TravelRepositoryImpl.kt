@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) : TravelRepository {
     override suspend fun addPointOfInterestDetails(poi: PointDetailsDomain) {
-        TODO("Not yet implemented")
+        localDataSrcIml.addPointOfInterestDetails(poi)
     }
 
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
@@ -31,9 +31,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         TODO("Not yet implemented")
     }
 
-    override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain> {
-        TODO("Not yet implemented")
-    }
+    override fun getPointOfInterestDetails(id: Int) = localDataSrcIml.getPointOfInterestDetails(id)
 
     override fun getRouteDetails(routeId: Int): Flow<RouteDomain> {
         TODO("Not yet implemented")
