@@ -21,7 +21,6 @@ import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
-import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
@@ -40,6 +39,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddButtonPressed {
     private val viewModel: PointViewModel by viewModel()
+    private var pointCoordinates = emptyList<PrivatePointModel>()
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
@@ -79,9 +79,11 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     private fun fetchPoints() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.points.collect { data ->
-                data.forEach {
+                data.minus(pointCoordinates).forEach {
                     addAnnotationToMap(it)
                 }
+
+                pointCoordinates = data
             }
         }
     }
@@ -107,36 +109,33 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     }
 
     private fun addAnnotationToMap(point: PrivatePointModel) {
-        Log.e("e", point.pointId.toString())
         activity?.applicationContext?.let {
             bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
-                pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        viewModel.getPointDetailsPreview(annotation.getData()?.asInt).collect { details ->
-                            Log.e("e", point.pointId.toString())
-                            Log.e("e", details.toString())
-                            prepareViewAnnotation(annotation, details, annotation.getData()?.asInt)
-                        }
-                    }
-
-                    true
-                })
-
                 pointAnnotationManager.create(
                     createAnnotationPoint(
                         image,
                         Point.fromLngLat(point.x, point.y)
                     ).withData(JsonPrimitive(point.pointId))
                 )
+
+                pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        annotation.getData()?.asInt?.let { pointId ->
+                            viewModel.getPointDetailsPreview(pointId).collect { details ->
+                                prepareViewAnnotation(annotation, details)
+                            }
+                        }
+                    }
+
+                    true
+                })
             }
         }
     }
 
     private fun prepareViewAnnotation(
         pointAnnotation: PointAnnotation,
-        details: PrivatePointDetailsPreviewModel?,
-        pointId: Int?
-    ) {
+        details: PrivatePointDetailsPreviewModel?) {
         val viewAnnotation =
             viewAnnotationManager.getViewAnnotationByFeatureId(pointAnnotation.featureIdentifier)
                 ?: viewAnnotationManager.addViewAnnotation(
@@ -156,7 +155,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment(pointId!!)
+                        .actionPrivatePointsFragmentToPointDetailsFragment(pointAnnotation.getData()?.asInt!!)
                 )
             }
 
@@ -165,6 +164,12 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
             }
 
             deleteButton.setOnClickListener {
+                    pointAnnotation.getData()?.asInt?.let { pointId ->
+                    viewModel.deletePoint(
+                        pointId
+                    )
+                }
+
                 viewAnnotationManager.removeViewAnnotation(viewAnnotation)
                 pointAnnotationManager.delete(pointAnnotation)
             }
