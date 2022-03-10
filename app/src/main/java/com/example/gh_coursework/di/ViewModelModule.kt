@@ -6,7 +6,7 @@ import org.koin.dsl.module
 
 val viewModelModule = module {
     viewModel {
-        PointViewModel(get(), get())
+        PointViewModel(get(), get(), get())
     }
 
     viewModel {
