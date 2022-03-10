@@ -1,7 +1,7 @@
 package com.example.gh_coursework.data
 
 import com.example.gh_coursework.data.datasource.TravelDatasource
-import com.example.gh_coursework.domain.entity.PointDomain
+import com.example.gh_coursework.domain.entity.PointDetailsDomain
 import com.example.gh_coursework.domain.entity.PointPreviewDomain
 import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.domain.entity.RoutePointPreviewDomain
@@ -9,7 +9,7 @@ import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) : TravelRepository {
-    override suspend fun addPointOfInterestDetails(poi: PointDomain) {
+    override suspend fun addPointOfInterestDetails(poi: PointDetailsDomain) {
         TODO("Not yet implemented")
     }
 
@@ -31,7 +31,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         TODO("Not yet implemented")
     }
 
-    override fun getPointOfInterestDetails(id: Int): Flow<PointDomain> {
+    override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain> {
         TODO("Not yet implemented")
     }
 
