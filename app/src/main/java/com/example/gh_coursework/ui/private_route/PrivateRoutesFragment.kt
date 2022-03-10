@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.OnAddButtonPressed
@@ -19,6 +20,9 @@ import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
+import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointModel
+import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
@@ -51,11 +55,16 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
+import kotlinx.coroutines.launch
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddButtonPressed {
 
     private lateinit var binding: FragmentPrivateRouteBinding
+
+    private val viewModel: RouteViewModel by viewModel()
+    private var pointCoordinates = emptyList<PrivateRoutePointModel>()
 
     private lateinit var mapboxNavigation: MapboxNavigation
     private lateinit var mapboxMap: MapboxMap
@@ -65,6 +74,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private val addedWaypoints = WaypointsSet()
 
     private lateinit var center: Pair<Float, Float>
+
     @OptIn(MapboxExperimental::class)
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var pointAnnotationManager: PointAnnotationManager
@@ -74,7 +84,8 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     }
     private val namedOnMapClickListener = OnMapClickListener { point ->
         addWaypoint(point, false)
-        addAnnotationToMap(point)
+        val newPoint = PrivateRoutePointModel(null, point.longitude(), point.latitude())
+        viewModel.addPoint(newPoint)
         return@OnMapClickListener true
     }
 
@@ -147,6 +158,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         super.onViewCreated(view, savedInstanceState)
 
         configMap()
+        fetchPoints()
         initMapboxNavigation()
         initRouteLine()
 
@@ -174,6 +186,18 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         }
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+    }
+
+    private fun fetchPoints() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.points.collect { data ->
+                data.minus(pointCoordinates).forEach {
+                    addAnnotationToMap(it)
+                }
+
+                pointCoordinates = data
+            }
+        }
     }
 
     private fun initMapboxNavigation() {
@@ -345,21 +369,36 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         }
     }
 
-    private fun addAnnotationToMap(point: Point) {
+    private fun addAnnotationToMap(point: PrivateRoutePointModel) {
         activity?.applicationContext?.let {
             bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
+                pointAnnotationManager.create(
+                    createAnnotationPoint(
+                        image,
+                        Point.fromLngLat(point.x, point.y)
+                    ).withData(JsonPrimitive(point.pointId))
+                )
+
                 pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
-                    prepareViewAnnotation(annotation)
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        annotation.getData()?.asInt?.let { pointId ->
+                            viewModel.getPointDetailsPreview(pointId).collect { details ->
+                                prepareViewAnnotation(annotation, details)
+                            }
+                        }
+                    }
+
                     true
                 })
-
-                pointAnnotationManager.create(createAnnotationPoint(image, point))
             }
         }
     }
 
     @OptIn(MapboxExperimental::class)
-    private fun prepareViewAnnotation(pointAnnotation: PointAnnotation) {
+    private fun prepareViewAnnotation(
+        pointAnnotation: PointAnnotation,
+        details: PrivateRoutePointDetailsPreviewModel?
+    ) {
         val viewAnnotation =
             viewAnnotationManager.getViewAnnotationByFeatureId(pointAnnotation.featureIdentifier)
                 ?: viewAnnotationManager.addViewAnnotation(
@@ -388,6 +427,11 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             }
 
             deleteButton.setOnClickListener {
+                pointAnnotation.getData()?.asInt?.let { pointId ->
+                    viewModel.deletePoint(
+                        pointId
+                    )
+                }
                 viewAnnotationManager.removeViewAnnotation(viewAnnotation)
                 pointAnnotationManager.delete(pointAnnotation)
             }
