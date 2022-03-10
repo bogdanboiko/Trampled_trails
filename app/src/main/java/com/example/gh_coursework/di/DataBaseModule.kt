@@ -18,4 +18,8 @@ val localDataBaseModule = module {
     single {
         get<TravelDatabase>().getRoutePreviewDao()
     }
+
+    single {
+        get<TravelDatabase>().getPointDetailsDao()
+    }
 }
