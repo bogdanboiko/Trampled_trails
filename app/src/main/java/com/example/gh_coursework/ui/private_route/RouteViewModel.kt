@@ -2,13 +2,9 @@ package com.example.gh_coursework.ui.private_route
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.AddPointPreviewUseCase
-import com.example.gh_coursework.domain.usecase.DeletePointUseCase
-import com.example.gh_coursework.domain.usecase.GetPointDetailsUseCase
-import com.example.gh_coursework.domain.usecase.GetPointsPreviewUseCase
-import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDetailsDomainToModel
-import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDomainToModel
-import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointModelToDomain
+import com.example.gh_coursework.domain.usecase.*
+import com.example.gh_coursework.ui.private_route.mapper.*
+import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointModel
 import kotlinx.coroutines.Dispatchers
@@ -17,17 +13,28 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class RouteViewModel(
+    getPointsPreviewUseCase: GetPointsPreviewUseCase,
+    getRoutesListUseCase: GetRoutesListUseCase,
     private val addPointPreviewUseCase: AddPointPreviewUseCase,
-    private val getPointsPreviewUseCase: GetPointsPreviewUseCase,
+    private val addRouteUseCase: AddRouteUseCase,
     private val getPointDetailsUseCase: GetPointDetailsUseCase,
     private val deletePointUseCase: DeletePointUseCase
 ) : ViewModel() {
-    val points =
-        getPointsPreviewUseCase.invoke().map { pointList -> pointList.map(::mapRoutePointDomainToModel) }
+
+    val points = getPointsPreviewUseCase.invoke()
+            .map { pointList -> pointList.map(::mapPointDomainToModel) }
+    val routes = getRoutesListUseCase.invoke()
+            .map { route -> route.map(::mapRouteDomainToModel) }
 
     fun addPoint(point: PrivateRoutePointModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            addPointPreviewUseCase.invoke(mapRoutePointModelToDomain(point))
+            addPointPreviewUseCase.invoke(mapPointModelToDomain(point))
+        }
+    }
+
+    fun addRoute(route: PrivateRouteModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            addRouteUseCase.invoke(mapRouteModelToDomainMapper(route))
         }
     }
 
