@@ -1,10 +1,10 @@
 package com.example.gh_coursework.data
 
+import com.example.gh_coursework.data.database.mapper.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.PointDetailsDomain
 import com.example.gh_coursework.domain.entity.PointPreviewDomain
 import com.example.gh_coursework.domain.entity.RouteDomain
-import com.example.gh_coursework.domain.entity.RoutePointPreviewDomain
 import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -22,22 +22,18 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
     }
 
     override suspend fun addRoute(route: RouteDomain) {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun addRouteDetails(route: RouteDomain) {
-        TODO("Not yet implemented")
+        localDataSrcIml.addRoute(route, route.coordinatesList.map(::mapRoutePointDomainToEntity))
     }
 
     override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()
 
-    override fun getRoutePreview(routeId: Int): Flow<List<RoutePointPreviewDomain>> {
+    override fun getRoutePreview(routeId: Int): Flow<List<PointPreviewDomain>> {
         TODO("Not yet implemented")
     }
 
     override fun getPointOfInterestDetails(id: Int) = localDataSrcIml.getPointOfInterestDetails(id)
 
-    override fun getRouteDetails(routeId: Int): Flow<RouteDomain> {
-        TODO("Not yet implemented")
-    }
+    override fun getRoute(): Flow<RouteDomain> = localDataSrcIml.getRoute()
+
+    override fun getRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getRoutesList()
 }
