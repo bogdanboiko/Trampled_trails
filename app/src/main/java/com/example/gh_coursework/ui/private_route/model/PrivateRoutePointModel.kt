@@ -1,6 +1,6 @@
-package com.example.gh_coursework.ui.private_point.model
+package com.example.gh_coursework.ui.private_route.model
 
-data class PrivatePointModel(
+data class PrivateRoutePointModel(
     val pointId: Int?,
     val x: Double,
     val y: Double,

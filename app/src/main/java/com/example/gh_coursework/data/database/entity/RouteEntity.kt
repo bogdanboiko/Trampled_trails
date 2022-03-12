@@ -5,14 +5,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "route_details")
-data class RouteDetailsEntity(
-    @PrimaryKey
+data class RouteEntity(
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "routeId")
-    val routeId: Int,
+    var routeId: Int?,
     @ColumnInfo(name = "routeName")
-    val name: String,
+    val name: String?,
     @ColumnInfo(name = "description")
-    val description: String,
+    val description: String?,
     @ColumnInfo(name = "rating")
     val rating: Double?
 )

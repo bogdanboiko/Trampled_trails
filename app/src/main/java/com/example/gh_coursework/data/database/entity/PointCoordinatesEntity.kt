@@ -12,5 +12,7 @@ data class PointCoordinatesEntity(
     @ColumnInfo(name = "x")
     val x: Double,
     @ColumnInfo(name = "y")
-    val y: Double
+    val y: Double,
+    @ColumnInfo(name = "isRoutePoint")
+    val isRoutePoint: Boolean
 )

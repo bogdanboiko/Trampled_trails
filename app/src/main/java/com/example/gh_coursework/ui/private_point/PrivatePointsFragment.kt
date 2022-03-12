@@ -3,7 +3,6 @@ package com.example.gh_coursework.ui.private_point
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,7 +45,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var center: Pair<Float, Float>
     private val onMapClickListener = OnMapClickListener { point ->
-        val newPoint = PrivatePointModel(null, point.longitude(), point.latitude())
+        val newPoint = PrivatePointModel(null, point.longitude(), point.latitude(), false)
         viewModel.addPoint(newPoint)
         return@OnMapClickListener true
     }
@@ -77,10 +76,18 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     }
 
     private fun fetchPoints() {
+        pointCoordinates.forEach {
+            if (!it.isRoutePoint) {
+                addAnnotationToMap(it)
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.points.collect { data ->
                 data.minus(pointCoordinates).forEach {
-                    addAnnotationToMap(it)
+                    if (!it.isRoutePoint) {
+                        addAnnotationToMap(it)
+                    }
                 }
 
                 pointCoordinates = data
