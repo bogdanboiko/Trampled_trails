@@ -20,6 +20,9 @@ import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.private_route.mapper.mapPointToPrivateRoutePointModel
+import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointModelToPoint
+import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointModel
 import com.google.gson.JsonPrimitive
@@ -84,7 +87,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     }
     private val namedOnMapClickListener = OnMapClickListener { point ->
         addWaypoint(point, false)
-        val newPoint = PrivateRoutePointModel(null, point.longitude(), point.latitude())
+        val newPoint = PrivateRoutePointModel(null, point.longitude(), point.latitude(), false)
         viewModel.addPoint(newPoint)
         return@OnMapClickListener true
     }
@@ -159,6 +162,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
 
         configMap()
         fetchPoints()
+        buildDefaultRoute()
         initMapboxNavigation()
         initRouteLine()
 
@@ -189,13 +193,31 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     }
 
     private fun fetchPoints() {
+        pointCoordinates.forEach {
+            if (!it.isRoutePoint) {
+                addAnnotationToMap(it)
+            }
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.points.collect { data ->
                 data.minus(pointCoordinates).forEach {
-                    addAnnotationToMap(it)
+                    if (!it.isRoutePoint) {
+                        addAnnotationToMap(it)
+                    }
                 }
 
                 pointCoordinates = data
+            }
+        }
+    }
+
+    private fun buildDefaultRoute() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.routes.collect { route ->
+                if (route.first().coordinatesList.isNotEmpty()) {
+                    buildRouteFromList((route.first().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
+                }
             }
         }
     }
@@ -245,6 +267,16 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
                 swapOnMapClickListener(isChecked)
             }
         } else {
+            if (addedWaypoints.getCoordinatesList().isNotEmpty()) {
+                viewModel.addRoute(
+                    PrivateRouteModel(
+                        null,
+                        addedWaypoints.getCoordinatesList().map(::mapPointToPrivateRoutePointModel)
+                    )
+                )
+                addedWaypoints.clear()
+            }
+
             binding.centralPointer.visibility = View.INVISIBLE
             binding.undoPointCreatingButton.visibility = View.INVISIBLE
             binding.resetRouteButton.visibility = View.INVISIBLE
@@ -274,7 +306,36 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             RouteOptions.builder()
                 .applyDefaultNavigationOptions()
                 .profile(PROFILE_WALKING)
-                .coordinatesList(addedWaypoints.coordinatesList())
+                .coordinatesList(addedWaypoints.getCoordinatesList())
+                .build(),
+            object : RouterCallback {
+                override fun onRoutesReady(
+                    routes: List<DirectionsRoute>,
+                    routerOrigin: RouterOrigin
+                ) {
+                    setRoute(routes)
+                }
+
+                override fun onFailure(
+                    reasons: List<RouterFailure>,
+                    routeOptions: RouteOptions
+                ) {
+                    // no impl
+                }
+
+                override fun onCanceled(routeOptions: RouteOptions, routerOrigin: RouterOrigin) {
+                    // no impl
+                }
+            }
+        )
+    }
+
+    private fun buildRouteFromList(coordinatesList: List<Point>) {
+        mapboxNavigation.requestRoutes(
+            RouteOptions.builder()
+                .applyDefaultNavigationOptions()
+                .profile(PROFILE_WALKING)
+                .coordinatesList(coordinatesList)
                 .build(),
             object : RouterCallback {
                 override fun onRoutesReady(
@@ -361,10 +422,10 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     }
 
     private fun undoPointCreating() {
-        if (addedWaypoints.coordinatesList().size > 2) {
+        if (addedWaypoints.getCoordinatesList().size > 2) {
             addedWaypoints.undoLastPointCreation()
             buildRoute()
-        } else if (addedWaypoints.coordinatesList().size == 2) {
+        } else if (addedWaypoints.getCoordinatesList().size == 2) {
             resetCurrentRoute(mapboxNavigation)
         }
     }
@@ -412,8 +473,8 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
                 )
 
         ItemAnnotationViewBinding.bind(viewAnnotation).apply {
-            pointCaptionText.text = "Preview sample caption"
-            previewDescriptionText.text = "Preview point description"
+            pointCaptionText.text = details?.caption
+            previewDescriptionText.text = details?.description
 
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
