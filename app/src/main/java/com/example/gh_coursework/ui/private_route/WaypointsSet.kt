@@ -22,7 +22,7 @@ class WaypointsSet {
         waypoints.clear()
     }
 
-    fun coordinatesList(): List<Point> {
+    fun getCoordinatesList(): List<Point> {
         return waypoints.map {it.point}
     }
 
