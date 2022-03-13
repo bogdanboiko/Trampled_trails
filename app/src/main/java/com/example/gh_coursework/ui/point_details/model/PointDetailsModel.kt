@@ -1,4 +1,4 @@
-package com.example.gh_coursework.ui.point_details.entity
+package com.example.gh_coursework.ui.point_details.model
 
 data class PointDetailsModel(
     val pointId: Int,

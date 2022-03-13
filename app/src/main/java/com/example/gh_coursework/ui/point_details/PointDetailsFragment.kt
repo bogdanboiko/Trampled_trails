@@ -1,5 +1,6 @@
 package com.example.gh_coursework.ui.point_details
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,9 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gh_coursework.R
+import com.example.gh_coursework.databinding.DialogTagBinding
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
-import com.example.gh_coursework.ui.point_details.entity.PointDetailsModel
+import com.example.gh_coursework.ui.point_details.adapter.TagAdapter
+import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -37,6 +41,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.GONE)
         configToolBar()
         configConfirmButton()
+        configTagButton()
         configData()
     }
 
@@ -72,6 +77,22 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         }
     }
 
+    private fun configTagButton() {
+        binding.addTagButton.setOnClickListener {
+            val builder = AlertDialog.Builder(context)
+            val dialogBinding = DialogTagBinding.inflate(layoutInflater)
+            val tagAdapter = TagAdapter()
+
+            dialogBinding.tagRecycler.apply {
+                adapter = tagAdapter
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            }
+
+            builder.setView(dialogBinding.root)
+            builder.create().show()
+        }
+    }
+
     private fun configToolBar() {
         with(binding) {
             pointDetailsEditButton.setOnClickListener {
@@ -84,7 +105,6 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
             }
         }
     }
-
 
     override fun onDetach() {
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.VISIBLE)

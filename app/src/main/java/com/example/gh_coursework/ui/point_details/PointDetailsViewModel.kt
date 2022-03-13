@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.AddPointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.GetPointDetailsUseCase
-import com.example.gh_coursework.ui.point_details.entity.PointDetailsModel
+import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.point_details.mapper.mapPointDetailsDomainToModel
 import com.example.gh_coursework.ui.point_details.mapper.mapPointDetailsModelToDomain
 import kotlinx.coroutines.Dispatchers

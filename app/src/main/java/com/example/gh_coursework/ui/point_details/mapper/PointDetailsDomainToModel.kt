@@ -1,7 +1,7 @@
 package com.example.gh_coursework.ui.point_details.mapper
 
 import com.example.gh_coursework.domain.entity.PointDetailsDomain
-import com.example.gh_coursework.ui.point_details.entity.PointDetailsModel
+import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 
 fun mapPointDetailsDomainToModel(details: PointDetailsDomain?): PointDetailsModel? {
     return if (details != null) {
