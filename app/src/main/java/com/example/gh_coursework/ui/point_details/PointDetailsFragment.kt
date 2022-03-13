@@ -57,6 +57,9 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 pointCaptionText.isEnabled = false
                 pointDescriptionText.isEnabled = false
                 confirmEditButton.visibility = View.INVISIBLE
+                addTagButton.visibility = View.INVISIBLE
+                pointCaptionText.hint = ""
+                pointDescriptionText.hint = ""
                 viewModel.addPointDetails(
                     PointDetailsModel(
                         arguments.pointId,
@@ -77,6 +80,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 pointCaptionText.hint = "Put in point caption..."
                 pointDescriptionText.hint = "Put in point description..."
                 confirmEditButton.visibility = View.VISIBLE
+                addTagButton.visibility = View.VISIBLE
             }
         }
     }
