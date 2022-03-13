@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "point_details", foreignKeys = [ForeignKey(entity = PointCoordinatesEntity::class,
         onDelete = CASCADE,
-        parentColumns = arrayOf("id"),
+        parentColumns = arrayOf("pointId"),
         childColumns = arrayOf("pointId"))])
 data class PointDetailsEntity(
     @PrimaryKey

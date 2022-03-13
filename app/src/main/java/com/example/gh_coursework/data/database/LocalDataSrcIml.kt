@@ -68,6 +68,6 @@ class LocalDataSrcIml(private val pointDao: PointPreviewDao,
     }
 
     override fun getRoutesList(): Flow<List<RouteDomain>> {
-        return routeDao.getRoutesResponse().map { (mapRouteResponseListToDomain(it)) }
+        return routeDao.getRoutesResponse().map { it.map { entity -> (mapRouteResponseListToDomain(entity)) }}
     }
 }
