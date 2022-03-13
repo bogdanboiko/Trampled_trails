@@ -74,6 +74,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private lateinit var mapboxMap: MapboxMap
     private lateinit var routeLineApi: MapboxRouteLineApi
     private lateinit var routeLineView: MapboxRouteLineView
+    private var mapState: MapState = MapState.PRESENTATION
     private val navigationLocationProvider = NavigationLocationProvider()
     private val addedWaypoints = WaypointsSet()
 
@@ -217,7 +218,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.routes.collect { route ->
                 if (route.isNotEmpty()) {
-                    if (route.first().coordinatesList.isNotEmpty()) {
+                    if (route.last().coordinatesList.isNotEmpty()) {
                         buildRouteFromList((route.first().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
                     }
                 }
@@ -260,6 +261,8 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     }
 
     override fun switchMapMod(mapState: MapState) {
+        this.mapState = mapState
+
         if (mapState == MapState.CREATOR) {
             binding.centralPointer.visibility = View.VISIBLE
             binding.pointTypeSwitchButton.visibility = View.VISIBLE
@@ -269,7 +272,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             binding.pointTypeSwitchButton.addSwitchObserver { _, isChecked ->
                 swapOnMapClickListener(isChecked)
             }
-        } else {
+        } else if (mapState == MapState.PRESENTATION) {
             if (addedWaypoints.getCoordinatesList().isNotEmpty()) {
                 viewModel.addRoute(
                     PrivateRouteModel(
@@ -391,21 +394,23 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     fun setRoute(routes: List<DirectionsRoute>) {
         mapboxNavigation.setRoutes(routes)
 
-        binding.resetRouteButton.apply {
-            show()
-            setOnClickListener {
-                resetCurrentRoute(mapboxNavigation)
-                hide()
-            }
-        }
-
-        binding.undoPointCreatingButton.apply {
-            show()
-            setOnClickListener {
-                undoPointCreating()
-
-                if (routes.isEmpty()) {
+        if (mapState == MapState.CREATOR) {
+            binding.resetRouteButton.apply {
+                show()
+                setOnClickListener {
+                    resetCurrentRoute(mapboxNavigation)
                     hide()
+                }
+            }
+
+            binding.undoPointCreatingButton.apply {
+                show()
+                setOnClickListener {
+                    undoPointCreating()
+
+                    if (routes.isEmpty()) {
+                        hide()
+                    }
                 }
             }
         }
