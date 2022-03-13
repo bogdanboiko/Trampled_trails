@@ -8,7 +8,7 @@ fun mapRouteDomainToModel(routeDomain: RouteDomain): PrivateRouteModel {
     val pointCoordinatesModelList = mutableListOf<PrivateRoutePointModel>()
 
     routeDomain.coordinatesList.forEach {
-        pointCoordinatesModelList.add(mapRoutePointDomainToModel(it))
+        pointCoordinatesModelList.add(mapPointDomainToModel(it))
     }
 
     return PrivateRouteModel(routeDomain.routeId, pointCoordinatesModelList)
