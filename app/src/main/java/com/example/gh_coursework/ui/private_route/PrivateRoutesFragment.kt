@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -215,8 +216,10 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private fun buildDefaultRoute() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.routes.collect { route ->
-                if (route.first().coordinatesList.isNotEmpty()) {
-                    buildRouteFromList((route.first().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
+                if (route.isNotEmpty()) {
+                    if (route.first().coordinatesList.isNotEmpty()) {
+                        buildRouteFromList((route.first().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
+                    }
                 }
             }
         }

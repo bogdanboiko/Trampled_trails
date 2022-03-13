@@ -28,8 +28,6 @@ abstract class RoutePreviewDao {
         insertRoutePointsList(coordinatesList)
     }
 
-    @Query("SELECT route_details.*, point_coordinates.* FROM route_details " +
-            "INNER JOIN routes_points ON routes_points.parentRouteId == route_details.routeId " +
-            "INNER JOIN point_coordinates ON point_coordinates.id == routes_points.pointId")
+    @Query("SELECT * FROM route_details")
     abstract fun getRoutesResponse(): Flow<List<RoutePreviewResponse>>
 }

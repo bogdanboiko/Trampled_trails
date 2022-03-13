@@ -10,7 +10,7 @@ fun mapRouteModelToDomainMapper(route: PrivateRouteModel): RouteDomain {
     val pointCoordinatesDomainList = mutableListOf<PointPreviewDomain>()
 
     route.coordinatesList.forEach {
-        pointCoordinatesDomainList.add(mapRoutePointModelToDomain(it))
+        pointCoordinatesDomainList.add(mapPointModelToDomain(it))
     }
 
     return RouteDomain(route.routeId, "test", "test", null, pointCoordinatesDomainList)

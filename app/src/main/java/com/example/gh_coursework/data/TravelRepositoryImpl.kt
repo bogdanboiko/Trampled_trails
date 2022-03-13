@@ -1,5 +1,6 @@
 package com.example.gh_coursework.data
 
+import com.example.gh_coursework.data.database.mapper.mapPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.PointDetailsDomain
@@ -22,7 +23,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
     }
 
     override suspend fun addRoute(route: RouteDomain) {
-        localDataSrcIml.addRoute(route, route.coordinatesList.map(::mapRoutePointDomainToEntity))
+        localDataSrcIml.addRoute(route, route.coordinatesList.map(::mapPointDomainToEntity))
     }
 
     override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()

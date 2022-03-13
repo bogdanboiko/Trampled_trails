@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "routes_points")
 data class RoutePointEntity(
-    @ColumnInfo(name = "parentRouteId")
+    @ColumnInfo(name = "routeId")
     var routeId: Long?,
     @PrimaryKey
     @ColumnInfo(name = "pointId")
