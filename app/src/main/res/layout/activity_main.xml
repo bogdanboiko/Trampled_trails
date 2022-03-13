@@ -31,7 +31,7 @@
         app:iconGravity="start"
         app:icon="@drawable/ic_close"
         android:layout_gravity="end"
-        android:elevation="2dp"/>
+        android:elevation="2dp" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment_activity_main"
@@ -39,38 +39,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_graph"/>
+        app:navGraph="@navigation/nav_graph" />
 
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/bottomAppBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:padding="0dp"
-        app:contentInsetStart="0dp"
-        app:contentInsetStartWithNavigation="0dp"
-        app:fabCradleMargin="10dp"
-        app:fabCradleRoundedCornerRadius="10dp"
-        app:fabCradleVerticalOffset="0dp">
-
-        <com.google.android.material.bottomnavigation.BottomNavigationView
-            android:id="@+id/bottomNavigationView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginEnd="20dp"
-            android:layout_marginStart="20dp"
-            android:background="@drawable/bottom_nav_color_transparent"
-            app:menu="@menu/bottom_nav_menu"
-            app:itemRippleColor="@color/transparent"/>
-    </com.google.android.material.bottomappbar.BottomAppBar>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:contentDescription="@string/app_name"
-        android:src="@drawable/ic_add"
-        app:fabCustomSize="75dp"
-        app:layout_anchor="@id/bottomAppBar"
-        app:maxImageSize="35dp" />
+    <include
+        android:id="@+id/bottomSheetDialogLayout"
+        layout="@layout/bottom_sheet_dialog" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
