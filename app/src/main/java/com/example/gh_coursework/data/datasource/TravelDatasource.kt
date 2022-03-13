@@ -19,6 +19,7 @@ interface TravelDatasource {
         fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?>
         fun getRoute(): Flow<RouteDomain>
         fun getRoutesList(): Flow<List<RouteDomain>>
+        fun getPointTagList(): Flow<List<PointTagDomain>>
     }
 
     interface Remote

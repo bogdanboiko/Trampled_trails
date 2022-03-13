@@ -77,6 +77,10 @@ class LocalDataSrcIml(
             .map { it.map { entity -> (mapRouteResponseListToDomain(entity)) } }
     }
 
+    override fun getPointTagList(): Flow<List<PointTagDomain>> {
+        return tagDao.getPointTags().map { tagList -> tagList.map(::mapPointTagEntityToDomain) }
+    }
+
     override suspend fun addPointTag(tag: PointTagDomain) {
         tagDao.addTag(mapTagDomainToEntity(tag))
     }

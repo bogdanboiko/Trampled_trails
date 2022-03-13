@@ -40,5 +40,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
 
     override fun getRoute(): Flow<RouteDomain> = localDataSrcIml.getRoute()
 
-    override fun getRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getRoutesList()
+    override fun getRoutesList() = localDataSrcIml.getRoutesList()
+
+    override fun getPointTagList() = localDataSrcIml.getPointTagList()
 }

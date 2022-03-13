@@ -35,4 +35,12 @@ val pointUseCasesModule = module {
     single<GetRouteUseCase> {
         GetRouteUseCaseImpl(get())
     }
+
+    single<AddPointTagUseCase> {
+        AddPointTagUseCaseImpl(get())
+    }
+
+    single<GetPointTagListUseCase> {
+        GetPointTagListUseCaseImpl(get())
+    }
 }

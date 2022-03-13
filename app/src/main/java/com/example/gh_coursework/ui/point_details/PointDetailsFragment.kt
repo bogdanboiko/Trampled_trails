@@ -14,6 +14,7 @@ import com.example.gh_coursework.databinding.DialogTagBinding
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
 import com.example.gh_coursework.ui.point_details.adapter.TagAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
+import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -23,6 +24,7 @@ interface OnSwitchActivityLayoutVisibility {
 }
 
 class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
+    private lateinit var tagAdapter: TagAdapter
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
@@ -81,7 +83,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         binding.addTagButton.setOnClickListener {
             val builder = AlertDialog.Builder(context)
             val dialogBinding = DialogTagBinding.inflate(layoutInflater)
-            val tagAdapter = TagAdapter()
+            tagAdapter = TagAdapter()
 
             dialogBinding.tagRecycler.apply {
                 adapter = tagAdapter
@@ -89,7 +91,17 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
             }
 
             dialogBinding.addTagButton.setOnClickListener {
-                viewModel
+                val tagName = dialogBinding.addTagEditText.text.toString()
+
+                if (tagName.isNotBlank() && tagName.isNotEmpty()) {
+                    viewModel.addTag(PointTagModel(null, tagName))
+                }
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.tags.collect {
+                    tagAdapter.setList(it)
+                }
             }
 
             builder.setView(dialogBinding.root)

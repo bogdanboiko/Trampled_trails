@@ -16,5 +16,5 @@ abstract class TagDao {
     abstract suspend fun addTagToPoint(pointTag: PointsTagsEntity)
 
     @Query("SELECT * FROM point_tag")
-    abstract fun getTags(): Flow<List<PointTagEntity>>
+    abstract fun getPointTags(): Flow<List<PointTagEntity>>
 }
