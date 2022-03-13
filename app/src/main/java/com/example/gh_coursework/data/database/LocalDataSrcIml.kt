@@ -3,6 +3,7 @@ package com.example.gh_coursework.data.database
 import com.example.gh_coursework.data.database.dao.PointDetailsDao
 import com.example.gh_coursework.data.database.dao.PointPreviewDao
 import com.example.gh_coursework.data.database.dao.RoutePreviewDao
+import com.example.gh_coursework.data.database.dao.TagDao
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.data.database.mapper.*
@@ -13,9 +14,12 @@ import com.example.gh_coursework.domain.entity.RouteDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class LocalDataSrcIml(private val pointDao: PointPreviewDao,
-                      private val routeDao: RoutePreviewDao,
-                      private val pointDetailsDao: PointDetailsDao) : TravelDatasource.Local {
+class LocalDataSrcIml(
+    private val pointDao: PointPreviewDao,
+    private val routeDao: RoutePreviewDao,
+    private val pointDetailsDao: PointDetailsDao,
+    private val tagDao: TagDao
+) : TravelDatasource.Local {
     override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
         pointDetailsDao.updateOrInsertPointDetails(mapPointDetailsDomainToEntity(poi))
     }
@@ -68,6 +72,7 @@ class LocalDataSrcIml(private val pointDao: PointPreviewDao,
     }
 
     override fun getRoutesList(): Flow<List<RouteDomain>> {
-        return routeDao.getRoutesResponse().map { it.map { entity -> (mapRouteResponseListToDomain(entity)) }}
+        return routeDao.getRoutesResponse()
+            .map { it.map { entity -> (mapRouteResponseListToDomain(entity)) } }
     }
 }

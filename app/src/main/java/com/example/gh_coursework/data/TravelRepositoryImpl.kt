@@ -1,7 +1,6 @@
 package com.example.gh_coursework.data
 
 import com.example.gh_coursework.data.database.mapper.mapPointDomainToEntity
-import com.example.gh_coursework.data.database.mapper.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.PointDetailsDomain
 import com.example.gh_coursework.domain.entity.PointPreviewDomain
