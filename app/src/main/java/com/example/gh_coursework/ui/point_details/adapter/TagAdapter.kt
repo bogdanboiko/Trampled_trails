@@ -1,24 +1,23 @@
 package com.example.gh_coursework.ui.point_details.adapter
 
-import android.annotation.SuppressLint
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.databinding.ItemTagBinding
-import com.example.gh_coursework.ui.point_details.model.TagModel
+import com.example.gh_coursework.ui.point_details.model.PointTagModel
 
 class TagAdapter : RecyclerView.Adapter<TagAdapter.TagViewHolder>() {
-    private var list = listOf<TagModel>()
+    private var list = listOf<PointTagModel>()
 
-    fun setList(tagList: List<TagModel>) {
+    fun setList(tagList: List<PointTagModel>) {
         list = tagList
         notifyDataSetChanged()
     }
 
     inner class TagViewHolder(private val binding: ItemTagBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(tagModel: TagModel) {
+        fun bind(tagModel: PointTagModel) {
             binding.tagCheckbox.text = tagModel.name
         }
     }

@@ -4,6 +4,7 @@ import com.example.gh_coursework.data.database.mapper.mapPointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.PointDetailsDomain
 import com.example.gh_coursework.domain.entity.PointPreviewDomain
+import com.example.gh_coursework.domain.entity.PointTagDomain
 import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,10 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
 
     override suspend fun addRoute(route: RouteDomain) {
         localDataSrcIml.addRoute(route, route.coordinatesList.map(::mapPointDomainToEntity))
+    }
+
+    override suspend fun addPointTag(tag: PointTagDomain) {
+        localDataSrcIml.addPointTag(tag)
     }
 
     override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()

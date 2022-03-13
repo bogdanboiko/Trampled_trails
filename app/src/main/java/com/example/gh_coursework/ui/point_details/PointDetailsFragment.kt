@@ -88,6 +88,10 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             }
 
+            dialogBinding.addTagButton.setOnClickListener {
+                viewModel
+            }
+
             builder.setView(dialogBinding.root)
             builder.create().show()
         }

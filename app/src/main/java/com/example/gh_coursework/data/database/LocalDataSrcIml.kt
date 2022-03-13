@@ -11,6 +11,7 @@ import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.PointDetailsDomain
 import com.example.gh_coursework.domain.entity.PointPreviewDomain
 import com.example.gh_coursework.domain.entity.RouteDomain
+import com.example.gh_coursework.domain.entity.PointTagDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -74,5 +75,9 @@ class LocalDataSrcIml(
     override fun getRoutesList(): Flow<List<RouteDomain>> {
         return routeDao.getRoutesResponse()
             .map { it.map { entity -> (mapRouteResponseListToDomain(entity)) } }
+    }
+
+    override suspend fun addPointTag(tag: PointTagDomain) {
+        tagDao.addTag(mapTagDomainToEntity(tag))
     }
 }
