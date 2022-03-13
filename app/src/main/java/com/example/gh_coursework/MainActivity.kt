@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -16,6 +17,7 @@ import com.example.gh_coursework.databinding.ActivityMainBinding
 import com.example.gh_coursework.ui.point_details.OnSwitchActivityLayoutVisibility
 import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.PrivateRoutesFragmentDirections
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 
@@ -25,18 +27,24 @@ interface OnAddButtonPressed {
 }
 
 class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityLayoutVisibility {
-    private lateinit var navController: NavController
-    private val permissionsManager = PermissionsManager(this)
+
     private lateinit var binding: ActivityMainBinding
-    private var mapState = MutableLiveData(MapState.PRESENTATION)
+
+    private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
+    private lateinit var behavior: BottomSheetBehavior<LinearLayout>
+    private val permissionsManager = PermissionsManager(this)
+    private var mapState = MutableLiveData(MapState.PRESENTATION)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
+        behavior = BottomSheetBehavior.from(binding.bottomSheetDialogLayout.bottomSheetDialog)
+
         configNavigation()
         configFabButton()
         configCancelButton()
@@ -52,16 +60,26 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
     private fun configMapStateObserver() {
         mapState.observe(this) {
             if (it == MapState.PRESENTATION) {
-                binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_add))
+                binding.bottomSheetDialogLayout.fab.setImageDrawable(
+                    applicationContext.getDrawable(
+                        R.drawable.ic_add
+                    )
+                )
                 binding.cancelButton.visibility = View.INVISIBLE
             } else if (it == MapState.CREATOR) {
-                binding.fab.setImageDrawable(applicationContext.getDrawable(R.drawable.ic_confirm))
+                binding.bottomSheetDialogLayout.fab.setImageDrawable(
+                    applicationContext.getDrawable(
+                        R.drawable.ic_confirm
+                    )
+                )
             }
 
             if (navHostFragment.childFragmentManager.fragments[0] is OnAddButtonPressed) {
                 (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
                     .switchMapMod(it)
             }
+
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -79,11 +97,12 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
         binding.cancelButton.setOnClickListener {
             mapState.value = MapState.PRESENTATION
             binding.cancelButton.visibility = View.INVISIBLE
+            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
     private fun configFabButton() {
-        binding.fab.setOnClickListener {
+        binding.bottomSheetDialogLayout.fab.setOnClickListener {
             if (mapState.value == MapState.PRESENTATION) {
                 mapState.value = MapState.CREATOR
                 binding.cancelButton.visibility = View.VISIBLE
@@ -175,8 +194,8 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
 
     override fun switchActivityLayoutState(state: Int) {
         with(binding) {
-            bottomAppBar.visibility = state
-            fab.visibility = state
+            binding.bottomSheetDialogLayout.bottomAppBar.visibility = state
+            binding.bottomSheetDialogLayout.fab.visibility = state
             mapRoutePointModSwitcher.visibility = state
             cancelButton.visibility = View.INVISIBLE
         }
