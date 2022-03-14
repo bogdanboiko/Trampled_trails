@@ -35,6 +35,10 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.removePointsTagsList(pointsTagsList)
     }
 
+    override suspend fun deletePointTag(tag: PointTagDomain) {
+        localDataSrcIml.deletePointTag(tag)
+    }
+
     override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()
 
     override fun getRoutePreview(routeId: Int): Flow<List<PointPreviewDomain>> {

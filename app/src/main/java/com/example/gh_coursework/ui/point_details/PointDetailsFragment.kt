@@ -2,6 +2,7 @@ package com.example.gh_coursework.ui.point_details
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.DialogTagBinding
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
+import com.example.gh_coursework.ui.point_details.adapter.DeleteTag
 import com.example.gh_coursework.ui.point_details.adapter.TagAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
@@ -24,7 +26,7 @@ interface OnSwitchActivityLayoutVisibility {
     fun switchActivityLayoutState(state: Int)
 }
 
-class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
+class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteTag {
     private lateinit var dialog: AlertDialog
     private lateinit var tagAdapter: TagAdapter
     private val arguments by navArgs<PointDetailsFragmentArgs>()
@@ -56,6 +58,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 viewModel.pointDetails.collect {
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
+                    Log.e("e", it.toString())
                     it?.tagList?.let { tagList -> tagAdapter.insertCheckedTagList(tagList) }
                 }
             }
@@ -83,7 +86,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     }
 
     private fun configDialog() {
-        tagAdapter = TagAdapter()
+        tagAdapter = TagAdapter(this)
 
         val builder = AlertDialog.Builder(context)
         val dialogBinding = DialogTagBinding.inflate(layoutInflater)
@@ -105,6 +108,8 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
             if (tagName.isNotBlank() && tagName.isNotEmpty()) {
                 viewModel.addTag(PointTagModel(null, tagName))
             }
+
+            dialogBinding.addTagEditText.text.clear()
         }
 
         dialogBinding.submitTagsButton.setOnClickListener {
@@ -154,5 +159,9 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     override fun onDetach() {
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.VISIBLE)
         super.onDetach()
+    }
+
+    override fun deleteTag(tag: PointTagModel) {
+        viewModel.deletePointTag(tag)
     }
 }

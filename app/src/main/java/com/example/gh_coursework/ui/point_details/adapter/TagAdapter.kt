@@ -9,7 +9,12 @@ import com.example.gh_coursework.databinding.ItemTagBinding
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import java.util.*
 
-class TagAdapter : ListAdapter<PointTagModel, TagAdapter.TagViewHolder>(Diff) {
+interface DeleteTag {
+    fun deleteTag(tag: PointTagModel)
+}
+
+class TagAdapter(private val deleteTag: DeleteTag) :
+    ListAdapter<PointTagModel, TagAdapter.TagViewHolder>(Diff) {
     private var checkedTagList = emptyList<PointTagModel>()
     private var _addTagList = LinkedList<PointTagModel>()
 
@@ -36,7 +41,8 @@ class TagAdapter : ListAdapter<PointTagModel, TagAdapter.TagViewHolder>(Diff) {
             binding.tagCheckbox.apply {
                 text = tagModel.name
 
-                isChecked = checkedTagList.contains(tagModel)
+                isChecked =
+                    (checkedTagList.contains(tagModel) && !removeTagList.contains(tagModel)) || addTagList.contains(tagModel)
 
                 setOnClickListener {
                     if (isChecked) {
@@ -53,6 +59,12 @@ class TagAdapter : ListAdapter<PointTagModel, TagAdapter.TagViewHolder>(Diff) {
                         }
                     }
                 }
+            }
+
+            binding.deleteTagButton.setOnClickListener {
+                deleteTag.deleteTag(tagModel)
+                addTagList.remove(tagModel)
+                removeTagList.remove(tagModel)
             }
         }
     }

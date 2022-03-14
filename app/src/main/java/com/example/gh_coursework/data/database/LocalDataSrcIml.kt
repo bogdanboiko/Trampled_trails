@@ -24,7 +24,8 @@ class LocalDataSrcIml(
     }
 
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
-        pointDao.addPointPreview(mapPointDomainToEntity(poi))
+        val pointId = pointDao.addPointPreview(mapPointDomainToEntity(poi))
+        addOrUpdatePointOfInterestDetails(PointDetailsDomain(pointId, emptyList(), "", ""))
     }
 
     override suspend fun addRoute(
@@ -89,5 +90,9 @@ class LocalDataSrcIml(
 
     override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
         tagDao.deletePointsTags(pointsTagsList.map(::mapPointsTagsDomainToEntity))
+    }
+
+    override suspend fun deletePointTag(tag: PointTagDomain) {
+        tagDao.deleteTag(mapTagDomainToEntity(tag))
     }
 }

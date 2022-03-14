@@ -51,4 +51,8 @@ val pointUseCasesModule = module {
     single<RemovePointsTagsListUseCase> {
         RemovePointsTagsListUseCaseImpl(get())
     }
+
+    single<DeletePointTagUseCase> {
+        DeletePointTagUseCaseImpl(get())
+    }
 }

@@ -20,7 +20,8 @@ class PointDetailsViewModel(
     private val addPointTagUseCase: AddPointTagUseCase,
     private val getPointTagListUseCase: GetPointTagListUseCase,
     private val addPointsTagsListUseCase: AddPointsTagsListUseCase,
-    private val removePointsTagsListUseCase: RemovePointsTagsListUseCase
+    private val removePointsTagsListUseCase: RemovePointsTagsListUseCase,
+    private val deletePointTagUseCase: DeletePointTagUseCase
 ) : ViewModel() {
     val pointDetails = getPointDetailsUseCase.invoke(pointId).map { mapPointDetailsDomainToModel(it) }
     val tags = getPointTagListUseCase.invoke().map { tagList -> tagList.map(::mapPointTagDomainToModel) }
@@ -46,6 +47,12 @@ class PointDetailsViewModel(
     fun removeTagsToPoint(tags: List<PointsTagsModel>) {
         viewModelScope.launch(Dispatchers.IO) {
             removePointsTagsListUseCase.invoke(tags.map(::mapPointsTagsModelToDomain))
+        }
+    }
+
+    fun deletePointTag(tag: PointTagModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deletePointTagUseCase.invoke(mapPointTagModelToDomain(tag))
         }
     }
 }
