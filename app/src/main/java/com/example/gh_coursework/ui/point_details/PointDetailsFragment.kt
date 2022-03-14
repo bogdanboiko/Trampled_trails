@@ -70,7 +70,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 viewModel.addPointDetails(
                     PointDetailsModel(
                         arguments.pointId,
-                        "default",
+                        emptyList(),
                         pointCaptionText.text.toString(),
                         pointDescriptionText.text.toString()
                     )

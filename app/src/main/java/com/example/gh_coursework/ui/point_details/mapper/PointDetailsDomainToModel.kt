@@ -5,7 +5,12 @@ import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 
 fun mapPointDetailsDomainToModel(details: PointDetailsDomain?): PointDetailsModel? {
     return if (details != null) {
-        PointDetailsModel(details.pointId, details.tag, details.caption, details.description)
+        PointDetailsModel(
+            details.pointId,
+            details.tagList.map(::mapPointTagDomainToModel),
+            details.caption,
+            details.description
+        )
     } else {
         null
     }

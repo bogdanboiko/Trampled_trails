@@ -2,6 +2,7 @@ package com.example.gh_coursework.data.database.dao
 
 import androidx.room.*
 import com.example.gh_coursework.data.database.entity.PointDetailsEntity
+import com.example.gh_coursework.data.database.response.PointDetailsResponse
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -13,7 +14,7 @@ abstract class PointDetailsDao {
     abstract suspend fun updatePointDetails(details: PointDetailsEntity)
 
     @Query("SELECT * FROM point_details WHERE pointId = :pointId")
-    abstract fun getPointDetails(pointId: Int): Flow<PointDetailsEntity?>
+    abstract fun getPointDetails(pointId: Int): Flow<PointDetailsResponse?>
 
     @Transaction
     open suspend fun updateOrInsertPointDetails(details: PointDetailsEntity) {

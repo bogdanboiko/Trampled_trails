@@ -15,8 +15,6 @@ data class PointDetailsEntity(
     @PrimaryKey
     @ColumnInfo(name = "pointId")
     val pointId: Int,
-    @ColumnInfo(name = "tag")
-    val tag: String,
     @ColumnInfo(name = "caption")
     val caption: String,
     @ColumnInfo(name = "description")
