@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -62,6 +61,10 @@ import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+interface RoutesListCallback {
+    fun getRoutesList(routes: MutableList<PrivateRouteModel>)
+}
+
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddButtonPressed {
 
@@ -70,13 +73,15 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private val viewModel: RouteViewModel by viewModel()
     private var pointCoordinates = emptyList<PrivateRoutePointModel>()
 
+    private val addedWaypoints = WaypointsSet()
+    private val routesList = mutableListOf<PrivateRouteModel>()
+
     private lateinit var mapboxNavigation: MapboxNavigation
     private lateinit var mapboxMap: MapboxMap
     private lateinit var routeLineApi: MapboxRouteLineApi
     private lateinit var routeLineView: MapboxRouteLineView
     private var mapState: MapState = MapState.PRESENTATION
     private val navigationLocationProvider = NavigationLocationProvider()
-    private val addedWaypoints = WaypointsSet()
 
     private lateinit var center: Pair<Float, Float>
 
@@ -218,9 +223,15 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.routes.collect { route ->
                 if (route.isNotEmpty()) {
-                    if (route.last().coordinatesList.isNotEmpty()) {
+                    if (route.first().coordinatesList.isNotEmpty()) {
                         buildRouteFromList((route.first().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
                     }
+
+                    route.minus(routesList).forEach {
+                        routesList.add(it)
+                    }
+
+                    (activity as RoutesListCallback).getRoutesList(routesList)
                 }
             }
         }
@@ -260,6 +271,21 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
         mapboxNavigation.onDestroy()
     }
 
+//    private fun createRoute() {
+//        if (addedWaypoints.getCoordinatesList().isNotEmpty()) {
+//            viewModel.addRoute(
+//                PrivateRouteModel(
+//                    null,
+//                    "",
+//                    "",
+//                    0.0,
+//                    addedWaypoints.getCoordinatesList().map(::mapPointToPrivateRoutePointModel)
+//                )
+//            )
+//            addedWaypoints.clear()
+//        }
+//    }
+
     override fun switchMapMod(mapState: MapState) {
         this.mapState = mapState
 
@@ -274,12 +300,19 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             }
         } else if (mapState == MapState.PRESENTATION) {
             if (addedWaypoints.getCoordinatesList().isNotEmpty()) {
-                viewModel.addRoute(
-                    PrivateRouteModel(
-                        null,
-                        addedWaypoints.getCoordinatesList().map(::mapPointToPrivateRoutePointModel)
-                    )
+                val route = PrivateRouteModel(
+                    null,
+                    "",
+                    "",
+                    0.0,
+                    addedWaypoints.getCoordinatesList().map(::mapPointToPrivateRoutePointModel),
+                    null
                 )
+
+                viewModel.addRoute(route)
+                routesList.add(route)
+
+                (activity as RoutesListCallback).getRoutesList(routesList)
                 addedWaypoints.clear()
             }
 
