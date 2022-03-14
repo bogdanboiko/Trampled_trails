@@ -58,6 +58,7 @@
             android:id="@+id/routesRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="200dp"
+            android:background="@color/map_background"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
