@@ -73,7 +73,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private val viewModel: RouteViewModel by viewModel()
     private var pointCoordinates = emptyList<PrivateRoutePointModel>()
 
-    private val addedWaypoints = WaypointsSet()
+    private val addedWaypoints: MutableList<Point> = mutableListOf()
     private val routesList = mutableListOf<PrivateRouteModel>()
 
     private lateinit var mapboxNavigation: MapboxNavigation
@@ -89,11 +89,11 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private val regularOnMapClickListener = OnMapClickListener { point ->
-        addWaypoint(point, true)
+        addWaypoint(point)
         return@OnMapClickListener true
     }
     private val namedOnMapClickListener = OnMapClickListener { point ->
-        addWaypoint(point, false)
+        addWaypoint(point)
         val newPoint = PrivateRoutePointModel(null, point.longitude(), point.latitude(), false)
         viewModel.addPoint(newPoint)
         return@OnMapClickListener true
@@ -299,13 +299,13 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
                 swapOnMapClickListener(isChecked)
             }
         } else if (mapState == MapState.PRESENTATION) {
-            if (addedWaypoints.getCoordinatesList().isNotEmpty()) {
+            if (addedWaypoints.isNotEmpty()) {
                 val route = PrivateRouteModel(
                     null,
                     "",
                     "",
                     0.0,
-                    addedWaypoints.getCoordinatesList().map(::mapPointToPrivateRoutePointModel),
+                    addedWaypoints.map(::mapPointToPrivateRoutePointModel),
                     null
                 )
 
@@ -345,7 +345,7 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
             RouteOptions.builder()
                 .applyDefaultNavigationOptions()
                 .profile(PROFILE_WALKING)
-                .coordinatesList(addedWaypoints.getCoordinatesList())
+                .coordinatesList(addedWaypoints)
                 .build(),
             object : RouterCallback {
                 override fun onRoutesReady(
@@ -414,12 +414,8 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     /*
     Adding point to points list, route build and set up
      */
-    private fun addWaypoint(point: Point, isChecked: Boolean) {
-        if (isChecked) {
-            addedWaypoints.addRegular(point)
-        } else {
-            addedWaypoints.addNamed(point, "Name", "Description")
-        }
+    private fun addWaypoint(point: Point) {
+        addedWaypoints.add(point)
 
         buildRoute()
     }
@@ -463,10 +459,10 @@ class PrivateRoutesFragment : Fragment(R.layout.fragment_private_route), OnAddBu
     }
 
     private fun undoPointCreating() {
-        if (addedWaypoints.getCoordinatesList().size > 2) {
-            addedWaypoints.undoLastPointCreation()
+        if (addedWaypoints.size > 2) {
+            addedWaypoints.remove(addedWaypoints[addedWaypoints.lastIndex])
             buildRoute()
-        } else if (addedWaypoints.getCoordinatesList().size == 2) {
+        } else if (addedWaypoints.size == 2) {
             resetCurrentRoute(mapboxNavigation)
         }
     }
