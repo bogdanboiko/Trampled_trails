@@ -100,7 +100,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
 
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.tags.collect {
-                    tagAdapter.setList(it)
+                    tagAdapter.submitList(it)
                 }
             }
 

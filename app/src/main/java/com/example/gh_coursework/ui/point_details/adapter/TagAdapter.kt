@@ -3,17 +3,13 @@ package com.example.gh_coursework.ui.point_details.adapter
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.databinding.ItemTagBinding
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
 
-class TagAdapter : RecyclerView.Adapter<TagAdapter.TagViewHolder>() {
-    private var list = listOf<PointTagModel>()
-
-    fun setList(tagList: List<PointTagModel>) {
-        list = tagList
-        notifyDataSetChanged()
-    }
+class TagAdapter : ListAdapter<PointTagModel, TagAdapter.TagViewHolder>(Diff) {
 
     inner class TagViewHolder(private val binding: ItemTagBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -23,7 +19,6 @@ class TagAdapter : RecyclerView.Adapter<TagAdapter.TagViewHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagViewHolder {
-        Log.e("e", "e")
         return TagViewHolder(
             ItemTagBinding.inflate(
                 LayoutInflater.from(parent.context),
@@ -34,10 +29,16 @@ class TagAdapter : RecyclerView.Adapter<TagAdapter.TagViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: TagViewHolder, position: Int) {
-        holder.bind(list[position])
+        holder.bind(currentList[position])
     }
 
-    override fun getItemCount(): Int {
-        return list.size
+    object Diff : DiffUtil.ItemCallback<PointTagModel>() {
+        override fun areItemsTheSame(oldItem: PointTagModel, newItem: PointTagModel): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(oldItem: PointTagModel, newItem: PointTagModel): Boolean {
+            return oldItem.tagId == newItem.tagId && oldItem.name == newItem.name
+        }
     }
 }
