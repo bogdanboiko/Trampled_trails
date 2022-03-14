@@ -17,6 +17,9 @@ import com.example.gh_coursework.databinding.ActivityMainBinding
 import com.example.gh_coursework.ui.point_details.OnSwitchActivityLayoutVisibility
 import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.PrivateRoutesFragmentDirections
+import com.example.gh_coursework.ui.private_route.RoutesListAdapter
+import com.example.gh_coursework.ui.private_route.RoutesListCallback
+import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
@@ -26,9 +29,14 @@ interface OnAddButtonPressed {
     fun onAddButtonPressed()
 }
 
-class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityLayoutVisibility {
+class MainActivity :
+    AppCompatActivity(),
+    PermissionsListener,
+    OnSwitchActivityLayoutVisibility,
+    RoutesListCallback {
 
     private lateinit var binding: ActivityMainBinding
+    private val routesListAdapter = RoutesListAdapter()
 
     private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
@@ -46,14 +54,44 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
         behavior = BottomSheetBehavior.from(binding.bottomSheetDialogLayout.bottomSheetDialog)
 
         configNavigation()
-        configFabButton()
-        configCancelButton()
         configMapStateObserver()
+        configMapTypeSwitcherButton()
+        configCancelButton()
+        configFabButton()
+        configRecycler()
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()
         } else {
             permissionsManager.requestLocationPermissions(this)
+        }
+    }
+
+    private fun configNavigation() {
+        navController = navHostFragment.findNavController()
+
+        binding.mapRoutePointModSwitcher.setOnClickListener {
+
+            if (navController.currentDestination?.id == R.id.privatePointsFragment) {
+                if (!navController.popBackStack(R.id.privateRoutesFragment, false)) {
+                    navController.navigate(
+                        PrivatePointsFragmentDirections
+                            .actionPrivatePointsFragmentToPrivateRoutesFragment()
+                    )
+                }
+
+            } else if (navController.currentDestination?.id == R.id.privateRoutesFragment) {
+                if (!navController.popBackStack(R.id.privatePointsFragment, false)) {
+                    navController
+                        .navigate(
+                            PrivateRoutesFragmentDirections
+                                .actionPrivateRoutesFragmentToPrivatePointsFragment()
+                        )
+                }
+            }
+
+            configMapTypeSwitcherButton()
+            mapState.value = MapState.PRESENTATION
         }
     }
 
@@ -113,31 +151,9 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
         }
     }
 
-    private fun configNavigation() {
-        navController = navHostFragment.findNavController()
-
-        binding.mapRoutePointModSwitcher.setOnClickListener {
-
-            if (navController.currentDestination?.id == R.id.privatePointsFragment) {
-                if (!navController.popBackStack(R.id.privateRoutesFragment, false)) {
-                    navController.navigate(
-                        PrivatePointsFragmentDirections
-                            .actionPrivatePointsFragmentToPrivateRoutesFragment()
-                    )
-                }
-
-            } else if (navController.currentDestination?.id == R.id.privateRoutesFragment) {
-                if (!navController.popBackStack(R.id.privatePointsFragment, false)) {
-                    navController
-                        .navigate(
-                            PrivateRoutesFragmentDirections
-                                .actionPrivateRoutesFragmentToPrivatePointsFragment()
-                        )
-                }
-            }
-
-            configMapTypeSwitcherButton()
-            mapState.value = MapState.PRESENTATION
+    private fun configRecycler() {
+        binding.bottomSheetDialogLayout.routesRecyclerView.apply {
+            adapter = routesListAdapter
         }
     }
 
@@ -199,6 +215,10 @@ class MainActivity : AppCompatActivity(), PermissionsListener, OnSwitchActivityL
             mapRoutePointModSwitcher.visibility = state
             cancelButton.visibility = View.INVISIBLE
         }
+    }
+
+    override fun getRoutesList(routes: MutableList<PrivateRouteModel>) {
+        routesListAdapter.currentList = routes
     }
 }
 
