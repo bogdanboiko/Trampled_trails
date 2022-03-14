@@ -36,6 +36,6 @@
         tools:layout="@layout/fragment_point_details">
         <argument
             android:name="pointId"
-            app:argType="integer" />
+            app:argType="long" />
     </fragment>
 </navigation>
