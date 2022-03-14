@@ -162,7 +162,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
             viewDetailsButton.setOnClickListener {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment(pointAnnotation.getData()?.asInt!!)
+                        .actionPrivatePointsFragmentToPointDetailsFragment(pointAnnotation.getData()?.asLong!!)
                 )
             }
 

@@ -47,7 +47,7 @@
                     android:layout_gravity="end"
                     android:src="@drawable/ic_edit"
                     android:background="@color/transparent"
-                    android:layout_marginEnd="20dp"
+                    android:padding="20dp"
                     />
 
                 <ImageButton
@@ -57,8 +57,7 @@
                     android:layout_gravity="end"
                     android:src="@drawable/ic_image"
                     android:background="@color/transparent"
-                    android:layout_marginEnd="20dp"
-                    />
+                    android:padding="20dp" />
 
             </Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -67,6 +66,7 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="60dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -110,13 +110,29 @@
         app:layout_anchorGravity="bottom|right|end"
         />
 
+    <RelativeLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="invisible"
+        android:background="@color/white">
     <ImageButton
         android:id="@+id/confirmEditButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_confirm"
-        android:layout_gravity="bottom|end"
+        android:layout_alignParentEnd="true"
         android:background="@color/white"
-        android:layout_margin="20dp"
-        android:visibility="invisible"/>
+        android:padding="20dp" />
+
+        <Button
+            android:id="@+id/addTagButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableStart="@drawable/ic_tag"
+            android:text="add tag"
+            app:iconGravity="start" />
+    </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

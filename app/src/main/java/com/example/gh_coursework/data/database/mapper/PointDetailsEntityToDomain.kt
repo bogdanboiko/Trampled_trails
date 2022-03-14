@@ -1,11 +1,18 @@
 package com.example.gh_coursework.data.database.mapper
 
-import com.example.gh_coursework.data.database.entity.PointDetailsEntity
+import com.example.gh_coursework.data.database.response.PointDetailsResponse
 import com.example.gh_coursework.domain.entity.PointDetailsDomain
 
-fun mapPointDetailsEntityToDomain(details: PointDetailsEntity?): PointDetailsDomain? {
+fun mapPointDetailsEntityToDomain(details: PointDetailsResponse?): PointDetailsDomain? {
     return if (details != null) {
-        PointDetailsDomain(details.pointId, details.tag, details.caption, details.description)
+        with(details.pointDetails) {
+            PointDetailsDomain(
+                pointId,
+                details.tagList.map(::mapPointTagEntityToDomain),
+                caption,
+                description
+            )
+        }
     } else {
         null
     }
