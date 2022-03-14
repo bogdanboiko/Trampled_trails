@@ -110,23 +110,29 @@
         app:layout_anchorGravity="bottom|right|end"
         />
 
+    <RelativeLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="invisible"
+        android:background="@color/white">
     <ImageButton
         android:id="@+id/confirmEditButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_confirm"
-        android:layout_gravity="bottom|end"
+        android:layout_alignParentEnd="true"
         android:background="@color/white"
-        android:padding="20dp"
-        android:visibility="invisible"/>
+        android:padding="20dp" />
 
-    <Button
-        android:id="@+id/addTagButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:drawableStart="@drawable/ic_tag"
-        android:layout_gravity="bottom"
-        app:iconGravity="start"
-        android:text="add tag"
-        android:visibility="invisible"/>
+        <Button
+            android:id="@+id/addTagButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:drawableStart="@drawable/ic_tag"
+            android:text="add tag"
+            app:iconGravity="start" />
+    </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

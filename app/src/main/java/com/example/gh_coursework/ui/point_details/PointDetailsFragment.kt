@@ -63,8 +63,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
             confirmEditButton.setOnClickListener {
                 pointCaptionText.isEnabled = false
                 pointDescriptionText.isEnabled = false
-                confirmEditButton.visibility = View.INVISIBLE
-                addTagButton.visibility = View.INVISIBLE
+                bottomBar.visibility = View.INVISIBLE
                 pointCaptionText.hint = ""
                 pointDescriptionText.hint = ""
                 viewModel.addPointDetails(
@@ -116,8 +115,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 pointDescriptionText.isEnabled = true
                 pointCaptionText.hint = "Put in point caption..."
                 pointDescriptionText.hint = "Put in point description..."
-                confirmEditButton.visibility = View.VISIBLE
-                addTagButton.visibility = View.VISIBLE
+                bottomBar.visibility = View.VISIBLE
             }
         }
     }
