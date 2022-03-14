@@ -9,38 +9,53 @@
         android:layout_width="0dp"
         android:textColor="@color/black"
         android:textColorHint="@color/black"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:hint="set tag name"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/addTagButton"
-        app:layout_constraintBottom_toTopOf="@+id/tagRecycler"/>
+        app:layout_constraintBottom_toTopOf="@+id/topGuideline"/>
     <ImageButton
         app:layout_constraintStart_toEndOf="@+id/addTagEditText"
-        app:layout_constraintTop_toTopOf="@id/addTagEditText"
-        app:layout_constraintBottom_toBottomOf="@id/addTagEditText"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/topGuideline"
         app:layout_constraintEnd_toEndOf="parent"
         android:id="@+id/addTagButton"
         android:layout_width="50dp"
         android:background="@color/white"
         android:layout_height="0dp"
+        android:padding="10dp"
         android:src="@drawable/ic_confirm"
         />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/topGuideline"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.07"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tagRecycler"
         android:layout_width="0dp"
-        android:layout_height="200dp"
-        app:layout_constraintTop_toBottomOf="@id/addTagEditText"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/topGuideline"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@+id/submitTagsButton"/>
+        app:layout_constraintBottom_toTopOf="@+id/bottomGuideline"/>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/bottomGuideline"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.9"/>
     <Button
         android:id="@+id/submitTagsButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit"
-        app:layout_constraintTop_toBottomOf="@+id/tagRecycler"
+        app:layout_constraintTop_toBottomOf="@+id/bottomGuideline"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="20dp"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_margin="10dp"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
