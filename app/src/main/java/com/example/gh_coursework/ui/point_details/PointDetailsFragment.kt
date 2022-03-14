@@ -15,6 +15,7 @@ import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
 import com.example.gh_coursework.ui.point_details.adapter.TagAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
+import com.example.gh_coursework.ui.point_details.model.PointsTagsModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -24,6 +25,7 @@ interface OnSwitchActivityLayoutVisibility {
 }
 
 class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
+    private lateinit var dialog: AlertDialog
     private lateinit var tagAdapter: TagAdapter
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
@@ -43,6 +45,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.GONE)
         configToolBar()
         configConfirmButton()
+        configDialog()
         configTagButton()
         configData()
     }
@@ -53,6 +56,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 viewModel.pointDetails.collect {
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
+                    it?.tagList?.let { tagList -> tagAdapter.insertCheckedTagList(tagList) }
                 }
             }
         }
@@ -78,33 +82,60 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         }
     }
 
+    private fun configDialog() {
+        tagAdapter = TagAdapter()
+
+        val builder = AlertDialog.Builder(context)
+        val dialogBinding = DialogTagBinding.inflate(layoutInflater)
+        builder.setView(dialogBinding.root)
+        dialog = builder.create()
+
+        dialogBinding.tagRecycler.apply {
+            adapter = tagAdapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        }
+
+        dialogBinding.cancelTagsDialogButton.setOnClickListener {
+            dialog.hide()
+        }
+
+        dialogBinding.addTagButton.setOnClickListener {
+            val tagName = dialogBinding.addTagEditText.text.toString()
+
+            if (tagName.isNotBlank() && tagName.isNotEmpty()) {
+                viewModel.addTag(PointTagModel(null, tagName))
+            }
+        }
+
+        dialogBinding.submitTagsButton.setOnClickListener {
+            viewModel.addTagsToPoint(tagAdapter.addTagList.map {
+                PointsTagsModel(
+                    arguments.pointId,
+                    it.tagId!!
+                )
+            })
+
+            viewModel.removeTagsToPoint(tagAdapter.removeTagList.map {
+                PointsTagsModel(
+                    arguments.pointId,
+                    it.tagId!!
+                )
+            })
+
+            tagAdapter.clearTagsLists()
+            dialog.hide()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.tags.collect {
+                tagAdapter.submitList(it)
+            }
+        }
+    }
+
     private fun configTagButton() {
         binding.addTagButton.setOnClickListener {
-            val builder = AlertDialog.Builder(context)
-            val dialogBinding = DialogTagBinding.inflate(layoutInflater)
-            tagAdapter = TagAdapter()
-
-            dialogBinding.tagRecycler.apply {
-                adapter = tagAdapter
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            }
-
-            dialogBinding.addTagButton.setOnClickListener {
-                val tagName = dialogBinding.addTagEditText.text.toString()
-
-                if (tagName.isNotBlank() && tagName.isNotEmpty()) {
-                    viewModel.addTag(PointTagModel(null, tagName))
-                }
-            }
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.tags.collect {
-                    tagAdapter.submitList(it)
-                }
-            }
-
-            builder.setView(dialogBinding.root)
-            builder.create().show()
+            dialog.show()
         }
     }
 

@@ -5,13 +5,11 @@ import com.example.gh_coursework.data.database.dao.PointPreviewDao
 import com.example.gh_coursework.data.database.dao.RoutePreviewDao
 import com.example.gh_coursework.data.database.dao.TagDao
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
+import com.example.gh_coursework.data.database.entity.PointsTagsEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.data.database.mapper.*
 import com.example.gh_coursework.data.datasource.TravelDatasource
-import com.example.gh_coursework.domain.entity.PointDetailsDomain
-import com.example.gh_coursework.domain.entity.PointPreviewDomain
-import com.example.gh_coursework.domain.entity.RouteDomain
-import com.example.gh_coursework.domain.entity.PointTagDomain
+import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -83,5 +81,13 @@ class LocalDataSrcIml(
 
     override suspend fun addPointTag(tag: PointTagDomain) {
         tagDao.addTag(mapTagDomainToEntity(tag))
+    }
+
+    override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
+        tagDao.addPointsTags(pointsTagsList.map(::mapPointsTagsDomainToEntity))
+    }
+
+    override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
+        tagDao.deletePointsTags(pointsTagsList.map(::mapPointsTagsDomainToEntity))
     }
 }
