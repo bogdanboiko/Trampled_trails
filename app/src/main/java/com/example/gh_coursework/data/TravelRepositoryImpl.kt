@@ -15,10 +15,6 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
-    override suspend fun deletePoint(pointId: Int) {
-        localDataSrcIml.deletePoint(pointId)
-    }
-
     override suspend fun addRoute(route: RouteDomain) {
         localDataSrcIml.addRoute(route, route.coordinatesList.map(::mapPointDomainToEntity))
     }
@@ -31,25 +27,33 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addPointsTagsList(pointsTagsList)
     }
 
-    override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
-        localDataSrcIml.removePointsTagsList(pointsTagsList)
+    override suspend fun deletePoint(pointId: Int) {
+        localDataSrcIml.deletePoint(pointId)
     }
 
     override suspend fun deletePointTag(tag: PointTagDomain) {
         localDataSrcIml.deletePointTag(tag)
     }
 
-    override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()
-
-    override fun getRoutePreview(routeId: Int): Flow<List<PointPreviewDomain>> {
-        TODO("Not yet implemented")
+    override suspend fun deleteRoute(routeId: Int) {
+        localDataSrcIml.deleteRoute(routeId)
     }
+
+    override suspend fun deleteRoutePoints(routeId: Int) {
+        localDataSrcIml.deleteRoutePoints(routeId)
+    }
+
+    override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
+        localDataSrcIml.removePointsTagsList(pointsTagsList)
+    }
+
+    override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()
 
     override fun getPointOfInterestDetails(id: Int) = localDataSrcIml.getPointOfInterestDetails(id)
 
-    override fun getRoute(): Flow<RouteDomain> = localDataSrcIml.getRoute()
+    override fun getPointTagList() = localDataSrcIml.getPointTagList()
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 
-    override fun getPointTagList() = localDataSrcIml.getPointTagList()
+    override fun getRoutePoints(routeId: Int) = localDataSrcIml.getRoutePoints(routeId)
 }
