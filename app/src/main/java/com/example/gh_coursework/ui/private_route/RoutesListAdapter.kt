@@ -6,12 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.bumptech.glide.request.RequestOptions
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.ItemRouteBinding
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 
-class RoutesListAdapter : RecyclerView.Adapter<RoutesListAdapter.RouteViewHolder>() {
+interface RoutesListAdapterCallback {
+    fun onRouteItemLongPressed(routeId: Int)
+}
+
+class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.Adapter<RoutesListAdapter.RouteViewHolder>() {
 
     var currentList: List<PrivateRouteModel> = emptyList()
         @SuppressLint("NotifyDataSetChanged")
@@ -51,6 +54,12 @@ class RoutesListAdapter : RecyclerView.Adapter<RoutesListAdapter.RouteViewHolder
                     .error(R.drawable.ic_launcher_background)
                     .transform(RoundedCorners(10))
                     .into(imgMapImage)
+            }
+
+            binding.root.setOnLongClickListener {
+                item.routeId?.let { id -> callback.onRouteItemLongPressed(id) }
+
+                return@setOnLongClickListener true
             }
         }
     }
