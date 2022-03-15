@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +21,6 @@ import com.example.gh_coursework.OnAddButtonPressed
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
-import com.example.gh_coursework.domain.entity.RoutePointDomain
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.private_route.mapper.mapPointToPrivateRoutePointModel
@@ -63,7 +61,9 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 interface RoutesListCallback {
@@ -285,6 +285,8 @@ class PrivateRoutesFragment :
         this.mapState = mapState
 
         if (mapState == MapState.CREATOR) {
+            mapboxNavigation.setRoutes(emptyList())
+
             binding.centralPointer.visibility = View.VISIBLE
             binding.pointTypeSwitchButton.visibility = View.VISIBLE
 
@@ -325,7 +327,7 @@ class PrivateRoutesFragment :
             binding.resetRouteButton.apply {
                 show()
                 setOnClickListener {
-                    resetCurrentRoute(mapboxNavigation)
+                    resetCurrentRoute()
                     hide()
                 }
             }
@@ -439,7 +441,7 @@ class PrivateRoutesFragment :
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            resetCurrentRoute(mapboxNavigation)
+            resetCurrentRoute()
             viewModel.routes.collect {
                 _routesList.value = it
             }
@@ -462,11 +464,9 @@ class PrivateRoutesFragment :
     /*
     Reset route or undo point creation
      */
-    private fun resetCurrentRoute(mapboxNavigation: MapboxNavigation) {
-        if (mapboxNavigation.getRoutes().isNotEmpty()) {
-            mapboxNavigation.setRoutes(emptyList())
-            currentRouteCoordinatesList.clear()
-        }
+    private fun resetCurrentRoute() {
+        mapboxNavigation.setRoutes(emptyList())
+        currentRouteCoordinatesList.clear()
 
         (activity as RoutesListCallback).isRoutePointExist(false)
         binding.undoPointCreatingButton.visibility = View.INVISIBLE
@@ -478,7 +478,7 @@ class PrivateRoutesFragment :
             currentRouteCoordinatesList.remove(currentRouteCoordinatesList[currentRouteCoordinatesList.lastIndex])
             buildRoute()
         } else if (currentRouteCoordinatesList.size == 2) {
-            resetCurrentRoute(mapboxNavigation)
+            resetCurrentRoute()
         }
     }
 
