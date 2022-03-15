@@ -1,12 +1,14 @@
 package com.example.gh_coursework
 
 import android.Manifest
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
@@ -18,6 +20,7 @@ import com.example.gh_coursework.ui.point_details.OnSwitchActivityLayoutVisibili
 import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.PrivateRoutesFragmentDirections
 import com.example.gh_coursework.ui.private_route.RoutesListAdapter
+import com.example.gh_coursework.ui.private_route.RoutesListAdapterCallback
 import com.example.gh_coursework.ui.private_route.RoutesListCallback
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -29,20 +32,27 @@ interface OnAddButtonPressed {
     fun onAddButtonPressed()
 }
 
+interface BottomSheetDialog {
+    fun createRoute()
+    fun deleteRoute(routeId: Int)
+}
+
 class MainActivity :
     AppCompatActivity(),
     PermissionsListener,
     OnSwitchActivityLayoutVisibility,
-    RoutesListCallback {
+    RoutesListCallback,
+    RoutesListAdapterCallback {
 
     private lateinit var binding: ActivityMainBinding
-    private val routesListAdapter = RoutesListAdapter()
+    private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
 
     private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var behavior: BottomSheetBehavior<LinearLayout>
     private val permissionsManager = PermissionsManager(this)
     private var mapState = MutableLiveData(MapState.PRESENTATION)
+    private var routeState = MutableLiveData<Boolean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,6 +62,7 @@ class MainActivity :
         navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
         behavior = BottomSheetBehavior.from(binding.bottomSheetDialogLayout.bottomSheetDialog)
+        routeState.value = false
 
         configNavigation()
         configMapStateObserver()
@@ -132,10 +143,28 @@ class MainActivity :
     }
 
     private fun configCancelButton() {
-        binding.cancelButton.setOnClickListener {
-            mapState.value = MapState.PRESENTATION
-            binding.cancelButton.visibility = View.INVISIBLE
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        routeState.observe(this) {
+            if (routeState.value == true) {
+                binding.cancelButton.text = getString(R.string.txtCancelButtonSave)
+                binding.cancelButton.icon = AppCompatResources.getDrawable(this, R.drawable.ic_confirm)
+
+                binding.cancelButton.setOnClickListener {
+                    (navHostFragment.childFragmentManager.fragments[0] as BottomSheetDialog)
+                        .createRoute()
+                    mapState.value = MapState.PRESENTATION
+                    binding.cancelButton.visibility = View.INVISIBLE
+                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+            } else if (routeState.value == false) {
+                binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
+                binding.cancelButton.icon = AppCompatResources.getDrawable(this, R.drawable.ic_close)
+
+                binding.cancelButton.setOnClickListener {
+                    mapState.value = MapState.PRESENTATION
+                    binding.cancelButton.visibility = View.INVISIBLE
+                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+            }
         }
     }
 
@@ -219,6 +248,30 @@ class MainActivity :
 
     override fun getRoutesList(routes: MutableList<PrivateRouteModel>) {
         routesListAdapter.currentList = routes
+    }
+
+    override fun isRoutePointExist(isExist: Boolean) {
+        routeState.value = isExist
+    }
+
+    override fun onRouteItemLongPressed(routeId: Int) {
+        val builder = android.app.AlertDialog.Builder(this)
+        builder.setMessage("Delete route?")
+            .setPositiveButton("Yes") { dialog, _ ->
+                dialogYesClick(routeId, dialog)
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+        builder.show()
+    }
+
+    private fun dialogYesClick(routeId: Int, dialog: DialogInterface) {
+        (navHostFragment.childFragmentManager.fragments[0] as BottomSheetDialog)
+            .deleteRoute(routeId)
+
+        dialog.dismiss()
     }
 }
 
