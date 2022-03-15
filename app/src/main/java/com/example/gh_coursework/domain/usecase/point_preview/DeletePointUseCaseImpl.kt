@@ -1,4 +1,4 @@
-package com.example.gh_coursework.domain.usecase
+package com.example.gh_coursework.domain.usecase.point_preview
 
 import com.example.gh_coursework.domain.repository.TravelRepository
 

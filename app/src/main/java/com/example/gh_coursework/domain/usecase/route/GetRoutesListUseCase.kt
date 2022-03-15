@@ -1,4 +1,4 @@
-package com.example.gh_coursework.domain.usecase
+package com.example.gh_coursework.domain.usecase.route
 
 import com.example.gh_coursework.domain.entity.RouteDomain
 import kotlinx.coroutines.flow.Flow

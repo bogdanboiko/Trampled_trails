@@ -2,16 +2,16 @@ package com.example.gh_coursework.ui.point_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.*
+import com.example.gh_coursework.domain.usecase.point_details.AddPointDetailsUseCase
+import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCase
+import com.example.gh_coursework.domain.usecase.point_tag.*
 import com.example.gh_coursework.ui.point_details.mapper.*
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.point_details.model.PointsTagsModel
-import com.example.gh_coursework.ui.private_point.mapper.mapPointModelToDomain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.*
 
 class PointDetailsViewModel(
     private val pointId: Int,
