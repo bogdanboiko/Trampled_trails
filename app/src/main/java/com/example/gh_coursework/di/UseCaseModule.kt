@@ -63,10 +63,6 @@ val pointUseCasesModule = module {
         GetRoutesListUseCaseImpl(get())
     }
 
-    single<GetRoutePointsUseCase> {
-        GetRoutePointsUseCaseImpl(get())
-    }
-
     single<DeleteRouteUseCase> {
         DeleteRouteUseCaseImpl(get())
     }

@@ -34,7 +34,7 @@ interface OnAddButtonPressed {
 
 interface BottomSheetDialog {
     fun createRoute()
-    fun deleteRoute(routeId: Int)
+    fun deleteRoute(route: PrivateRouteModel)
 }
 
 class MainActivity :
@@ -254,11 +254,11 @@ class MainActivity :
         routeState.value = isExist
     }
 
-    override fun onRouteItemLongPressed(routeId: Int) {
+    override fun onRouteItemLongPressed(route: PrivateRouteModel) {
         val builder = android.app.AlertDialog.Builder(this)
         builder.setMessage("Delete route?")
             .setPositiveButton("Yes") { dialog, _ ->
-                dialogYesClick(routeId, dialog)
+                dialogYesClick(route, dialog)
             }
             .setNegativeButton("No") { dialog, _ ->
                 dialog.dismiss()
@@ -267,9 +267,9 @@ class MainActivity :
         builder.show()
     }
 
-    private fun dialogYesClick(routeId: Int, dialog: DialogInterface) {
+    private fun dialogYesClick(route: PrivateRouteModel, dialog: DialogInterface) {
         (navHostFragment.childFragmentManager.fragments[0] as BottomSheetDialog)
-            .deleteRoute(routeId)
+            .deleteRoute(route)
 
         dialog.dismiss()
     }

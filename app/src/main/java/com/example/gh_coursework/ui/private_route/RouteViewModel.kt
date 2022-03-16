@@ -2,14 +2,12 @@ package com.example.gh_coursework.ui.private_route
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.entity.RoutePointDomain
 import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.AddPointPreviewUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.GetPointsPreviewUseCase
 import com.example.gh_coursework.domain.usecase.route.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route.DeleteRouteUseCase
-import com.example.gh_coursework.domain.usecase.route.GetRoutePointsUseCase
 import com.example.gh_coursework.domain.usecase.route.GetRoutesListUseCase
 import com.example.gh_coursework.ui.private_route.mapper.*
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
@@ -26,12 +24,10 @@ class RouteViewModel(
     private val addPointPreviewUseCase: AddPointPreviewUseCase,
     private val addRouteUseCase: AddRouteUseCase,
     private val getPointDetailsUseCase: GetPointDetailsUseCase,
-    private val getRoutePointsUseCase: GetRoutePointsUseCase,
     private val deletePointUseCase: DeletePointUseCase,
     private val deleteRouteUseCase: DeleteRouteUseCase
 ) : ViewModel() {
 
-    var routePoints = listOf<RoutePointDomain>()
     val points = getPointsPreviewUseCase.invoke()
         .map { pointList -> pointList.map(::mapPointDomainToModel) }
     val routes = getRoutesListUseCase.invoke()
@@ -60,25 +56,9 @@ class RouteViewModel(
         }
     }
 
-    fun deleteRoute(routeId: Int) {
+    fun deleteRoute(route: PrivateRouteModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteRouteUseCase.invoke(routeId)
-        }
-    }
-
-    fun getRoutePoints(routeId: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            getRoutePointsUseCase.invoke(routeId).collect {
-                routePoints = it
-            }
-        }
-    }
-
-    fun deleteRoutePoints(routePointsList: List<RoutePointDomain>) {
-        routePointsList.forEach {
-            viewModelScope.launch(Dispatchers.IO) {
-                deletePointUseCase.invoke(it.pointId.toInt())
-            }
+            deleteRouteUseCase.invoke(mapRouteModelToDomainMapper(route))
         }
     }
 }

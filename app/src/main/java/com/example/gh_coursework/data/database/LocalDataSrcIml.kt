@@ -5,7 +5,6 @@ import com.example.gh_coursework.data.database.dao.PointPreviewDao
 import com.example.gh_coursework.data.database.dao.RoutePreviewDao
 import com.example.gh_coursework.data.database.dao.TagDao
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
-import com.example.gh_coursework.data.database.entity.PointsTagsEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.data.database.mapper.*
 import com.example.gh_coursework.data.datasource.TravelDatasource
@@ -54,12 +53,8 @@ class LocalDataSrcIml(
         routeDao.addRoute(mapRouteDomainToEntity(route), routePointEntitiesList)
     }
 
-    override suspend fun deleteRoute(routeId: Int) {
-        routeDao.deleteRoute(routeId)
-    }
-
-    override suspend fun deleteRoutePoints(routeId: Int) {
-        routeDao.deleteRoutePoints(routeId)
+    override suspend fun deleteRoute(route: RouteDomain) {
+        routeDao.deleteRoute(mapRouteDomainToEntity(route))
     }
 
     override suspend fun deletePoint(pointId: Int) {
@@ -69,12 +64,6 @@ class LocalDataSrcIml(
     override fun getRoutesList(): Flow<List<RouteDomain>> {
         return routeDao.getRoutesResponse()
             .map { it.map { entity -> (mapRouteResponseListToDomain(entity)) } }
-    }
-
-    override fun getRoutePoints(routeId: Int): Flow<List<RoutePointDomain>> {
-        return routeDao.getRoutePoints(routeId).map {
-            point -> point.map(::mapRoutePointEntityToDomain)
-        }
     }
 
     override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?> {

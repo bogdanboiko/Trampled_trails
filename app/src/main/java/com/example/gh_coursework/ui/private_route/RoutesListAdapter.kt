@@ -11,7 +11,7 @@ import com.example.gh_coursework.databinding.ItemRouteBinding
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 
 interface RoutesListAdapterCallback {
-    fun onRouteItemLongPressed(routeId: Int)
+    fun onRouteItemLongPressed(route: PrivateRouteModel)
 }
 
 class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.Adapter<RoutesListAdapter.RouteViewHolder>() {
@@ -57,7 +57,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.
             }
 
             binding.root.setOnLongClickListener {
-                item.routeId?.let { id -> callback.onRouteItemLongPressed(id) }
+                item.routeId?.let { id -> callback.onRouteItemLongPressed(item) }
 
                 return@setOnLongClickListener true
             }

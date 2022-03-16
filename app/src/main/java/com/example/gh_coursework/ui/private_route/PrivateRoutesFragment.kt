@@ -478,17 +478,12 @@ Adding point to points list, route build and set up
         }
     }
 
-    override fun deleteRoute(routeId: Int) {
-        viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-            viewModel.getRoutePoints(routeId)
-            delay(100)
-            viewModel.deleteRoutePoints(viewModel.routePoints)
-            viewModel.deleteRoute(routeId)
-        }
-
+    override fun deleteRoute(route: PrivateRouteModel) {
         viewLifecycleOwner.lifecycleScope.launch {
             resetCurrentRoute()
             pointAnnotationManager.deleteAll()
+
+            viewModel.deleteRoute(route)
             viewModel.routes.collect {
                 _routesList.value = it
             }

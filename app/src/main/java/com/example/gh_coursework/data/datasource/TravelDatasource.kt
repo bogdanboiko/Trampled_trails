@@ -1,7 +1,6 @@
 package com.example.gh_coursework.data.datasource
 
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
-import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
 
@@ -17,15 +16,13 @@ interface TravelDatasource {
         suspend fun deletePointTag(tag: PointTagDomain)
 
         suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointCoordinatesEntity>)
-        suspend fun deleteRoute(routeId: Int)
-        suspend fun deleteRoutePoints(routeId: Int)
+        suspend fun deleteRoute(route: RouteDomain)
 
         fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
         fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?>
         fun getPointTagList(): Flow<List<PointTagDomain>>
 
         fun getRoutesList(): Flow<List<RouteDomain>>
-        fun getRoutePoints(routeId: Int): Flow<List<RoutePointDomain>>
     }
 
     interface Remote

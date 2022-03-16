@@ -14,13 +14,11 @@ interface TravelRepository {
     suspend fun deletePointTag(tag: PointTagDomain)
 
     suspend fun addRoute(route: RouteDomain)
-    suspend fun deleteRoute(routeId: Int)
-    suspend fun deleteRoutePoints(routeId: Int)
+    suspend fun deleteRoute(route: RouteDomain)
 
     fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
     fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?>
     fun getPointTagList(): Flow<List<PointTagDomain>>
 
     fun getRoutesList(): Flow<List<RouteDomain>>
-    fun getRoutePoints(routeId: Int): Flow<List<RoutePointDomain>>
 }
