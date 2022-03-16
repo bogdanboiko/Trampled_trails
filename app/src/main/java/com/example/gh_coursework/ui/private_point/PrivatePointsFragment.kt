@@ -156,16 +156,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         }
     }
 
-    private fun switchMapMod() {
-        if (mapState == MapState.CREATOR) {
-            binding.centralPointer.visibility = View.VISIBLE
-            mapboxMap.addOnMapClickListener(onMapClickListener)
-        } else {
-            binding.centralPointer.visibility = View.INVISIBLE
-            mapboxMap.removeOnMapClickListener(onMapClickListener)
-        }
-    }
-
     private fun executeClickAtPoint() {
         val clickEvent = createOnMapClickEvent(center)
         binding.mapView.dispatchTouchEvent(clickEvent.first)
