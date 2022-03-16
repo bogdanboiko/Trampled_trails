@@ -5,7 +5,6 @@ import com.example.gh_coursework.data.database.dao.PointPreviewDao
 import com.example.gh_coursework.data.database.dao.RoutePreviewDao
 import com.example.gh_coursework.data.database.dao.TagDao
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
-import com.example.gh_coursework.data.database.entity.PointsTagsEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.data.database.mapper.*
 import com.example.gh_coursework.data.datasource.TravelDatasource
@@ -26,6 +25,11 @@ class LocalDataSrcIml(
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
         val pointId = pointDao.addPointPreview(mapPointDomainToEntity(poi))
         addOrUpdatePointOfInterestDetails(PointDetailsDomain(pointId, emptyList(), "", ""))
+    }
+
+    override fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>> {
+        return pointDao.getPointPreview()
+            .map { pointPreview -> pointPreview.map(::mapPointEntityToDomain) }
     }
 
     override suspend fun addRoute(
@@ -49,31 +53,21 @@ class LocalDataSrcIml(
         routeDao.addRoute(mapRouteDomainToEntity(route), routePointEntitiesList)
     }
 
+    override suspend fun deleteRoute(route: RouteDomain) {
+        routeDao.deleteRoute(mapRouteDomainToEntity(route))
+    }
+
     override suspend fun deletePoint(pointId: Int) {
         pointDao.deletePoint(pointId)
-    }
-
-    override fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>> {
-        return pointDao.getPointPreview()
-            .map { pointPreview -> pointPreview.map(::mapPointEntityToDomain) }
-    }
-
-    override fun getRoutePreview(routeId: Int): Flow<List<PointPreviewDomain>> {
-        TODO("Not yet implemented")
-    }
-
-
-    override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?> {
-        return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
-    }
-
-    override fun getRoute(): Flow<RouteDomain> {
-        TODO("Not yet implemented")
     }
 
     override fun getRoutesList(): Flow<List<RouteDomain>> {
         return routeDao.getRoutesResponse()
             .map { it.map { entity -> (mapRouteResponseListToDomain(entity)) } }
+    }
+
+    override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?> {
+        return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
     }
 
     override fun getPointTagList(): Flow<List<PointTagDomain>> {

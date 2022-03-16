@@ -4,7 +4,6 @@ import com.example.gh_coursework.data.database.mapper.mapPointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
-import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) : TravelRepository {
     override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
@@ -13,10 +12,6 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
 
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
         localDataSrcIml.addPointOfInterestCoordinates(poi)
-    }
-
-    override suspend fun deletePoint(pointId: Int) {
-        localDataSrcIml.deletePoint(pointId)
     }
 
     override suspend fun addRoute(route: RouteDomain) {
@@ -31,25 +26,27 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addPointsTagsList(pointsTagsList)
     }
 
-    override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
-        localDataSrcIml.removePointsTagsList(pointsTagsList)
+    override suspend fun deletePoint(pointId: Int) {
+        localDataSrcIml.deletePoint(pointId)
     }
 
     override suspend fun deletePointTag(tag: PointTagDomain) {
         localDataSrcIml.deletePointTag(tag)
     }
 
-    override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()
-
-    override fun getRoutePreview(routeId: Int): Flow<List<PointPreviewDomain>> {
-        TODO("Not yet implemented")
+    override suspend fun deleteRoute(route: RouteDomain) {
+        localDataSrcIml.deleteRoute(route)
     }
+
+    override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
+        localDataSrcIml.removePointsTagsList(pointsTagsList)
+    }
+
+    override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()
 
     override fun getPointOfInterestDetails(id: Int) = localDataSrcIml.getPointOfInterestDetails(id)
 
-    override fun getRoute(): Flow<RouteDomain> = localDataSrcIml.getRoute()
+    override fun getPointTagList() = localDataSrcIml.getPointTagList()
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
-
-    override fun getPointTagList() = localDataSrcIml.getPointTagList()
 }

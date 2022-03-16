@@ -30,4 +30,7 @@ abstract class RoutePreviewDao {
 
     @Query("SELECT * FROM route_details")
     abstract fun getRoutesResponse(): Flow<List<RoutePreviewResponse>>
+
+    @Delete
+    abstract fun deleteRoute(route: RouteEntity)
 }

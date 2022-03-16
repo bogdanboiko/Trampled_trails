@@ -11,5 +11,12 @@ fun mapRouteDomainToModel(routeDomain: RouteDomain): PrivateRouteModel {
         pointCoordinatesModelList.add(mapPointDomainToModel(it))
     }
 
-    return PrivateRouteModel(routeDomain.routeId, pointCoordinatesModelList)
+    return PrivateRouteModel(
+        routeDomain.routeId,
+        routeDomain.name,
+        routeDomain.description,
+        routeDomain.rating,
+        pointCoordinatesModelList,
+        null
+    )
 }

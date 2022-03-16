@@ -3,4 +3,6 @@
     <string name="mapbox_access_token">pk.eyJ1IjoiYm9nZ2RhbiIsImEiOiJja3oxNnZtbGowZGl4Mm90MnRldXp0cW11In0.nGRpno1yA12A7uYaU4oXOQ</string>
     <string name="public_menu_item">Public</string>
     <string name="private_menu_item">Private</string>
+    <string name="txtCancelButtonExit">exit</string>
+    <string name="txtCancelButtonSave">save</string>
 </resources>
