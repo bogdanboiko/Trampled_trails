@@ -74,21 +74,21 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         }
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
-    private fun configCancelButton() {
-        binding.cancelButton.setOnClickListener {
-            with(binding) {
-                centralPointer.visibility = View.INVISIBLE
-                cancelButton.visibility = View.INVISIBLE
-                bottomSheetDialogLayout.fab.setImageDrawable(
-                    context?.getDrawable(
-                        R.drawable.ic_add
-                    )
-                )
-            }
+    private fun configMap() {
+        mapboxMap = binding.mapView.getMapboxMap().also {
+            viewAnnotationManager = binding.mapView.viewAnnotationManager
+            it.loadStyleUri(Style.MAPBOX_STREETS)
+        }
 
-            mapboxMap.removeOnMapClickListener(onMapClickListener)
-            mapState = MapState.PRESENTATION
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+    }
+
+    private fun configMapSwitcherButton() {
+        binding.mapRoutePointModSwitcher.setOnClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections
+                    .actionPrivatePointsFragmentToPrivateRoutesFragment()
+            )
         }
     }
 
@@ -118,22 +118,22 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         }
     }
 
-    private fun configMapSwitcherButton() {
-        binding.mapRoutePointModSwitcher.setOnClickListener {
-            findNavController().navigate(
-                PrivatePointsFragmentDirections
-                    .actionPrivatePointsFragmentToPrivateRoutesFragment()
-            )
-        }
-    }
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun configCancelButton() {
+        binding.cancelButton.setOnClickListener {
+            with(binding) {
+                centralPointer.visibility = View.INVISIBLE
+                cancelButton.visibility = View.INVISIBLE
+                bottomSheetDialogLayout.fab.setImageDrawable(
+                    context?.getDrawable(
+                        R.drawable.ic_add
+                    )
+                )
+            }
 
-    private fun configMap() {
-        mapboxMap = binding.mapView.getMapboxMap().also {
-            viewAnnotationManager = binding.mapView.viewAnnotationManager
-            it.loadStyleUri(Style.MAPBOX_STREETS)
+            mapboxMap.removeOnMapClickListener(onMapClickListener)
+            mapState = MapState.PRESENTATION
         }
-
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
     }
 
     private fun fetchPoints() {
