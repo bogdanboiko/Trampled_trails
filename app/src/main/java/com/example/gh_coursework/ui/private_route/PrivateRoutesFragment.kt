@@ -349,7 +349,21 @@ Adding point to points list, route build and set up
             addRouteFlagAnnotationToMap(currentRouteCoordinatesList[0], R.drawable.ic_start_flag)
         }
 
+        undoFlagAnnotation()
         buildRoute()
+    }
+
+    private fun undoFlagAnnotation() {
+        if (pointAnnotationManager.annotations.size == 1 && currentRouteCoordinatesList.size == 1) {
+            binding.undoPointCreatingButton.apply {
+                show()
+                setOnClickListener {
+                    pointAnnotationManager.deleteAll()
+                    resetCurrentRoute()
+                    hide()
+                }
+            }
+        }
     }
 
     private fun setRoute(routes: List<DirectionsRoute>) {
@@ -497,8 +511,10 @@ Adding point to points list, route build and set up
         if (currentRouteCoordinatesList.size > 2) {
             currentRouteCoordinatesList.remove(currentRouteCoordinatesList[currentRouteCoordinatesList.lastIndex])
             buildRoute()
-        } else if (currentRouteCoordinatesList.size == 2) {
+        } else if (currentRouteCoordinatesList.size == 2
+            && pointAnnotationManager.annotations.size == 1) {
             resetCurrentRoute()
+            pointAnnotationManager.deleteAll()
         }
     }
 
