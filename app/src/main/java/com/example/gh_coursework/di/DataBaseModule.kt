@@ -9,18 +9,20 @@ import org.koin.dsl.module
 val localDataBaseModule = module {
     single {
         Room.databaseBuilder(get(), TravelDatabase::class.java, "Travel.db")
-//            .addCallback(object : RoomDatabase.Callback() {
-//                override fun onCreate(db: SupportSQLiteDatabase) {
-//                    super.onCreate(db)
-//                    db.execSQL(
-//                        """
-//                            CREATE TRIGGER IF NOT EXISTS route_details.delete_route
-//                            BEFORE DELETE ON route_details
-//                            BEGIN DELETE FROM routes_points WHERE routeId = DELETED.routeId; END
-//                        """.trimIndent()
-//                    )
-//                }
-//            })
+            .addCallback(object : RoomDatabase.Callback() {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    db.execSQL(
+                        """
+                            CREATE TRIGGER IF NOT EXISTS delete_point
+                            AFTER DELETE ON routes_points
+                            BEGIN 
+                            DELETE FROM point_coordinates WHERE pointId = OLD.pointId; 
+                            END
+                        """.trimIndent()
+                    )
+                }
+            })
             .fallbackToDestructiveMigration()
             .build()
     }

@@ -12,6 +12,11 @@ import androidx.room.PrimaryKey
         onDelete = CASCADE,
         parentColumns = arrayOf("pointId"),
         childColumns = arrayOf("pointId")
+    ), ForeignKey(
+        entity = RouteEntity::class,
+        onDelete = CASCADE,
+        parentColumns = arrayOf("routeId"),
+        childColumns = arrayOf("routeId")
     )]
 )
 data class RoutePointEntity(
