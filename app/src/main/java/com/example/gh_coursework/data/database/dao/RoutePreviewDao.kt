@@ -31,12 +31,6 @@ abstract class RoutePreviewDao {
     @Query("SELECT * FROM route_details")
     abstract fun getRoutesResponse(): Flow<List<RoutePreviewResponse>>
 
-    @Query("SELECT * FROM routes_points WHERE routeId = :routeId")
-    abstract fun getRoutePoints(routeId: Int): Flow<List<RoutePointEntity>>
-
-    @Query("DELETE FROM route_details WHERE routeId = :routeId")
-    abstract fun deleteRoute(routeId: Int)
-
-    @Query("DELETE FROM routes_points WHERE routeId = :routeId")
-    abstract fun deleteRoutePoints(routeId: Int)
+    @Delete
+    abstract fun deleteRoute(route: RouteEntity)
 }
