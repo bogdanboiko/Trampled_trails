@@ -27,10 +27,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 
-interface OnAddButtonPressed {
-    fun switchMapMod(mapState: MapState)
-    fun onAddButtonPressed()
-}
 
 interface BottomSheetDialog {
     fun createRoute()
@@ -48,11 +44,9 @@ class MainActivity :
     private lateinit var binding: ActivityMainBinding
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
 
-    private lateinit var navController: NavController
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var behavior: BottomSheetBehavior<LinearLayout>
     private val permissionsManager = PermissionsManager(this)
-    private var mapState = MutableLiveData(MapState.PRESENTATION)
     private var routeState = MutableLiveData<Boolean>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,81 +59,13 @@ class MainActivity :
         behavior = BottomSheetBehavior.from(binding.bottomSheetDialogLayout.bottomSheetDialog)
         routeState.value = false
 
-        configNavigation()
-        configMapStateObserver()
-        configMapTypeSwitcherButton()
         configCancelButton()
-        configFabButton()
         configRecycler()
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()
         } else {
             permissionsManager.requestLocationPermissions(this)
-        }
-    }
-
-    private fun configNavigation() {
-        navController = navHostFragment.findNavController()
-
-        binding.mapRoutePointModSwitcher.setOnClickListener {
-
-            if (navController.currentDestination?.id == R.id.privatePointsFragment) {
-                if (!navController.popBackStack(R.id.privateRoutesFragment, false)) {
-                    navController.navigate(
-                        PrivatePointsFragmentDirections
-                            .actionPrivatePointsFragmentToPrivateRoutesFragment()
-                    )
-                }
-
-            } else if (navController.currentDestination?.id == R.id.privateRoutesFragment) {
-                if (!navController.popBackStack(R.id.privatePointsFragment, false)) {
-                    navController
-                        .navigate(
-                            PrivateRoutesFragmentDirections
-                                .actionPrivateRoutesFragmentToPrivatePointsFragment()
-                        )
-                }
-            }
-
-            configMapTypeSwitcherButton()
-            mapState.value = MapState.PRESENTATION
-        }
-    }
-
-    private fun configMapStateObserver() {
-        mapState.observe(this) {
-            if (it == MapState.PRESENTATION) {
-                binding.bottomSheetDialogLayout.fab.setImageDrawable(
-                    applicationContext.getDrawable(
-                        R.drawable.ic_add
-                    )
-                )
-                binding.cancelButton.visibility = View.INVISIBLE
-            } else if (it == MapState.CREATOR) {
-                binding.bottomSheetDialogLayout.fab.setImageDrawable(
-                    applicationContext.getDrawable(
-                        R.drawable.ic_confirm
-                    )
-                )
-            }
-
-            if (navHostFragment.childFragmentManager.fragments[0] is OnAddButtonPressed) {
-                (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
-                    .switchMapMod(it)
-            }
-
-            behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
-    }
-
-    private fun configMapTypeSwitcherButton() {
-        if (navController.currentDestination?.id == R.id.privatePointsFragment) {
-            binding.mapRoutePointModSwitcher.background =
-                applicationContext.getDrawable(R.drawable.ic_points)
-        } else if (navController.currentDestination?.id == R.id.privateRoutesFragment) {
-            binding.mapRoutePointModSwitcher.background =
-                applicationContext.getDrawable(R.drawable.ic_routes)
         }
     }
 
@@ -152,7 +78,6 @@ class MainActivity :
                 binding.cancelButton.setOnClickListener {
                     (navHostFragment.childFragmentManager.fragments[0] as BottomSheetDialog)
                         .createRoute()
-                    mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
                     behavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
@@ -161,22 +86,9 @@ class MainActivity :
                 binding.cancelButton.icon = AppCompatResources.getDrawable(this, R.drawable.ic_close)
 
                 binding.cancelButton.setOnClickListener {
-                    mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
                     behavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
-            }
-        }
-    }
-
-    private fun configFabButton() {
-        binding.bottomSheetDialogLayout.fab.setOnClickListener {
-            if (mapState.value == MapState.PRESENTATION) {
-                mapState.value = MapState.CREATOR
-                binding.cancelButton.visibility = View.VISIBLE
-            } else if (mapState.value == MapState.CREATOR) {
-                (navHostFragment.childFragmentManager.fragments[0] as OnAddButtonPressed)
-                    .onAddButtonPressed()
             }
         }
     }
@@ -189,8 +101,6 @@ class MainActivity :
 
     override fun onBackPressed() {
         super.onBackPressed()
-        configMapTypeSwitcherButton()
-        mapState.value = MapState.PRESENTATION
     }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
@@ -242,7 +152,6 @@ class MainActivity :
         with(binding) {
             binding.bottomSheetDialogLayout.bottomAppBar.visibility = state
             binding.bottomSheetDialogLayout.fab.visibility = state
-            mapRoutePointModSwitcher.visibility = state
             cancelButton.visibility = View.INVISIBLE
         }
     }

@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.MapState
-import com.example.gh_coursework.OnAddButtonPressed
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
@@ -36,12 +35,13 @@ import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddButtonPressed {
+class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private val viewModel: PointViewModel by viewModel()
     private var pointCoordinates = emptyList<PrivatePointModel>()
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
+    private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var center: Pair<Float, Float>
     private val onMapClickListener = OnMapClickListener { point ->
@@ -60,9 +60,19 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configMap()
+        configMapSwitcherButton()
         fetchPoints()
         view.viewTreeObserver?.addOnGlobalLayoutListener {
             center = Pair(view.width / 2f, view.height / 2f)
+        }
+    }
+
+    private fun configMapSwitcherButton() {
+        binding.mapRoutePointModSwitcher.setOnClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections
+                    .actionPrivatePointsFragmentToPrivateRoutesFragment()
+            )
         }
     }
 
@@ -95,7 +105,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
         }
     }
 
-    override fun switchMapMod(mapState: MapState) {
+    fun switchMapMod() {
         if (mapState == MapState.CREATOR) {
             binding.centralPointer.visibility = View.VISIBLE
             mapboxMap.addOnMapClickListener(onMapClickListener)
@@ -103,10 +113,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), OnAddB
             binding.centralPointer.visibility = View.INVISIBLE
             mapboxMap.removeOnMapClickListener(onMapClickListener)
         }
-    }
-
-    override fun onAddButtonPressed() {
-        executeClickAtPoint()
     }
 
     private fun executeClickAtPoint() {

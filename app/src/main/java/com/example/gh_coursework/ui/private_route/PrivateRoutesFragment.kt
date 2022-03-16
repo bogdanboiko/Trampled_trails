@@ -17,7 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.BottomSheetDialog
 import com.example.gh_coursework.MapState
-import com.example.gh_coursework.OnAddButtonPressed
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
@@ -61,8 +60,6 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -74,7 +71,6 @@ interface RoutesListCallback {
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PrivateRoutesFragment :
     Fragment(R.layout.fragment_private_route),
-    OnAddButtonPressed,
     BottomSheetDialog {
 
     private lateinit var binding: FragmentPrivateRouteBinding
@@ -178,6 +174,7 @@ class PrivateRoutesFragment :
         super.onViewCreated(view, savedInstanceState)
 
         configMap()
+        configMapSwitcherButton()
         fetchPoints()
         buildDefaultRoute()
         initMapboxNavigation()
@@ -192,6 +189,15 @@ class PrivateRoutesFragment :
 
         routesList.observe(viewLifecycleOwner) {
             (activity as RoutesListCallback).getRoutesList(routesList.value as MutableList<PrivateRouteModel>)
+        }
+    }
+
+    private fun configMapSwitcherButton() {
+        binding.mapRoutePointModSwitcher.setOnClickListener {
+            findNavController().navigate(
+                PrivateRoutesFragmentDirections
+                    .actionPrivateRoutesFragmentToPrivatePointsFragment()
+            )
         }
     }
 
@@ -298,7 +304,7 @@ class PrivateRoutesFragment :
         mapboxNavigation.onDestroy()
     }
 
-    override fun switchMapMod(mapState: MapState) {
+    fun switchMapMod(mapState: MapState) {
         this.mapState = mapState
 
         if (mapState == MapState.CREATOR) {
@@ -449,12 +455,6 @@ Adding point to points list, route build and set up
         )
     }
 
-    /*
-    Creating route point on screen
-     */
-    override fun onAddButtonPressed() {
-        executeClickAtPoint()
-    }
 
     private fun executeClickAtPoint() {
         val clickEvent = createOnMapClickEvent(center)
@@ -530,7 +530,8 @@ Adding point to points list, route build and set up
             currentRouteCoordinatesList.remove(currentRouteCoordinatesList[currentRouteCoordinatesList.lastIndex])
             buildRoute()
         } else if (currentRouteCoordinatesList.size == 2
-            && pointAnnotationManager.annotations.size == 1) {
+            && pointAnnotationManager.annotations.size == 1
+        ) {
             resetCurrentRoute()
             pointAnnotationManager.deleteAll()
         }

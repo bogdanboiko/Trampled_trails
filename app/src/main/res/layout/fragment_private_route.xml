@@ -12,30 +12,34 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+    <ImageButton
+        android:id="@+id/mapRoutePointModSwitcher"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/ic_routes"
+        android:elevation="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageView
-                android:id="@+id/centralPointer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                mapbox:layout_constraintEnd_toEndOf="parent"
-                android:visibility="invisible"
-                mapbox:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/centerGuideline"/>
+    <ImageView
+        android:id="@+id/centralPointer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
+        mapbox:layout_constraintEnd_toEndOf="parent"
+        mapbox:layout_constraintStart_toStartOf="parent" />
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/centerGuideline"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:orientation="horizontal"
-                app:layout_constraintGuide_percent="0.5"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.mapbox.maps.MapView>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/centerGuideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.5" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/resetRouteButton"
@@ -59,8 +63,8 @@
         android:paddingStart="20dp"
         android:text="Undo"
         android:visibility="invisible"
-        app:iconGravity="end"
         app:icon="@drawable/ic_undo"
+        app:iconGravity="end"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
