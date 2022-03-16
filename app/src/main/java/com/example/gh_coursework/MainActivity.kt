@@ -13,13 +13,6 @@ import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 
-
-interface BottomSheetDialog {
-    fun createRoute()
-    fun deleteRoute(route: PrivateRouteModel)
-    fun rebuildRoute(route: PrivateRouteModel)
-}
-
 class MainActivity :
     AppCompatActivity(),
     PermissionsListener {
