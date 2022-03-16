@@ -1,11 +1,13 @@
 package com.example.gh_coursework.ui.private_point
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.Fragment
@@ -19,6 +21,7 @@ import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapboxMap
@@ -41,6 +44,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
+    private lateinit var behavior: BottomSheetBehavior<LinearLayout>
     private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var center: Pair<Float, Float>
@@ -61,9 +65,56 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         super.onViewCreated(view, savedInstanceState)
         configMap()
         configMapSwitcherButton()
+        configBottomSheetDialog()
+        configMapModSwitcher()
+        configCancelButton()
         fetchPoints()
         view.viewTreeObserver?.addOnGlobalLayoutListener {
             center = Pair(view.width / 2f, view.height / 2f)
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun configCancelButton() {
+        binding.cancelButton.setOnClickListener {
+            with(binding) {
+                centralPointer.visibility = View.INVISIBLE
+                cancelButton.visibility = View.INVISIBLE
+                bottomSheetDialogLayout.fab.setImageDrawable(
+                    context?.getDrawable(
+                        R.drawable.ic_add
+                    )
+                )
+            }
+
+            mapboxMap.removeOnMapClickListener(onMapClickListener)
+            mapState = MapState.PRESENTATION
+        }
+    }
+
+    private fun configBottomSheetDialog() {
+        behavior = BottomSheetBehavior.from(binding.bottomSheetDialogLayout.bottomSheetDialog)
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun configMapModSwitcher() {
+        binding.bottomSheetDialogLayout.fab.setOnClickListener {
+            if (mapState == MapState.CREATOR) {
+                executeClickAtPoint()
+            } else {
+                with(binding) {
+                    centralPointer.visibility = View.VISIBLE
+                    cancelButton.visibility = View.VISIBLE
+                    bottomSheetDialogLayout.fab.setImageDrawable(
+                        context?.getDrawable(
+                            R.drawable.ic_confirm
+                        )
+                    )
+                }
+
+                mapboxMap.addOnMapClickListener(onMapClickListener)
+                mapState = MapState.CREATOR
+            }
         }
     }
 
@@ -105,7 +156,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         }
     }
 
-    fun switchMapMod() {
+    private fun switchMapMod() {
         if (mapState == MapState.CREATOR) {
             binding.centralPointer.visibility = View.VISIBLE
             mapboxMap.addOnMapClickListener(onMapClickListener)
@@ -148,7 +199,8 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
 
     private fun prepareViewAnnotation(
         pointAnnotation: PointAnnotation,
-        details: PrivatePointDetailsPreviewModel?) {
+        details: PrivatePointDetailsPreviewModel?
+    ) {
         val viewAnnotation =
             viewAnnotationManager.getViewAnnotationByFeatureId(pointAnnotation.featureIdentifier)
                 ?: viewAnnotationManager.addViewAnnotation(
@@ -177,7 +229,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             }
 
             deleteButton.setOnClickListener {
-                    pointAnnotation.getData()?.asInt?.let { pointId ->
+                pointAnnotation.getData()?.asInt?.let { pointId ->
                     viewModel.deletePoint(
                         pointId
                     )

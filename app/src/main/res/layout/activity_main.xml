@@ -8,19 +8,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/cancelButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="15dp"
-        android:paddingStart="20dp"
-        android:text="@string/txtCancelButtonExit"
-        android:visibility="invisible"
-        app:iconGravity="start"
-        app:icon="@drawable/ic_close"
-        android:layout_gravity="end"
-        android:elevation="2dp" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment_activity_main"
@@ -29,8 +16,4 @@
         android:layout_height="match_parent"
         app:defaultNavHost="true"
         app:navGraph="@navigation/nav_graph" />
-
-    <include
-        android:id="@+id/bottomSheetDialogLayout"
-        layout="@layout/bottom_sheet_dialog" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

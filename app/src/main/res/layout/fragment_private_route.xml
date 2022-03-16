@@ -90,4 +90,12 @@
         app:switchToggleCheckedImage="@drawable/ic_pin_route_rotated"
         app:switchToggleNotCheckedColor="@color/teal_200"
         app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated" />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include
+            android:id="@+id/bottomSheetDialogLayout"
+            layout="@layout/bottom_sheet_dialog"/>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

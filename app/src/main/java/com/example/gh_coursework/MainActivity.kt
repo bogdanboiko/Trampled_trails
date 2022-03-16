@@ -37,7 +37,6 @@ interface BottomSheetDialog {
 class MainActivity :
     AppCompatActivity(),
     PermissionsListener,
-    OnSwitchActivityLayoutVisibility,
     RoutesListCallback,
     RoutesListAdapterCallback {
 
@@ -45,7 +44,6 @@ class MainActivity :
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
 
     private lateinit var navHostFragment: NavHostFragment
-    private lateinit var behavior: BottomSheetBehavior<LinearLayout>
     private val permissionsManager = PermissionsManager(this)
     private var routeState = MutableLiveData<Boolean>()
 
@@ -56,11 +54,9 @@ class MainActivity :
 
         navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment_activity_main) as NavHostFragment
-        behavior = BottomSheetBehavior.from(binding.bottomSheetDialogLayout.bottomSheetDialog)
         routeState.value = false
 
-        configCancelButton()
-        configRecycler()
+            //     configCancelButton()
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()
@@ -69,39 +65,29 @@ class MainActivity :
         }
     }
 
-    private fun configCancelButton() {
-        routeState.observe(this) {
-            if (routeState.value == true) {
-                binding.cancelButton.text = getString(R.string.txtCancelButtonSave)
-                binding.cancelButton.icon = AppCompatResources.getDrawable(this, R.drawable.ic_confirm)
-
-                binding.cancelButton.setOnClickListener {
-                    (navHostFragment.childFragmentManager.fragments[0] as BottomSheetDialog)
-                        .createRoute()
-                    binding.cancelButton.visibility = View.INVISIBLE
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-            } else if (routeState.value == false) {
-                binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
-                binding.cancelButton.icon = AppCompatResources.getDrawable(this, R.drawable.ic_close)
-
-                binding.cancelButton.setOnClickListener {
-                    binding.cancelButton.visibility = View.INVISIBLE
-                    behavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-            }
-        }
-    }
-
-    private fun configRecycler() {
-        binding.bottomSheetDialogLayout.routesRecyclerView.apply {
-            adapter = routesListAdapter
-        }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-    }
+//  private fun configCancelButton() {
+//        routeState.observe(this) {
+//            if (routeState.value == true) {
+//                binding.cancelButton.text = getString(R.string.txtCancelButtonSave)
+//                binding.cancelButton.icon = AppCompatResources.getDrawable(this, R.drawable.ic_confirm)
+//
+//                binding.cancelButton.setOnClickListener {
+//                    (navHostFragment.childFragmentManager.fragments[0] as BottomSheetDialog)
+//                        .createRoute()
+//                    binding.cancelButton.visibility = View.INVISIBLE
+//    //                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+//                }
+//            } else if (routeState.value == false) {
+//                binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
+//                binding.cancelButton.icon = AppCompatResources.getDrawable(this, R.drawable.ic_close)
+//
+//                binding.cancelButton.setOnClickListener {
+//                    binding.cancelButton.visibility = View.INVISIBLE
+//    //                behavior.state = BottomSheetBehavior.STATE_COLLAPSED
+//                }
+//            }
+//        }
+//    }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         Toast.makeText(
@@ -145,14 +131,6 @@ class MainActivity :
                 permissionsNeeded.toTypedArray(),
                 10
             )
-        }
-    }
-
-    override fun switchActivityLayoutState(state: Int) {
-        with(binding) {
-            binding.bottomSheetDialogLayout.bottomAppBar.visibility = state
-            binding.bottomSheetDialogLayout.fab.visibility = state
-            cancelButton.visibility = View.INVISIBLE
         }
     }
 
