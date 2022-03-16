@@ -239,6 +239,23 @@ class PrivateRoutesFragment :
                 if (route.isNotEmpty()) {
                     if (route.last().coordinatesList.isNotEmpty()) {
                         buildRouteFromList((route.last().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
+
+                        pointAnnotationManager.deleteAll()
+                        addRouteFlagAnnotationToMap(
+                            Point.fromLngLat(
+                                route.last().coordinatesList.first().x,
+                                route.last().coordinatesList.first().y,
+                            ),
+                            R.drawable.ic_start_flag
+                        )
+
+                        addRouteFlagAnnotationToMap(
+                            Point.fromLngLat(
+                                route.last().coordinatesList.last().x,
+                                route.last().coordinatesList.last().y,
+                            ),
+                            R.drawable.ic_finish_flag
+                        )
                     }
 
                     _routesList.value = route
@@ -286,6 +303,7 @@ class PrivateRoutesFragment :
 
         if (mapState == MapState.CREATOR) {
             mapboxNavigation.setRoutes(emptyList())
+            pointAnnotationManager.deleteAll()
 
             binding.centralPointer.visibility = View.VISIBLE
             binding.pointTypeSwitchButton.visibility = View.VISIBLE
@@ -318,6 +336,20 @@ class PrivateRoutesFragment :
 
             binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
         }
+    }
+
+    /*
+Adding point to points list, route build and set up
+ */
+    private fun addWaypoint(point: Point) {
+        currentRouteCoordinatesList.add(point)
+
+        if (currentRouteCoordinatesList.size == 1) {
+            (activity as RoutesListCallback).isRoutePointExist(true)
+            addRouteFlagAnnotationToMap(currentRouteCoordinatesList[0], R.drawable.ic_start_flag)
+        }
+
+        buildRoute()
     }
 
     private fun setRoute(routes: List<DirectionsRoute>) {
@@ -442,23 +474,11 @@ class PrivateRoutesFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             resetCurrentRoute()
+            pointAnnotationManager.deleteAll()
             viewModel.routes.collect {
                 _routesList.value = it
             }
         }
-    }
-
-    /*
-    Adding point to points list, route build and set up
-     */
-    private fun addWaypoint(point: Point) {
-        currentRouteCoordinatesList.add(point)
-
-        if (currentRouteCoordinatesList.size == 1) {
-            (activity as RoutesListCallback).isRoutePointExist(true)
-        }
-
-        buildRoute()
     }
 
     /*
@@ -480,6 +500,38 @@ class PrivateRoutesFragment :
         } else if (currentRouteCoordinatesList.size == 2) {
             resetCurrentRoute()
         }
+    }
+
+    private fun addRouteFlagAnnotationToMap(point: Point, resourceId: Int) {
+        activity?.applicationContext?.let {
+            bitmapFromDrawableRes(it, resourceId)?.let { image ->
+                pointAnnotationManager.create(
+                    createFlagAnnotationPoint(
+                        image,
+                        point
+                    )
+                )
+//                pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
+//                    viewLifecycleOwner.lifecycleScope.launch {
+//                        annotation.getData()?.asInt?.let { pointId ->
+//                            viewModel.getPointDetailsPreview(pointId).collect { details ->
+//                                prepareViewAnnotation(annotation, details)
+//                            }
+//                        }
+//                    }
+//
+//                    true
+//                })
+            }
+        }
+    }
+
+    private fun createFlagAnnotationPoint(bitmap: Bitmap, point: Point): PointAnnotationOptions {
+        return PointAnnotationOptions()
+            .withPoint(point)
+            .withIconImage(bitmap)
+            .withIconAnchor(IconAnchor.BOTTOM_LEFT)
+            .withIconOffset(listOf(-9.6, 3.8))
     }
 
     private fun addAnnotationToMap(point: PrivateRoutePointModel) {
