@@ -12,6 +12,7 @@ import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 
 interface RoutesListAdapterCallback {
     fun onRouteItemLongPressed(route: PrivateRouteModel)
+    fun onRouteItemClick(route: PrivateRouteModel)
 }
 
 class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.Adapter<RoutesListAdapter.RouteViewHolder>() {
@@ -60,6 +61,10 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.
                 item.routeId?.let { id -> callback.onRouteItemLongPressed(item) }
 
                 return@setOnLongClickListener true
+            }
+
+            binding.root.setOnClickListener {
+                callback.onRouteItemClick(item)
             }
         }
     }

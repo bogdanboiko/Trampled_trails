@@ -35,6 +35,7 @@ interface OnAddButtonPressed {
 interface BottomSheetDialog {
     fun createRoute()
     fun deleteRoute(route: PrivateRouteModel)
+    fun rebuildRoute(route: PrivateRouteModel)
 }
 
 class MainActivity :
@@ -265,6 +266,11 @@ class MainActivity :
             }
 
         builder.show()
+    }
+
+    override fun onRouteItemClick(route: PrivateRouteModel) {
+        (navHostFragment.childFragmentManager.fragments[0] as BottomSheetDialog)
+            .rebuildRoute(route)
     }
 
     private fun dialogYesClick(route: PrivateRouteModel, dialog: DialogInterface) {

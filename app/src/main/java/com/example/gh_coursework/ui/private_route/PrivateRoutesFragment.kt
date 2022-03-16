@@ -490,6 +490,29 @@ Adding point to points list, route build and set up
         }
     }
 
+    override fun rebuildRoute(route: PrivateRouteModel) {
+        mapboxNavigation.setRoutes(emptyList())
+        pointAnnotationManager.deleteAll()
+
+        buildRouteFromList((route.coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
+
+        addRouteFlagAnnotationToMap(
+            Point.fromLngLat(
+                route.coordinatesList.first().x,
+                route.coordinatesList.first().y,
+            ),
+            R.drawable.ic_start_flag
+        )
+
+        addRouteFlagAnnotationToMap(
+            Point.fromLngLat(
+                route.coordinatesList.last().x,
+                route.coordinatesList.last().y,
+            ),
+            R.drawable.ic_finish_flag
+        )
+    }
+
     /*
     Reset route or undo point creation
      */
