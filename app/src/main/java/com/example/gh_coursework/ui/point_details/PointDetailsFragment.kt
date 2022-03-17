@@ -44,7 +44,6 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteTa
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.GONE)
         configToolBar()
         configConfirmButton()
         configDialog()
@@ -154,11 +153,6 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteTa
                 bottomBar.visibility = View.VISIBLE
             }
         }
-    }
-
-    override fun onDetach() {
-        (activity as OnSwitchActivityLayoutVisibility).switchActivityLayoutState(View.VISIBLE)
-        super.onDetach()
     }
 
     override fun deleteTag(tag: PointTagModel) {

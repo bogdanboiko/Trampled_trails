@@ -7,9 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -38,13 +38,14 @@ import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private val viewModel: PointViewModel by viewModel()
     private var pointCoordinates = emptyList<PrivatePointModel>()
     private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
-    private lateinit var behavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var center: Pair<Float, Float>
@@ -68,6 +69,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         configBottomSheetDialog()
         configMapModSwitcher()
         configCancelButton()
+        configBottomSheetDialog()
         fetchPoints()
         view.viewTreeObserver?.addOnGlobalLayoutListener {
             center = Pair(view.width / 2f, view.height / 2f)
@@ -93,19 +95,23 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     }
 
     private fun configBottomSheetDialog() {
-        behavior = BottomSheetBehavior.from(binding.bottomSheetDialogLayout.bottomSheetDialog)
+        sheetBehavior =
+            BottomSheetBehavior.from(binding.bottomSheetDialogLayout.pointBottomSheetDialog)
+
+        sheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 2
+        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun configMapModSwitcher() {
-        binding.bottomSheetDialogLayout.fab.setOnClickListener {
+        binding.fab.setOnClickListener {
             if (mapState == MapState.CREATOR) {
                 executeClickAtPoint()
             } else {
                 with(binding) {
                     centralPointer.visibility = View.VISIBLE
                     cancelButton.visibility = View.VISIBLE
-                    bottomSheetDialogLayout.fab.setImageDrawable(
+                    fab.setImageDrawable(
                         context?.getDrawable(
                             R.drawable.ic_confirm
                         )
@@ -124,7 +130,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             with(binding) {
                 centralPointer.visibility = View.INVISIBLE
                 cancelButton.visibility = View.INVISIBLE
-                bottomSheetDialogLayout.fab.setImageDrawable(
+                fab.setImageDrawable(
                     context?.getDrawable(
                         R.drawable.ic_add
                     )
@@ -173,12 +179,18 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                 )
 
                 pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        annotation.getData()?.asInt?.let { pointId ->
-                            viewModel.getPointDetailsPreview(pointId).collect { details ->
-                                prepareViewAnnotation(annotation, details)
+                    if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                        viewLifecycleOwner.lifecycleScope.launch {
+
+                            annotation.getData()?.asInt?.let { pointId ->
+                                viewModel.getPointDetailsPreview(pointId).collect { details ->
+                                    prepareDetailsDialog(annotation, details)
+                                }
                             }
                         }
+                        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+                    } else {
+                        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
                     }
 
                     true
@@ -187,46 +199,30 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         }
     }
 
-    private fun prepareViewAnnotation(
+    private fun prepareDetailsDialog(
         pointAnnotation: PointAnnotation,
         details: PrivatePointDetailsPreviewModel?
     ) {
-        val viewAnnotation =
-            viewAnnotationManager.getViewAnnotationByFeatureId(pointAnnotation.featureIdentifier)
-                ?: viewAnnotationManager.addViewAnnotation(
-                    resId = R.layout.item_annotation_view,
-                    options = viewAnnotationOptions {
-                        geometry(pointAnnotation.geometry)
-                        anchor(ViewAnnotationAnchor.BOTTOM)
-                        associatedFeatureId(pointAnnotation.featureIdentifier)
-                        offsetY(pointAnnotation.iconImageBitmap?.height)
-                    }
-                )
+        binding.bottomSheetDialogLayout.apply {
+            pointCaptionText.text = details?.caption ?: ""
+            pointDescriptionText.text = details?.description ?: ""
 
-        ItemAnnotationViewBinding.bind(viewAnnotation).apply {
-            pointCaptionText.text = details?.caption
-            previewDescriptionText.text = details?.description
-
-            viewDetailsButton.setOnClickListener {
+            pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections
                         .actionPrivatePointsFragmentToPointDetailsFragment(pointAnnotation.getData()?.asLong!!)
                 )
             }
 
-            closeNativeView.setOnClickListener {
-                viewAnnotationManager.removeViewAnnotation(viewAnnotation)
-            }
-
-            deleteButton.setOnClickListener {
+            pointDetailsDeleteButton.setOnClickListener {
                 pointAnnotation.getData()?.asInt?.let { pointId ->
                     viewModel.deletePoint(
                         pointId
                     )
                 }
 
-                viewAnnotationManager.removeViewAnnotation(viewAnnotation)
                 pointAnnotationManager.delete(pointAnnotation)
+                sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
     }
