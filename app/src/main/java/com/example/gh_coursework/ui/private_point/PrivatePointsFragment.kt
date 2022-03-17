@@ -238,6 +238,8 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         binding.bottomSheetDialogLayout.apply {
             pointCaptionText.text = details?.caption ?: ""
             pointDescriptionText.text = details?.description ?: ""
+            tagListTextView.text = details?.tagList?.joinToString(",", "Tags: ")
+            { pointTagModel -> pointTagModel.name } ?: ""
 
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(

@@ -4,61 +4,83 @@
     android:id="@+id/pointBottomSheetDialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:behavior_hideable="true"
     android:background="@color/white"
+    app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
-    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+    android:paddingBottom="55dp">
+
     <ImageButton
         android:id="@+id/pointDetailsEditButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/black"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/ic_edit"
         android:background="@color/transparent"
+        android:backgroundTint="@color/black"
         android:padding="20dp"
-        />
+        android:src="@drawable/ic_edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/pointDetailsDeleteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/pointDetailsEditButton"
-        android:src="@drawable/ic_delete"
         android:background="@color/transparent"
-        android:padding="20dp" />
-
-    <LinearLayout
+        android:padding="20dp"
+        android:src="@drawable/ic_delete"
+        app:layout_constraintEnd_toStartOf="@id/pointDetailsEditButton"
+        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/pointDetailsEditButton"
-        android:orientation="vertical">
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
         <TextView
             android:id="@+id/pointCaptionText"
             android:layout_width="match_parent"
-            android:enabled="false"
-            android:textStyle="bold"
-            android:textColorHint="@color/black"
+            android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@color/transparent"
-            android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:enabled="false"
+            android:lineSpacingExtra="2dp"
             android:textColor="@color/black"
-            android:lineSpacingExtra="2dp" />
+            android:textColorHint="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tagListTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            app:layout_anchor="@id/pointCaptionText"
+            android:background="@color/transparent"
+            android:enabled="false"
+            android:lineSpacingExtra="2dp"
+            android:paddingBottom="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:textSize="16sp" />
+
         <TextView
             android:id="@+id/pointDescriptionText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
             android:layout_margin="10dp"
-            android:paddingBottom="10dp"
-            android:textColorHint="@color/black"
             android:background="@color/transparent"
             android:enabled="false"
+            android:lineSpacingExtra="2dp"
+            android:paddingBottom="10dp"
             android:textColor="@color/black"
-            android:lineSpacingExtra="2dp" />
-    </LinearLayout>
+            android:textColorHint="@color/black"
+            android:textSize="16sp" />
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
