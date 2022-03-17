@@ -51,10 +51,39 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var center: Pair<Float, Float>
+
     private val onMapClickListener = OnMapClickListener { point ->
         val newPoint = PrivatePointModel(null, point.longitude(), point.latitude(), false)
         viewModel.addPoint(newPoint)
         return@OnMapClickListener true
+    }
+
+    private val onPointClickEvent = OnPointAnnotationClickListener  { annotation ->
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            annotation.getData()?.asInt?.let { pointId ->
+                viewModel.getPointDetailsPreview(pointId).collect { details ->
+                    prepareDetailsDialog(annotation, details)
+                }
+            }
+        }
+        if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+            loadPointData(annotation)
+            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        } else {
+            sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            loadPointData(annotation)
+            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+
+        binding.mapView.camera.easeTo(
+            CameraOptions.Builder()
+                .center(Point.fromLngLat(annotation.point.longitude(), annotation.point.latitude()))
+                .zoom(12.0)
+                .build()
+        )
+
+        true
     }
 
     override fun onCreateView(
@@ -85,6 +114,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         }
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        pointAnnotationManager.addClickListener(onPointClickEvent)
     }
 
     private fun configMapSwitcherButton() {
@@ -121,6 +151,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                 }
 
                 mapboxMap.addOnMapClickListener(onMapClickListener)
+                pointAnnotationManager.removeClickListener(onPointClickEvent)
                 mapState = MapState.CREATOR
             }
         }
@@ -140,6 +171,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             }
 
             mapboxMap.removeOnMapClickListener(onMapClickListener)
+            pointAnnotationManager.addClickListener(onPointClickEvent)
             mapState = MapState.PRESENTATION
         }
     }
@@ -179,34 +211,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                         Point.fromLngLat(point.x, point.y)
                     ).withData(JsonPrimitive(point.pointId))
                 )
-
-                pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
-                    viewLifecycleOwner.lifecycleScope.launch {
-
-                        annotation.getData()?.asInt?.let { pointId ->
-                            viewModel.getPointDetailsPreview(pointId).collect { details ->
-                                prepareDetailsDialog(annotation, details)
-                            }
-                        }
-                    }
-                    if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                        loadPointData(annotation)
-                        sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    } else {
-                        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                        loadPointData(annotation)
-                        sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    }
-
-                    binding.mapView.camera.easeTo(
-                        CameraOptions.Builder()
-                            .center(Point.fromLngLat(annotation.point.longitude(), annotation.point.latitude()))
-                            .zoom(12.0)
-                            .build()
-                    )
-
-                    true
-                })
             }
         }
     }
