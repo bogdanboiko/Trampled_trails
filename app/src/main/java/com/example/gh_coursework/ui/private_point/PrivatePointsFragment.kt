@@ -24,10 +24,12 @@ import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
+import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.ViewAnnotationAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
@@ -179,22 +181,43 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                 )
 
                 pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
-                    if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                        viewLifecycleOwner.lifecycleScope.launch {
+                    viewLifecycleOwner.lifecycleScope.launch {
 
-                            annotation.getData()?.asInt?.let { pointId ->
-                                viewModel.getPointDetailsPreview(pointId).collect { details ->
-                                    prepareDetailsDialog(annotation, details)
-                                }
+                        annotation.getData()?.asInt?.let { pointId ->
+                            viewModel.getPointDetailsPreview(pointId).collect { details ->
+                                prepareDetailsDialog(annotation, details)
                             }
                         }
-                        sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-                    } else {
-                        sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN)
                     }
+                    if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                        loadPointData(annotation)
+                        sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    } else {
+                        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                        loadPointData(annotation)
+                        sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                    }
+
+                    binding.mapView.camera.easeTo(
+                        CameraOptions.Builder()
+                            .center(Point.fromLngLat(annotation.point.longitude(), annotation.point.latitude()))
+                            .zoom(12.0)
+                            .build()
+                    )
 
                     true
                 })
+            }
+        }
+    }
+
+    private fun loadPointData(annotation: PointAnnotation) {
+        viewLifecycleOwner.lifecycleScope.launch {
+
+            annotation.getData()?.asInt?.let { pointId ->
+                viewModel.getPointDetailsPreview(pointId).collect { details ->
+                    prepareDetailsDialog(annotation, details)
+                }
             }
         }
     }
