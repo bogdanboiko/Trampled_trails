@@ -16,7 +16,6 @@ import androidx.navigation.fragment.findNavController
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
-import com.example.gh_coursework.databinding.ItemAnnotationViewBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
@@ -27,7 +26,6 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.ViewAnnotationAnchor
 import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
@@ -36,7 +34,6 @@ import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.viewannotation.ViewAnnotationManager
-import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -53,12 +50,20 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private lateinit var center: Pair<Float, Float>
 
     private val onMapClickListener = OnMapClickListener { point ->
-        val newPoint = PrivatePointModel(null, point.longitude(), point.latitude(), false)
-        viewModel.addPoint(newPoint)
+        val result = pointAnnotationManager.annotations.find {
+            return@find it.point.latitude() == point.latitude()
+                    && it.point.longitude() == point.longitude()
+        }
+
+        if (result == null) {
+            val newPoint = PrivatePointModel(null, point.longitude(), point.latitude(), false)
+            viewModel.addPoint(newPoint)
+        }
+
         return@OnMapClickListener true
     }
 
-    private val onPointClickEvent = OnPointAnnotationClickListener  { annotation ->
+    private val onPointClickEvent = OnPointAnnotationClickListener { annotation ->
         viewLifecycleOwner.lifecycleScope.launch {
 
             annotation.getData()?.asInt?.let { pointId ->
