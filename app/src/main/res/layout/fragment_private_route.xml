@@ -9,11 +9,7 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:elevation="-3dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:elevation="-3dp" />
 
     <ImageButton
         android:id="@+id/mapRoutePointModSwitcher"
@@ -22,7 +18,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/ic_routes"
-        android:elevation="2dp"
+        android:elevation="-2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -109,8 +105,8 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
         android:id="@+id/parent_container"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.google.android.material.bottomappbar.BottomAppBar
@@ -146,19 +142,19 @@
             app:fabCustomSize="75dp"
             app:layout_anchor="@id/bottomAppBar"
             app:maxImageSize="35dp" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:elevation="-1dp">
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="-1dp">
 
-        <include
-            android:id="@+id/bottomSheetDialogRoutes"
-            layout="@layout/bottom_sheet_routes" />
+            <include
+                android:id="@+id/bottomSheetDialogRoutes"
+                layout="@layout/bottom_sheet_routes" />
 
-        <include
-            android:id="@+id/bottomSheetDialogPoints"
-            layout="@layout/bottom_sheet_points" />
+            <include
+                android:id="@+id/bottomSheetDialogPoints"
+                layout="@layout/bottom_sheet_points" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
