@@ -113,6 +113,7 @@ class PrivateRoutesFragment :
 
         if (result == null) {
             val newPoint = PrivateRoutePointModel(null, point.longitude(), point.latitude(), false)
+            addEmptyAnnotationToMap(newPoint)
             addWaypoint(newPoint)
         }
 
@@ -121,7 +122,6 @@ class PrivateRoutesFragment :
 
     private val onPointClickEvent = OnPointAnnotationClickListener { annotation ->
         viewLifecycleOwner.lifecycleScope.launch {
-
             annotation.getData()?.asInt?.let { pointId ->
                 viewModel.getPointDetailsPreview(pointId).collect { details ->
                     prepareDetailsDialog(annotation, details)
@@ -343,33 +343,67 @@ class PrivateRoutesFragment :
                 if (route.isNotEmpty()) {
                     if (route.last().coordinatesList.isNotEmpty()) {
                         buildRouteFromList((route.last().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
-
-                        pointAnnotationManager.deleteAll()
-                        addRouteFlagAnnotationToMap(
-                            Point.fromLngLat(
-                                route.last().coordinatesList.first().x,
-                                route.last().coordinatesList.first().y,
-                            ),
-                            R.drawable.ic_start_flag
-                        )
-
-                        addRouteFlagAnnotationToMap(
-                            Point.fromLngLat(
-                                route.last().coordinatesList.last().x,
-                                route.last().coordinatesList.last().y,
-                            ),
-                            R.drawable.ic_finish_flag
-                        )
-
-                        route.last().coordinatesList.forEach {
-                            if (!it.isRoutePoint) {
-                                addAnnotationToMap(it)
-                            }
-                        }
+                        fetchAnnotatedRoutePoints(route.last())
                     }
 
                     _routesList.value = route
                 }
+            }
+        }
+    }
+
+    private fun fetchAnnotatedRoutePoints(route: PrivateRouteModel) {
+        val isFirstAnnotated = pointAnnotationManager.annotations.find {
+            return@find it.point.latitude() == route.coordinatesList.first().x
+                    && it.point.longitude() == route.coordinatesList.first().y
+        }
+
+        val isLastAnnotated = pointAnnotationManager.annotations.find {
+            return@find it.point.latitude() == route.coordinatesList.last().x
+                    && it.point.longitude() == route.coordinatesList.last().y
+        }
+
+        pointAnnotationManager.deleteAll()
+
+        if (isFirstAnnotated != null) {
+            addRouteFlagAnnotationToMap(
+                Point.fromLngLat(
+                    route.coordinatesList.first().x,
+                    route.coordinatesList.first().y + 5.5,
+                ),
+                R.drawable.ic_start_flag
+            )
+        } else {
+            addRouteFlagAnnotationToMap(
+                Point.fromLngLat(
+                    route.coordinatesList.first().x,
+                    route.coordinatesList.first().y,
+                ),
+                R.drawable.ic_start_flag
+            )
+        }
+
+        if (isLastAnnotated != null) {
+            addRouteFlagAnnotationToMap(
+                Point.fromLngLat(
+                    route.coordinatesList.last().x,
+                    route.coordinatesList.last().y + 5.5,
+                ),
+                R.drawable.ic_finish_flag
+            )
+        } else {
+            addRouteFlagAnnotationToMap(
+                Point.fromLngLat(
+                    route.coordinatesList.first().x,
+                    route.coordinatesList.first().y,
+                ),
+                R.drawable.ic_start_flag
+            )
+        }
+
+        route.coordinatesList.forEach {
+            if (!it.isRoutePoint) {
+                addAnnotationToMap(it)
             }
         }
     }
@@ -398,6 +432,7 @@ class PrivateRoutesFragment :
                 if (it == MapState.CREATOR) {
                     setEmptyRoute()
                     pointAnnotationManager.deleteAll()
+                    pointAnnotationManager.removeClickListener(onPointClickEvent)
 
                     centralPointer.visibility = View.VISIBLE
                     pointTypeSwitchButton.visibility = View.VISIBLE
@@ -438,8 +473,6 @@ class PrivateRoutesFragment :
     }
 
     private fun swapOnMapClickListener(isChecked: Boolean) {
-        pointAnnotationManager.removeClickListener(onPointClickEvent)
-
         if (isChecked) {
             mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
             mapboxMap.addOnMapClickListener(regularOnMapClickListener)
@@ -555,14 +588,26 @@ class PrivateRoutesFragment :
     private fun addWaypoint(point: PrivateRoutePointModel) {
         currentRouteCoordinatesList.add(point)
 
+        routeState.value = true
+
         if (currentRouteCoordinatesList.size == 1) {
-            routeState.value = true
-            addRouteFlagAnnotationToMap(
-                Point.fromLngLat(
-                    currentRouteCoordinatesList[0].x,
-                    currentRouteCoordinatesList[0].y
-                ), R.drawable.ic_start_flag
-            )
+            if (binding.pointTypeSwitchButton.isChecked) {
+                addRouteFlagAnnotationToMap(
+                    Point.fromLngLat(
+                        currentRouteCoordinatesList[0].x,
+                        currentRouteCoordinatesList[0].y
+                    ),
+                    R.drawable.ic_start_flag
+                )
+            } else {
+                addRouteFlagAnnotationToMap(
+                    Point.fromLngLat(
+                        currentRouteCoordinatesList[0].x,
+                        currentRouteCoordinatesList[0].y + 0.0001
+                    ),
+                    R.drawable.ic_start_flag
+                )
+            }
 
             binding.undoPointCreatingButton.apply {
                 show()
@@ -611,21 +656,7 @@ class PrivateRoutesFragment :
 
         buildRouteFromList((route.coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
 
-        addRouteFlagAnnotationToMap(
-            Point.fromLngLat(
-                route.coordinatesList.first().x,
-                route.coordinatesList.first().y,
-            ),
-            R.drawable.ic_start_flag
-        )
-
-        addRouteFlagAnnotationToMap(
-            Point.fromLngLat(
-                route.coordinatesList.last().x,
-                route.coordinatesList.last().y,
-            ),
-            R.drawable.ic_finish_flag
-        )
+        fetchAnnotatedRoutePoints(route)
     }
 
     private fun resetCurrentRoute() {
@@ -692,6 +723,19 @@ class PrivateRoutesFragment :
             .withIconImage(bitmap)
             .withIconAnchor(IconAnchor.BOTTOM_LEFT)
             .withIconOffset(listOf(-9.6, 3.8))
+    }
+
+    private fun addEmptyAnnotationToMap(point: PrivateRoutePointModel) {
+        activity?.applicationContext?.let {
+            bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
+                pointAnnotationManager.create(
+                    createAnnotationPoint(
+                        image,
+                        Point.fromLngLat(point.x, point.y)
+                    )
+                )
+            }
+        }
     }
 
     private fun addAnnotationToMap(point: PrivateRoutePointModel) {
