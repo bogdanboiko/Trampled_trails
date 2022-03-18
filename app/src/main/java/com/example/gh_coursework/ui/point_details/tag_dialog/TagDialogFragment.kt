@@ -1,6 +1,5 @@
 package com.example.gh_coursework.ui.point_details.tag_dialog
 
-import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -20,13 +19,12 @@ import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.point_details.model.PointsTagsModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
 
 class TagDialogFragment : DialogFragment(), DeleteTag {
     private val tagAdapter = TagAdapter(this)
     private lateinit var binding: DialogTagBinding
     private val arguments by navArgs<PointDetailsFragmentArgs>()
-    private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
+    private val viewModel: TagDialogViewModel by viewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater,

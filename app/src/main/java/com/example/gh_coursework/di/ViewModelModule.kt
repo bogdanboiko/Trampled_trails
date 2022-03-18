@@ -1,6 +1,7 @@
 package com.example.gh_coursework.di
 
 import com.example.gh_coursework.ui.point_details.PointDetailsViewModel
+import com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogViewModel
 import com.example.gh_coursework.ui.private_point.PointViewModel
 import com.example.gh_coursework.ui.private_route.RouteViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -17,6 +18,10 @@ val viewModelModule = module {
     }
 
     viewModel {
-            parameters -> PointDetailsViewModel(parameters[0], get(), get(), get(), get(), get(), get(), get())
+        TagDialogViewModel(get(), get(), get(), get(), get())
+    }
+
+    viewModel {
+            parameters -> PointDetailsViewModel(parameters[0], get(), get())
     }
 }
