@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class PointDetailsViewModel(
-    private val pointId: Int,
+    private val pointId: Long,
     private val addPointDetailsUseCase: AddPointDetailsUseCase,
     private val getPointDetailsUseCase: GetPointDetailsUseCase) : ViewModel() {
     val pointDetails = getPointDetailsUseCase.invoke(pointId).map { mapPointDetailsDomainToModel(it) }

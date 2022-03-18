@@ -2,6 +2,7 @@ package com.example.gh_coursework.ui.point_details.tag_dialog
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,12 +20,13 @@ import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.point_details.model.PointsTagsModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 class TagDialogFragment : DialogFragment(), DeleteTag {
     private val tagAdapter = TagAdapter(this)
     private lateinit var binding: DialogTagBinding
     private val arguments by navArgs<PointDetailsFragmentArgs>()
-    private val viewModel: TagDialogViewModel by viewModel()
+    private val viewModel: TagDialogViewModel by viewModel { parametersOf(arguments.pointId) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,6 +48,12 @@ class TagDialogFragment : DialogFragment(), DeleteTag {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.tags.collect {
                 tagAdapter.submitList(it)
+            }
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.pointTags.collect {
+                tagAdapter.insertCheckedTagList(it)
             }
         }
     }
@@ -98,6 +106,7 @@ class TagDialogFragment : DialogFragment(), DeleteTag {
             }
 
             submitTagsButton.setOnClickListener {
+                Log.e("e", tagAdapter.addTagList.toString())
                 viewModel.addTagsToPoint(tagAdapter.addTagList.map {
                     PointsTagsModel(
                         arguments.pointId,

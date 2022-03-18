@@ -656,7 +656,7 @@ class PrivateRoutesFragment :
 
                 pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
                     viewLifecycleOwner.lifecycleScope.launch {
-                        annotation.getData()?.asInt?.let { pointId ->
+                        annotation.getData()?.asLong?.let { pointId ->
                             viewModel.getPointDetailsPreview(pointId).collect { details ->
                                 prepareViewAnnotation(annotation, details)
                             }

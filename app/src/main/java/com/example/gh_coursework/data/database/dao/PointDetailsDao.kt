@@ -14,7 +14,7 @@ abstract class PointDetailsDao {
     abstract suspend fun updatePointDetails(details: PointDetailsEntity)
 
     @Query("SELECT * FROM point_details WHERE pointId = :pointId")
-    abstract fun getPointDetails(pointId: Int): Flow<PointDetailsResponse?>
+    abstract fun getPointDetails(pointId: Long): Flow<PointDetailsResponse?>
 
     @Transaction
     open suspend fun updateOrInsertPointDetails(details: PointDetailsEntity) {

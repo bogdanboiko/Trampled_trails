@@ -20,7 +20,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
-    private lateinit var dialog: TagDialogFragment
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
@@ -77,7 +76,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     private fun configTagButton() {
         binding.addTagButton.setOnClickListener {
             findNavController().navigate(
-                PointDetailsFragmentDirections.actionPrivateDetailsFragmentToPointTagDialogFragment()
+                PointDetailsFragmentDirections.actionPrivateDetailsFragmentToPointTagDialogFragment(arguments.pointId)
             )
         }
     }
