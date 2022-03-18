@@ -102,7 +102,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         super.onViewCreated(view, savedInstanceState)
         configMap()
         configMapSwitcherButton()
-        configBottomSheetDialog()
         configMapModSwitcher()
         configCancelButton()
         configBottomSheetDialog()
