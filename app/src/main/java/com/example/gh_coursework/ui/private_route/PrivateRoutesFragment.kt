@@ -223,13 +223,13 @@ class PrivateRoutesFragment :
             .from(binding.bottomSheetDialogLayout.bottomSheetDialogPoints.pointBottomSheetDialog)
 
         configMap()
-        configMapSwitcherButton()
         configMapStateSwitcher()
+        configMapSwitcherButton()
         configCancelButton()
-        buildDefaultRoute()
         configRecycler()
         initMapboxNavigation()
         initRouteLine()
+        buildDefaultRoute()
 
         view.viewTreeObserver?.addOnGlobalLayoutListener {
             center = Pair(view.width / 2f, view.height / 2f)
@@ -243,33 +243,20 @@ class PrivateRoutesFragment :
         }
     }
 
-    private fun configCancelButton() {
-        routeState.observe(viewLifecycleOwner) {
-            if (routeState.value == true) {
-                binding.cancelButton.text = getString(R.string.txtCancelButtonSave)
-                binding.cancelButton.icon =
-                    view?.context?.let { it1 -> AppCompatResources.getDrawable(it1, R.drawable.ic_confirm) }
-
-                binding.cancelButton.setOnClickListener {
-                    createRoute()
-                    mapState.value = MapState.PRESENTATION
-                    binding.cancelButton.visibility = View.INVISIBLE
-                    routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-            } else if (routeState.value == false) {
-                binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
-                binding.cancelButton.icon =
-                    view?.context?.let { it1 -> AppCompatResources.getDrawable(it1, R.drawable.ic_close) }
-
-                binding.cancelButton.setOnClickListener {
-                    resetCurrentRoute()
-                    buildDefaultRoute()
-                    mapState.value = MapState.PRESENTATION
-                    binding.cancelButton.visibility = View.INVISIBLE
-                    routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                }
-            }
+    @OptIn(MapboxExperimental::class)
+    private fun configMap() {
+        mapboxMap = binding.mapView.getMapboxMap().also {
+            viewAnnotationManager = binding.mapView.viewAnnotationManager
+            it.loadStyleUri(Style.MAPBOX_STREETS)
         }
+
+        binding.mapView.location.apply {
+            setLocationProvider(navigationLocationProvider)
+            enabled = true
+        }
+
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        pointAnnotationManager.addClickListener(onPointClickEvent)
     }
 
     private fun configMapStateSwitcher() {
@@ -298,20 +285,39 @@ class PrivateRoutesFragment :
         }
     }
 
-    @OptIn(MapboxExperimental::class)
-    private fun configMap() {
-        mapboxMap = binding.mapView.getMapboxMap().also {
-            viewAnnotationManager = binding.mapView.viewAnnotationManager
-            it.loadStyleUri(Style.MAPBOX_STREETS)
-        }
+    private fun configCancelButton() {
+        routeState.observe(viewLifecycleOwner) {
+            if (routeState.value == true) {
+                binding.cancelButton.text = getString(R.string.txtCancelButtonSave)
+                binding.cancelButton.icon =
+                    view?.context?.let { it1 ->
+                        AppCompatResources.getDrawable(
+                            it1,
+                            R.drawable.ic_confirm
+                        )
+                    }
 
-        binding.mapView.location.apply {
-            setLocationProvider(navigationLocationProvider)
-            enabled = true
-        }
+                binding.cancelButton.setOnClickListener {
+                    createRoute()
+                    routeState.value = false
+                    mapState.value = MapState.PRESENTATION
+                    binding.cancelButton.visibility = View.INVISIBLE
+                    routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+            } else if (routeState.value == false) {
+                binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
+                binding.cancelButton.icon =
+                    view?.context?.let { it1 -> AppCompatResources.getDrawable(it1, R.drawable.ic_close) }
 
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
-        pointAnnotationManager.addClickListener(onPointClickEvent)
+                binding.cancelButton.setOnClickListener {
+                    resetCurrentRoute()
+                    buildDefaultRoute()
+                    mapState.value = MapState.PRESENTATION
+                    binding.cancelButton.visibility = View.INVISIBLE
+                    routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                }
+            }
+        }
     }
 
     private fun configRecycler() {
@@ -353,27 +359,9 @@ class PrivateRoutesFragment :
     }
 
     private fun fetchAnnotatedRoutePoints(route: PrivateRouteModel) {
-        val isFirstAnnotated = pointAnnotationManager.annotations.find {
-            return@find it.point.latitude() == route.coordinatesList.first().x
-                    && it.point.longitude() == route.coordinatesList.first().y
-        }
-
-        val isLastAnnotated = pointAnnotationManager.annotations.find {
-            return@find it.point.latitude() == route.coordinatesList.last().x
-                    && it.point.longitude() == route.coordinatesList.last().y
-        }
-
         pointAnnotationManager.deleteAll()
 
-        if (isFirstAnnotated != null) {
-            addRouteFlagAnnotationToMap(
-                Point.fromLngLat(
-                    route.coordinatesList.first().x,
-                    route.coordinatesList.first().y + 5.5,
-                ),
-                R.drawable.ic_start_flag
-            )
-        } else {
+        if (route.coordinatesList.first().isRoutePoint) {
             addRouteFlagAnnotationToMap(
                 Point.fromLngLat(
                     route.coordinatesList.first().x,
@@ -381,23 +369,31 @@ class PrivateRoutesFragment :
                 ),
                 R.drawable.ic_start_flag
             )
+        } else {
+            addRouteFlagAnnotationToMap(
+                Point.fromLngLat(
+                    route.coordinatesList.first().x,
+                    route.coordinatesList.first().y + 0.0005,
+                ),
+                R.drawable.ic_start_flag
+            )
         }
 
-        if (isLastAnnotated != null) {
+        if (route.coordinatesList.last().isRoutePoint) {
             addRouteFlagAnnotationToMap(
                 Point.fromLngLat(
                     route.coordinatesList.last().x,
-                    route.coordinatesList.last().y + 5.5,
+                    route.coordinatesList.last().y,
                 ),
                 R.drawable.ic_finish_flag
             )
         } else {
             addRouteFlagAnnotationToMap(
                 Point.fromLngLat(
-                    route.coordinatesList.first().x,
-                    route.coordinatesList.first().y,
+                    route.coordinatesList.last().x,
+                    route.coordinatesList.last().y + 0.0005,
                 ),
-                R.drawable.ic_start_flag
+                R.drawable.ic_finish_flag
             )
         }
 
@@ -603,7 +599,7 @@ class PrivateRoutesFragment :
                 addRouteFlagAnnotationToMap(
                     Point.fromLngLat(
                         currentRouteCoordinatesList[0].x,
-                        currentRouteCoordinatesList[0].y + 0.0001
+                        currentRouteCoordinatesList[0].y + 0.0005
                     ),
                     R.drawable.ic_start_flag
                 )
