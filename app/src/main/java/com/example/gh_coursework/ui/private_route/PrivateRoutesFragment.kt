@@ -121,29 +121,41 @@ class PrivateRoutesFragment :
     }
 
     private val onPointClickEvent = OnPointAnnotationClickListener { annotation ->
-        viewLifecycleOwner.lifecycleScope.launch {
-            annotation.getData()?.asInt?.let { pointId ->
-                viewModel.getPointDetailsPreview(pointId).collect { details ->
-                    prepareDetailsDialog(annotation, details)
+
+        if (annotation.getData()?.isJsonNull == false) {
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                annotation.getData()?.asInt?.let { pointId ->
+                    viewModel.getPointDetailsPreview(pointId).collect { details ->
+                        prepareDetailsDialog(annotation, details)
+                    }
                 }
             }
-        }
 
-        if (pointsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            loadPointData(annotation)
-            pointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        } else {
+            routesDialogBehavior.peekHeight = 0
+            routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            pointsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+
+            if (pointsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                loadPointData(annotation)
+                pointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            } else {
+                pointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                loadPointData(annotation)
+                pointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        } else if (annotation.getData()?.isJsonNull == true) {
+
+            pointsDialogBehavior.peekHeight = 0
             pointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            loadPointData(annotation)
-            pointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
+            routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
 
-        binding.mapView.camera.easeTo(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(annotation.point.longitude(), annotation.point.latitude()))
-                .zoom(12.0)
-                .build()
-        )
+            if (routesDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            } else {
+                routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
 
         true
     }
@@ -217,16 +229,13 @@ class PrivateRoutesFragment :
         super.onViewCreated(view, savedInstanceState)
 
         routeState.value = false
-        routesDialogBehavior =
-            BottomSheetBehavior.from(binding.bottomSheetDialogLayout.bottomSheetDialog)
-        pointsDialogBehavior = BottomSheetBehavior
-            .from(binding.bottomSheetDialogLayout.bottomSheetDialogPoints.pointBottomSheetDialog)
 
         configMap()
         configMapStateSwitcher()
         configMapSwitcherButton()
         configCancelButton()
         configRecycler()
+        configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
         buildDefaultRoute()
@@ -260,7 +269,7 @@ class PrivateRoutesFragment :
     }
 
     private fun configMapStateSwitcher() {
-        binding.bottomSheetDialogLayout.fab.setOnClickListener {
+        binding.fab.setOnClickListener {
             if (mapState.value == MapState.CREATOR) {
                 executeClickAtPoint()
             } else {
@@ -321,9 +330,21 @@ class PrivateRoutesFragment :
     }
 
     private fun configRecycler() {
-        binding.bottomSheetDialogLayout.routesRecyclerView.apply {
+        binding.bottomSheetDialogRoutes.routesRecyclerView.apply {
             adapter = routesListAdapter
         }
+    }
+
+    private fun configBottomSheetDialogs() {
+        routesDialogBehavior =
+            BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
+        routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+        routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        pointsDialogBehavior =
+            BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointBottomSheetDialog)
+        pointsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+        pointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun initMapboxNavigation() {
@@ -424,6 +445,8 @@ class PrivateRoutesFragment :
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun switchMapMod() {
         mapState.observe(viewLifecycleOwner) {
+            routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
             with(binding) {
                 if (it == MapState.CREATOR) {
                     setEmptyRoute()
@@ -440,7 +463,7 @@ class PrivateRoutesFragment :
                         swapOnMapClickListener(isChecked)
                     }
 
-                    bottomSheetDialogLayout.fab.setImageDrawable(
+                    fab.setImageDrawable(
                         context?.getDrawable(
                             R.drawable.ic_confirm
                         )
@@ -458,7 +481,7 @@ class PrivateRoutesFragment :
 
                     pointAnnotationManager.addClickListener(onPointClickEvent)
 
-                    bottomSheetDialogLayout.fab.setImageDrawable(
+                    fab.setImageDrawable(
                         context?.getDrawable(
                             R.drawable.ic_add
                         )
@@ -707,8 +730,11 @@ class PrivateRoutesFragment :
                         point
                     )
                 )
-//                pointAnnotationManager.addClickListener(OnPointAnnotationClickListener { annotation ->
-//                })
+                pointAnnotationManager.addLongClickListener(OnPointAnnotationLongClickListener {
+
+
+                    true
+                })
             }
         }
     }
@@ -762,7 +788,7 @@ class PrivateRoutesFragment :
         pointAnnotation: PointAnnotation,
         details: PrivateRoutePointDetailsPreviewModel?
     ) {
-        binding.bottomSheetDialogLayout.bottomSheetDialogPoints.apply {
+        binding.bottomSheetDialogPoints.apply {
             pointCaptionText.text = details?.caption ?: ""
             pointDescriptionText.text = details?.description ?: ""
             tagListTextView.text = details?.tagList?.joinToString(",", "Tags: ")
