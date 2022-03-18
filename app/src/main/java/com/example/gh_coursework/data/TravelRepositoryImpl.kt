@@ -4,6 +4,7 @@ import com.example.gh_coursework.data.database.mapper.mapPointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
+import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) : TravelRepository {
     override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
@@ -38,13 +39,17 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.deleteRoute(route)
     }
 
+    override fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>> {
+        return localDataSrcIml.getPointsTagsList(pointId)
+    }
+
     override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
         localDataSrcIml.removePointsTagsList(pointsTagsList)
     }
 
     override fun getPointOfInterestPreview() = localDataSrcIml.getPointOfInterestPreview()
 
-    override fun getPointOfInterestDetails(id: Int) = localDataSrcIml.getPointOfInterestDetails(id)
+    override fun getPointOfInterestDetails(id: Long) = localDataSrcIml.getPointOfInterestDetails(id)
 
     override fun getPointTagList() = localDataSrcIml.getPointTagList()
 
