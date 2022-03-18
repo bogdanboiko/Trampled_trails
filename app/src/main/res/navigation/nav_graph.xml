@@ -34,8 +34,15 @@
         android:name="com.example.gh_coursework.ui.point_details.PointDetailsFragment"
         android:label="fragment_point_details"
         tools:layout="@layout/fragment_point_details">
+        <action
+            android:id="@+id/action_privateDetailsFragment_to_pointTagDialogFragment"
+            app:destination="@id/pointTagsDialogFragment" />
         <argument
             android:name="pointId"
             app:argType="long" />
     </fragment>
+    <dialog
+        android:id="@+id/pointTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogFragment"
+        android:label="TagDialog"/>
 </navigation>
