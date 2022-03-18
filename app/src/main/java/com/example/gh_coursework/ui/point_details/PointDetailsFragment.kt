@@ -56,9 +56,10 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     private fun configConfirmButton() {
         with(binding) {
             confirmEditButton.setOnClickListener {
+                it.visibility = View.GONE
+                pointDetailsEditButton.visibility = View.VISIBLE
                 pointCaptionText.isEnabled = false
                 pointDescriptionText.isEnabled = false
-                bottomBar.visibility = View.INVISIBLE
                 pointCaptionText.hint = ""
                 pointDescriptionText.hint = ""
                 viewModel.addPointDetails(
@@ -74,9 +75,11 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     }
 
     private fun configTagButton() {
-        binding.addTagButton.setOnClickListener {
+        binding.pointDetailsTagButton.setOnClickListener {
             findNavController().navigate(
-                PointDetailsFragmentDirections.actionPrivateDetailsFragmentToPointTagDialogFragment(arguments.pointId)
+                PointDetailsFragmentDirections.actionPrivateDetailsFragmentToPointTagDialogFragment(
+                    arguments.pointId
+                )
             )
         }
     }
@@ -84,11 +87,12 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     private fun configToolBar() {
         with(binding) {
             pointDetailsEditButton.setOnClickListener {
+                it.visibility = View.GONE
+                confirmEditButton.visibility = View.VISIBLE
                 pointCaptionText.isEnabled = true
                 pointDescriptionText.isEnabled = true
                 pointCaptionText.hint = "Put in point caption..."
                 pointDescriptionText.hint = "Put in point description..."
-                bottomBar.visibility = View.VISIBLE
             }
         }
     }
