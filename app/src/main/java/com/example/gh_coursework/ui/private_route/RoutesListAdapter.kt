@@ -58,7 +58,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.
             }
 
             binding.root.setOnLongClickListener {
-                item.routeId?.let { id -> callback.onRouteItemLongPressed(item) }
+                item.routeId?.let { callback.onRouteItemLongPressed(item) }
 
                 return@setOnLongClickListener true
             }

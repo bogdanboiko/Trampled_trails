@@ -1,6 +1,6 @@
 package com.example.gh_coursework.ui.point_details.model
 
 data class PointTagModel(
-    val tagId: Int?,
+    val tagId: Long?,
     val name: String
 )

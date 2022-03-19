@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 interface TravelRepository {
     suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain)
     suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain)
-    suspend fun deletePoint(pointId: Int)
+    suspend fun deletePoint(pointId: Long)
 
     suspend fun addPointTag(tag: PointTagDomain)
     suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>)

@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class PointCoordinatesEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "pointId")
-    val pointId: Int?,
+    val pointId: Long?,
     @ColumnInfo(name = "x")
     val x: Double,
     @ColumnInfo(name = "y")

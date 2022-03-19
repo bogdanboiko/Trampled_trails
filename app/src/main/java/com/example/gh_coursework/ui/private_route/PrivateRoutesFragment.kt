@@ -801,7 +801,7 @@ class PrivateRoutesFragment :
             }
 
             pointDetailsDeleteButton.setOnClickListener {
-                pointAnnotation.getData()?.asInt?.let { pointId ->
+                pointAnnotation.getData()?.asLong?.let { pointId ->
                     viewModel.deletePoint(
                         pointId
                     )

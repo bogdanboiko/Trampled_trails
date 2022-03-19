@@ -39,7 +39,7 @@ class RouteViewModel(
             .map { details -> mapRoutePointDetailsDomainToModel(details) }
     }
 
-    fun deletePoint(pointId: Int) {
+    fun deletePoint(pointId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deletePointUseCase.invoke(pointId)
         }

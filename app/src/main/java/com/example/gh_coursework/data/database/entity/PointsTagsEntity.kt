@@ -23,5 +23,5 @@ data class PointsTagsEntity(
     @ColumnInfo(name = "pointId")
     val pointId: Long,
     @ColumnInfo(name = "tagId")
-    val tagId: Int
+    val tagId: Long
 )
