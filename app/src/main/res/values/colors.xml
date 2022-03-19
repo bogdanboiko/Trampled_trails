@@ -9,6 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="transparent">#00000000</color>
-    <color name="light_gray">#FF0C0C0C</color>
-    <color name="map_background">#E5E4E0</color>
+    <color name="light_gray">#2D2D2D</color>
+    <color name="map_background">#EBE7E1</color>
 </resources>
