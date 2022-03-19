@@ -43,7 +43,7 @@ class LocalDataSrcIml(
             routePointEntitiesList.add(
                 RoutePointEntity(
                     route.routeId?.toLong(),
-                    pointDao.addPointPreview(PointCoordinatesEntity(it.pointId, it.x, it.y, true)),
+                    pointDao.addPointPreview(it),
                     position
                 )
             )

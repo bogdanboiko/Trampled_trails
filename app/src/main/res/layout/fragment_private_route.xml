@@ -9,10 +9,7 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:elevation="-3dp" />
 
     <ImageButton
         android:id="@+id/mapRoutePointModSwitcher"
@@ -21,7 +18,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginTop="25dp"
         android:background="@drawable/ic_routes"
-        android:elevation="2dp"
+        android:elevation="-2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -108,11 +105,56 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/parent_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
-            android:id="@+id/bottomSheetDialogLayout"
-            layout="@layout/bottom_sheet_dialog" />
+        <com.google.android.material.bottomappbar.BottomAppBar
+            android:id="@+id/bottomAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:padding="0dp"
+            app:contentInsetStart="0dp"
+            app:contentInsetStartWithNavigation="0dp"
+            app:fabCradleMargin="10dp"
+            app:fabCradleRoundedCornerRadius="10dp"
+            app:fabCradleVerticalOffset="20dp">
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/bottomNavigationView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:background="@drawable/bottom_nav_color_transparent"
+                app:itemRippleColor="@color/transparent"
+                app:menu="@menu/bottom_nav_menu" />
+        </com.google.android.material.bottomappbar.BottomAppBar>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/ic_add"
+            app:elevation="-2dp"
+            app:fabCustomSize="75dp"
+            app:layout_anchor="@id/bottomAppBar"
+            app:maxImageSize="35dp" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:elevation="-1dp">
+
+            <include
+                android:id="@+id/bottomSheetDialogRoutes"
+                layout="@layout/bottom_sheet_routes" />
+
+            <include
+                android:id="@+id/bottomSheetDialogPoints"
+                layout="@layout/bottom_sheet_points" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
