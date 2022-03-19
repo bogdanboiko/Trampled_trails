@@ -57,6 +57,10 @@ class LocalDataSrcIml(
         routeDao.deleteRoute(mapRouteDomainToEntity(route))
     }
 
+    override fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>> {
+       return getPointOfInterestDetails(pointId).map { it?.tagList ?: emptyList() }
+    }
+
     override suspend fun deletePoint(pointId: Int) {
         pointDao.deletePoint(pointId)
     }
@@ -66,7 +70,7 @@ class LocalDataSrcIml(
             .map { it.map { entity -> (mapRouteResponseListToDomain(entity)) } }
     }
 
-    override fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?> {
+    override fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?> {
         return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
     }
 
@@ -79,11 +83,11 @@ class LocalDataSrcIml(
     }
 
     override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
-        tagDao.addPointsTags(pointsTagsList.map(::mapPointsTagsDomainToEntity))
+        tagDao.addTagsToPoint(pointsTagsList.map(::mapPointsTagsDomainToEntity))
     }
 
     override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
-        tagDao.deletePointsTags(pointsTagsList.map(::mapPointsTagsDomainToEntity))
+        tagDao.deleteTagsFromPoint(pointsTagsList.map(::mapPointsTagsDomainToEntity))
     }
 
     override suspend fun deletePointTag(tag: PointTagDomain) {

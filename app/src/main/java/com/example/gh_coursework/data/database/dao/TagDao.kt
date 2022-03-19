@@ -17,10 +17,10 @@ abstract class TagDao {
     abstract fun getPointTags(): Flow<List<PointTagEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun addPointsTags(pointsTagsList: List<PointsTagsEntity>)
+    abstract fun addTagsToPoint(pointsTagsList: List<PointsTagsEntity>)
 
     @Delete
-    abstract fun deletePointsTags(pointsTagsList: List<PointsTagsEntity>)
+    abstract fun deleteTagsFromPoint(pointsTagsList: List<PointsTagsEntity>)
 
     @Delete
     abstract fun deleteTag(tag: PointTagEntity)

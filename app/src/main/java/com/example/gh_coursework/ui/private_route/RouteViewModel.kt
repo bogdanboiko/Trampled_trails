@@ -34,7 +34,7 @@ class RouteViewModel(
         }
     }
 
-    fun getPointDetailsPreview(pointId: Int): Flow<PrivateRoutePointDetailsPreviewModel?> {
+    fun getPointDetailsPreview(pointId: Long): Flow<PrivateRoutePointDetailsPreviewModel?> {
         return getPointDetailsUseCase.invoke(pointId)
             .map { details -> mapRoutePointDetailsDomainToModel(details) }
     }

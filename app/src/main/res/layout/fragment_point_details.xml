@@ -51,11 +51,22 @@
                     />
 
                 <ImageButton
-                    android:id="@+id/pointDetailsImageButton"
+                    android:id="@+id/confirmEditButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:src="@drawable/ic_image"
+                    android:visibility="gone"
+                    android:src="@drawable/ic_confirm"
+                    android:background="@color/transparent"
+                    android:padding="20dp"
+                    />
+
+                <ImageButton
+                    android:id="@+id/pointDetailsTagButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_tag"
                     android:background="@color/transparent"
                     android:padding="20dp" />
 
@@ -66,7 +77,6 @@
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="60dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <LinearLayout
@@ -109,30 +119,4 @@
         app:layout_anchor="@id/pointDetailsAppBar"
         app:layout_anchorGravity="bottom|right|end"
         />
-
-    <RelativeLayout
-        android:id="@+id/bottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:visibility="invisible"
-        android:background="@color/white">
-    <ImageButton
-        android:id="@+id/confirmEditButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_confirm"
-        android:layout_alignParentEnd="true"
-        android:background="@color/white"
-        android:padding="20dp" />
-
-        <Button
-            android:id="@+id/addTagButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:drawableStart="@drawable/ic_tag"
-            android:text="add tag"
-            app:iconGravity="start" />
-    </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

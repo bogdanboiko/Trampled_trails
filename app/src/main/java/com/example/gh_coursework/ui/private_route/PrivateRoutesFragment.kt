@@ -775,7 +775,6 @@ class PrivateRoutesFragment :
 
     private fun loadPointData(annotation: PointAnnotation) {
         viewLifecycleOwner.lifecycleScope.launch {
-
             annotation.getData()?.asInt?.let { pointId ->
                 viewModel.getPointDetailsPreview(pointId).collect { details ->
                     prepareDetailsDialog(annotation, details)

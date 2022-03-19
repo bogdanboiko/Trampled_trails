@@ -18,8 +18,9 @@ interface TravelDatasource {
         suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointCoordinatesEntity>)
         suspend fun deleteRoute(route: RouteDomain)
 
+        fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>>
         fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
-        fun getPointOfInterestDetails(id: Int): Flow<PointDetailsDomain?>
+        fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?>
         fun getPointTagList(): Flow<List<PointTagDomain>>
 
         fun getRoutesList(): Flow<List<RouteDomain>>

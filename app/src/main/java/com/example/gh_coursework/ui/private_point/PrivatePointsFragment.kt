@@ -66,7 +66,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private val onPointClickEvent = OnPointAnnotationClickListener { annotation ->
         viewLifecycleOwner.lifecycleScope.launch {
 
-            annotation.getData()?.asInt?.let { pointId ->
+            annotation.getData()?.asLong?.let { pointId ->
                 viewModel.getPointDetailsPreview(pointId).collect { details ->
                     prepareDetailsDialog(annotation, details)
                 }
@@ -102,7 +102,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         super.onViewCreated(view, savedInstanceState)
         configMap()
         configMapSwitcherButton()
-        configBottomSheetDialog()
         configMapModSwitcher()
         configCancelButton()
         configBottomSheetDialog()
@@ -223,7 +222,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private fun loadPointData(annotation: PointAnnotation) {
         viewLifecycleOwner.lifecycleScope.launch {
 
-            annotation.getData()?.asInt?.let { pointId ->
+            annotation.getData()?.asLong?.let { pointId ->
                 viewModel.getPointDetailsPreview(pointId).collect { details ->
                     prepareDetailsDialog(annotation, details)
                 }
