@@ -70,6 +70,16 @@
                     android:background="@color/transparent"
                     android:padding="20dp" />
 
+                <ImageButton
+                    android:id="@+id/pointImageAddButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_image"
+                    android:background="@color/transparent"
+                    android:padding="20dp"
+                    />
+
             </Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
