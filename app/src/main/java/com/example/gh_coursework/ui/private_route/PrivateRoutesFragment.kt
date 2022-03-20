@@ -66,6 +66,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -444,17 +445,19 @@ class PrivateRoutesFragment :
 
     private fun buildDefaultRoute() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.routes.collect { route ->
-                if (route.isNotEmpty()) {
-                    if (route.last().coordinatesList.isNotEmpty()) {
-                        buildRouteFromList((route.last().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
+            viewModel.routes
+                .distinctUntilChanged()
+                .collect { route ->
+                    if (route.isNotEmpty()) {
+                        if (route.last().coordinatesList.isNotEmpty()) {
+                            buildRouteFromList((route.last().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
 
-                        fetchAnnotatedRoutePoints(route.last())
-                        focusedRoute = route.last()
-                        eraseCameraToPoint(
-                            route.last().coordinatesList[0].x,
-                            route.last().coordinatesList[0].y
-                        )
+                            fetchAnnotatedRoutePoints(route.last())
+                            focusedRoute = route.last()
+                            eraseCameraToPoint(
+                                route.last().coordinatesList[0].x,
+                                route.last().coordinatesList[0].y
+                            )
                     }
 
                     routesListAdapter.currentList = route
@@ -936,7 +939,7 @@ class PrivateRoutesFragment :
             routeDetailsDeleteButton.setOnClickListener {
                 deleteRoute(route)
 
-                pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
     }
