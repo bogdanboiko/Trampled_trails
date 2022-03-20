@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -30,32 +31,34 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data = result.data
-                if (data?.clipData == null) {
+                val imageList = data?.clipData
+                    if (imageList != null) {
+                        val imageUriList = mutableListOf<PointImageModel>()
+
+                        for (i in 0 until imageList.itemCount) {
+                            imageUriList.add(PointImageModel(arguments.pointId, imageList.getItemAt(i).uri.toString()))
+                        }
+
+                        viewModel.addPointImageList(imageUriList)
+
+                } else {
                     val imageUri = data?.data
 
                     if (imageUri != null) {
-                        val inStream = activity?.contentResolver?.openInputStream(imageUri)
-                        inStream.use {
-                            val image = Drawable.createFromStream(inStream, imageUri.toString())
-                            if (image != null) {
-                                val compressedImage = compressImage(image.toBitmap())
-                                viewModel.addPointImageList(
-                                    listOf(
-                                        PointImageModel(
-                                            arguments.pointId,
-                                            compressedImage
-                                        )
-                                    )
+                        viewModel.addPointImageList(
+                            listOf(
+                                PointImageModel(
+                                    arguments.pointId,
+                                    imageUri.toString()
                                 )
-                            }
-                        }
+                            )
+                        )
+                        // viewModel.addPointImageList(imageList)
                     }
-                } else {
-                    val imageList = data.clipData
-                    // viewModel.addPointImageList(imageList)
                 }
             }
         }
+
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
@@ -84,10 +87,19 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
                     if (it?.imageList?.isNotEmpty() == true) {
-                        context?.let { it1 ->
-                            Glide.with(it1)
-                                .load(it.imageList[0].image)
-                                .into(pointImage)
+                        val imageUri = Uri.parse(it.imageList[0].image)
+                        val inStream = activity?.contentResolver?.openInputStream(imageUri)
+
+                        inStream.use {
+                            val image = Drawable.createFromStream(inStream, imageUri.toString())
+                            if (image != null) {
+                                context?.let { it1 ->
+                                    Glide.with(it1)
+                                        .load(image)
+                                        .into(pointImage)
+                                }
+                            } else {
+                            }
                         }
                     }
                 }

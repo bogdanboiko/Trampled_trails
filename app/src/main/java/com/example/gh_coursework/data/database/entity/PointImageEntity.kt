@@ -15,6 +15,6 @@ import androidx.room.ForeignKey
 data class PointImageEntity(
     @ColumnInfo(name = "pointId")
     val pointId: Long,
-    @ColumnInfo(name = "image", typeAffinity = ColumnInfo.BLOB)
-    val image: ByteArray
+    @ColumnInfo(name = "image")
+    val image: String
 )

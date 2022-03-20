@@ -7,6 +7,6 @@ import com.example.gh_coursework.data.database.entity.PointImageEntity
 
 @Dao
 abstract class ImageDao {
-    @Insert(onConflict = OnConflictStrategy.ABORT)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun addPointImages(image: List<PointImageEntity>)
 }
