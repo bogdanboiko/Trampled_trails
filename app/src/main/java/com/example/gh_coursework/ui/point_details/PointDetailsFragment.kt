@@ -90,6 +90,10 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 pointCaptionText.hint = "Put in point caption..."
                 pointDescriptionText.hint = "Put in point description..."
             }
+
+            pointImageAddButton.setOnClickListener {
+
+            }
         }
     }
 }

@@ -11,8 +11,8 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addOrUpdatePointOfInterestDetails(poi)
     }
 
-    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
-        localDataSrcIml.addPointOfInterestCoordinates(poi)
+    override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {
+        localDataSrcIml.addPointOfInterestCoordinatesWithDetails(poi)
     }
 
     override suspend fun addRoute(route: RouteDomain) {

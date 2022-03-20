@@ -22,7 +22,7 @@ class LocalDataSrcIml(
         pointDetailsDao.updateOrInsertPointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
-    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
+    override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {
         val pointId = pointDao.addPointPreview(mapPointDomainToEntity(poi))
         addOrUpdatePointOfInterestDetails(PointDetailsDomain(pointId, emptyList(), "", ""))
     }

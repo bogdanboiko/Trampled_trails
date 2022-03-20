@@ -12,8 +12,8 @@ import org.koin.dsl.module
 val pointUseCasesModule = module {
 
     //Point preview
-    single<AddPointPreviewUseCase> {
-        AddPointPreviewUseCaseImpl(get())
+    single<AddPointPreviewWithDetailsUseCase> {
+        AddPointPreviewWithDetailsUseCaseImpl(get())
     }
 
     single<GetPointsPreviewUseCase> {
