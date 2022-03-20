@@ -87,10 +87,6 @@ class PrivateRoutesFragment :
 
     private val currentRouteCoordinatesList = mutableListOf<PrivateRoutePointModel>()
     private lateinit var focusedRoute: PrivateRouteModel
-    private val _routesList = MutableLiveData<List<PrivateRouteModel>>()
-    private val routesList: LiveData<List<PrivateRouteModel>> = _routesList
-    private val _pointsList = MutableLiveData<List<PrivateRoutePointDetailsPreviewModel>>()
-    private val pointsList: LiveData<List<PrivateRoutePointDetailsPreviewModel>> = _pointsList
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var routePointsDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -229,16 +225,6 @@ class PrivateRoutesFragment :
 
         mapboxNavigation.startTripSession(withForegroundService = false)
         mapboxMap.loadStyleUri(Style.MAPBOX_STREETS)
-
-        routesList.observe(viewLifecycleOwner) {
-            routesListAdapter.currentList = routesList.value as MutableList<PrivateRouteModel>
-            Log.e("list", routesListAdapter.currentList.toString())
-            Log.e("focused", focusedRoute.toString())
-        }
-
-        pointsList.observe(viewLifecycleOwner) {
-            pointsList.value?. let { pointsListAdapter.currentList = it }
-        }
     }
 
     @OptIn(MapboxExperimental::class)
@@ -478,7 +464,7 @@ class PrivateRoutesFragment :
                         focusedRoute = route.last()
                     }
 
-                    _routesList.value = route
+                    routesListAdapter.currentList = route
                 }
             }
         }
@@ -488,7 +474,7 @@ class PrivateRoutesFragment :
         val annotatedPointsList = mutableListOf<PrivateRoutePointDetailsPreviewModel>()
 
         pointAnnotationManager.deleteAll()
-        _pointsList.value = emptyList()
+        pointsListAdapter.currentList = emptyList()
 
         if (route.coordinatesList.first().isRoutePoint) {
             addFlagAnnotationToMap(
@@ -550,7 +536,7 @@ class PrivateRoutesFragment :
                                         it.y
                                     )
                                 )
-                                _pointsList.value = annotatedPointsList
+                                pointsListAdapter.currentList = annotatedPointsList
                             }
                         }
                     }
@@ -810,9 +796,6 @@ class PrivateRoutesFragment :
             pointAnnotationManager.deleteAll()
 
             viewModel.deleteRoute(route)
-            viewModel.routes.collect {
-                _routesList.value = it
-            }
         }
     }
 
