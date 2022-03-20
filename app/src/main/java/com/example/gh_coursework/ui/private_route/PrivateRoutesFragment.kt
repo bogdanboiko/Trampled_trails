@@ -512,37 +512,29 @@ class PrivateRoutesFragment :
             )
         }
 
-        route.coordinatesList.forEach {
-            if (!it.isRoutePoint) {
+        route.coordinatesList.forEach { route ->
+            if (!route.isRoutePoint) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    it.pointId?.let { id ->
+                    route.pointId?.let { id ->
                         viewModel.getPointDetailsPreview(id).collect { details ->
-                            if (details == null) {
-                                viewModel.addPointDetails(
-                                    PointDetailsModel(
-                                        id,
-                                        emptyList(),
-                                        "Empty caption",
-                                        "Empty description"
-                                    )
-                                )
-                            } else {
+                            details?.let {
                                 annotatedPointsList.add(
                                     PrivateRoutePointDetailsPreviewModel(
                                         details.tagList,
                                         details.caption,
                                         details.description,
-                                        it.x,
-                                        it.y
+                                        route.x,
+                                        route.y
                                     )
                                 )
-                                pointsListAdapter.currentList = annotatedPointsList
                             }
+
+                            pointsListAdapter.currentList = annotatedPointsList
                         }
                     }
                 }
 
-                addAnnotationToMap(it)
+                addAnnotationToMap(route)
             }
         }
     }
