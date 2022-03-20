@@ -23,6 +23,10 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addPointTag(tag)
     }
 
+    override suspend fun addPointImages(images: List<PointImageDomain>) {
+        localDataSrcIml.addPointImages(images)
+    }
+
     override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
         localDataSrcIml.addPointsTagsList(pointsTagsList)
     }

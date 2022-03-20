@@ -536,6 +536,7 @@ class PrivateRoutesFragment :
                                     PointDetailsModel(
                                         id,
                                         emptyList(),
+                                        emptyList(),
                                         "Empty caption",
                                         "Empty description"
                                     )

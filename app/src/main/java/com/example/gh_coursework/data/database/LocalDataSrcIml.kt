@@ -1,9 +1,6 @@
 package com.example.gh_coursework.data.database
 
-import com.example.gh_coursework.data.database.dao.PointDetailsDao
-import com.example.gh_coursework.data.database.dao.PointPreviewDao
-import com.example.gh_coursework.data.database.dao.RoutePreviewDao
-import com.example.gh_coursework.data.database.dao.TagDao
+import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.data.database.mapper.*
@@ -16,7 +13,8 @@ class LocalDataSrcIml(
     private val pointDao: PointPreviewDao,
     private val routeDao: RoutePreviewDao,
     private val pointDetailsDao: PointDetailsDao,
-    private val tagDao: TagDao
+    private val tagDao: TagDao,
+    private val imageDao: ImageDao
 ) : TravelDatasource.Local {
     override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
         pointDetailsDao.updateOrInsertPointDetails(mapPointDetailsDomainToEntity(poi))
@@ -24,7 +22,7 @@ class LocalDataSrcIml(
 
     override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {
         val pointId = pointDao.addPointPreview(mapPointDomainToEntity(poi))
-        addOrUpdatePointOfInterestDetails(PointDetailsDomain(pointId, emptyList(), "", ""))
+        addOrUpdatePointOfInterestDetails(PointDetailsDomain(pointId, emptyList(), emptyList(), "", ""))
     }
 
     override fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>> {
@@ -80,6 +78,10 @@ class LocalDataSrcIml(
 
     override suspend fun addPointTag(tag: PointTagDomain) {
         tagDao.addTag(mapTagDomainToEntity(tag))
+    }
+
+    override suspend fun addPointImages(images: List<PointImageDomain>) {
+        imageDao.addPointImages(images.map(::mapPointImageDomainToEntity))
     }
 
     override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {

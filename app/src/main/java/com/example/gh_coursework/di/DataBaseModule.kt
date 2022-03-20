@@ -42,4 +42,8 @@ val localDataBaseModule = module {
     single {
         get<TravelDatabase>().getTagDao()
     }
+
+    single {
+        get<TravelDatabase>().getImageDao()
+    }
 }

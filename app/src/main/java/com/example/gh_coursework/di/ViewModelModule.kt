@@ -23,7 +23,7 @@ val viewModelModule = module {
     }
 
     viewModel { parameters ->
-        PointDetailsViewModel(parameters[0], get(), get())
+        PointDetailsViewModel(parameters[0], get(), get(), get())
     }
 
     viewModel { parameters ->

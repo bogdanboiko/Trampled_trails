@@ -9,6 +9,7 @@ interface TravelRepository {
     suspend fun deletePoint(pointId: Long)
 
     suspend fun addPointTag(tag: PointTagDomain)
+    suspend fun addPointImages(images: List<PointImageDomain>)
     suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>)
     suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>)
     suspend fun deletePointTag(tag: PointTagDomain)

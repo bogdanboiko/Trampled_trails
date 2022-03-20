@@ -2,27 +2,28 @@ package com.example.gh_coursework.ui.point_details
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.ImageDecoder
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.bumptech.glide.Glide
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
+import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import java.io.ByteArrayOutputStream
 
 class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     private val imageTakerLauncher =
@@ -36,11 +37,22 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                         val inStream = activity?.contentResolver?.openInputStream(imageUri)
                         inStream.use {
                             val image = Drawable.createFromStream(inStream, imageUri.toString())
-                            binding.pointImage.setImageBitmap(image.toBitmap())
+                            if (image != null) {
+                                val compressedImage = compressImage(image.toBitmap())
+                                viewModel.addPointImageList(
+                                    listOf(
+                                        PointImageModel(
+                                            arguments.pointId,
+                                            compressedImage
+                                        )
+                                    )
+                                )
+                            }
                         }
                     }
                 } else {
                     val imageList = data.clipData
+                    // viewModel.addPointImageList(imageList)
                 }
             }
         }
@@ -71,7 +83,13 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 viewModel.pointDetails.collect {
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
-                    //  it?.tagList?.let { it1 -> dialog.updatePointTagList(it1) }
+                    if (it?.imageList?.isNotEmpty() == true) {
+                        context?.let { it1 ->
+                            Glide.with(it1)
+                                .load(it.imageList[0].image)
+                                .into(pointImage)
+                        }
+                    }
                 }
             }
         }
@@ -89,6 +107,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 viewModel.addPointDetails(
                     PointDetailsModel(
                         arguments.pointId,
+                        emptyList(),
                         emptyList(),
                         pointCaptionText.text.toString(),
                         pointDescriptionText.text.toString()
@@ -124,8 +143,20 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 transitionToGallery.type = "image/*"
                 transitionToGallery.action = Intent.ACTION_GET_CONTENT
                 transitionToGallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                imageTakerLauncher.launch(Intent.createChooser(transitionToGallery, "Select pictures"))
+                imageTakerLauncher.launch(
+                    Intent.createChooser(
+                        transitionToGallery,
+                        "Select pictures"
+                    )
+                )
             }
+        }
+    }
+
+    private fun compressImage(image: Bitmap): ByteArray {
+        ByteArrayOutputStream().use {
+            image.compress(Bitmap.CompressFormat.JPEG, 100, it)
+            return it.toByteArray()
         }
     }
 }
