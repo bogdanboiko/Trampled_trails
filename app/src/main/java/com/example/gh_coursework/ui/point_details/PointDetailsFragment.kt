@@ -2,8 +2,8 @@ package com.example.gh_coursework.ui.point_details
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,7 +13,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
@@ -24,7 +23,6 @@ import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
-import java.io.ByteArrayOutputStream
 
 class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteImage {
     private val arguments by navArgs<PointDetailsFragmentArgs>()
@@ -101,6 +99,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteIm
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
                     imageAdapter.submitList(it?.imageList)
+                    Log.e("e", it?.imageList.toString())
                 }
             }
         }

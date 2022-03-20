@@ -20,7 +20,6 @@ data class PointDetailsResponse(
     @Relation(
         parentColumn = "pointId",
         entityColumn = "pointId",
-        associateBy = Junction(PointImageEntity::class)
     )
     val imageList: List<PointImageEntity>
 )
