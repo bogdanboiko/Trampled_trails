@@ -21,7 +21,6 @@ import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -807,6 +806,10 @@ class PrivateRoutesFragment :
 
     private fun undoPointCreating() {
         if (currentRouteCoordinatesList.size > 2) {
+            if (!currentRouteCoordinatesList.last().isRoutePoint) {
+                pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
+            }
+
             currentRouteCoordinatesList.remove(currentRouteCoordinatesList[currentRouteCoordinatesList.lastIndex])
             buildRoute()
         } else if (currentRouteCoordinatesList.size == 2) {
@@ -901,8 +904,10 @@ class PrivateRoutesFragment :
 
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(
-                    PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment(pointAnnotation.getData()?.asLong!!)
+                    PrivateRoutesFragmentDirections
+                        .actionPrivateRoutesFragmentToPointDetailsFragment(
+                            pointAnnotation.getData()?.asLong!!
+                        )
                 )
             }
 
