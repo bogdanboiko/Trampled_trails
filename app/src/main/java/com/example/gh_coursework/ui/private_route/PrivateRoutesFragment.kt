@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,6 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -23,7 +21,6 @@ import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
@@ -189,7 +186,7 @@ class PrivateRoutesFragment :
             binding.mapView.camera.easeTo(
                 CameraOptions.Builder()
                     .center(Point.fromLngLat(location.longitude, location.latitude))
-                    .zoom(16.0)
+                    .zoom(15.0)
                     .build(),
                 mapAnimationOptions
             )
@@ -380,7 +377,7 @@ class PrivateRoutesFragment :
     }
 
     private fun getRouteDetailsDialog() {
-        focusedRoute?.let { prepareRouteDetailsDialog(it) }
+        prepareRouteDetailsDialog(focusedRoute)
 
         routesDialogBehavior.peekHeight = 0
         routePointsDialogBehavior.peekHeight = 0
@@ -451,17 +448,13 @@ class PrivateRoutesFragment :
                 if (route.isNotEmpty()) {
                     if (route.last().coordinatesList.isNotEmpty()) {
                         buildRouteFromList((route.last().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
-                        binding.mapView.camera.easeTo(
-                            CameraOptions.Builder()
-                                .center(Point.fromLngLat(
-                                    route.last().coordinatesList[0].x,
-                                    route.last().coordinatesList[0].y)
-                                )
-                                .zoom(17.0)
-                                .build()
-                        )
+
                         fetchAnnotatedRoutePoints(route.last())
                         focusedRoute = route.last()
+                        eraseCameraToPoint(
+                            route.last().coordinatesList[0].x,
+                            route.last().coordinatesList[0].y
+                        )
                     }
 
                     routesListAdapter.currentList = route
@@ -512,10 +505,10 @@ class PrivateRoutesFragment :
             )
         }
 
-        route.coordinatesList.forEach { route ->
-            if (!route.isRoutePoint) {
+        route.coordinatesList.forEach { _route ->
+            if (!_route.isRoutePoint) {
                 viewLifecycleOwner.lifecycleScope.launch {
-                    route.pointId?.let { id ->
+                    _route.pointId?.let { id ->
                         viewModel.getPointDetailsPreview(id).collect { details ->
                             details?.let {
                                 annotatedPointsList.add(
@@ -523,8 +516,8 @@ class PrivateRoutesFragment :
                                         details.tagList,
                                         details.caption,
                                         details.description,
-                                        route.x,
-                                        route.y
+                                        _route.x,
+                                        _route.y
                                     )
                                 )
                             }
@@ -534,7 +527,7 @@ class PrivateRoutesFragment :
                     }
                 }
 
-                addAnnotationToMap(route)
+                addAnnotationToMap(_route)
             }
         }
     }
@@ -786,7 +779,6 @@ class PrivateRoutesFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             resetCurrentRoute()
             pointAnnotationManager.deleteAll()
-
             viewModel.deleteRoute(route)
         }
     }
@@ -796,8 +788,8 @@ class PrivateRoutesFragment :
         pointAnnotationManager.deleteAll()
 
         buildRouteFromList((route.coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
-
         fetchAnnotatedRoutePoints(route)
+        eraseCameraToPoint(route.coordinatesList[0].x, route.coordinatesList[0].y)
     }
 
     private fun resetCurrentRoute() {
@@ -827,12 +819,7 @@ class PrivateRoutesFragment :
     }
 
     override fun onPointItemClick(point: PrivateRoutePointDetailsPreviewModel) {
-        binding.mapView.camera.easeTo(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(point.x, point.y))
-                .zoom(17.0)
-                .build()
-        )
+        eraseCameraToPoint(point.x, point.y)
 
         routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
@@ -963,4 +950,13 @@ class PrivateRoutesFragment :
 
     private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
         convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
+
+    private fun eraseCameraToPoint(x: Double, y: Double) {
+        binding.mapView.camera.easeTo(
+            CameraOptions.Builder()
+                .center(Point.fromLngLat(x, y))
+                .zoom(15.0)
+                .build()
+        )
+    }
 }
