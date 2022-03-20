@@ -13,5 +13,5 @@ fun mapRouteModelToDomainMapper(route: PrivateRouteModel): RouteDomain {
         pointCoordinatesDomainList.add(mapPointModelToDomain(it))
     }
 
-    return RouteDomain(route.routeId, route.name, route.description, null, pointCoordinatesDomainList)
+    return RouteDomain(route.routeId, route.name, route.description, 0.0, pointCoordinatesDomainList)
 }

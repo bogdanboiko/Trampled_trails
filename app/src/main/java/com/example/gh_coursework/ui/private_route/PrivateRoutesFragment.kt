@@ -465,6 +465,15 @@ class PrivateRoutesFragment :
                 if (route.isNotEmpty()) {
                     if (route.last().coordinatesList.isNotEmpty()) {
                         buildRouteFromList((route.last().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
+                        binding.mapView.camera.easeTo(
+                            CameraOptions.Builder()
+                                .center(Point.fromLngLat(
+                                    route.last().coordinatesList[0].x,
+                                    route.last().coordinatesList[0].y)
+                                )
+                                .zoom(17.0)
+                                .build()
+                        )
                         fetchAnnotatedRoutePoints(route.last())
                         focusedRoute = route.last()
                     }
@@ -954,14 +963,16 @@ class PrivateRoutesFragment :
             routeRating.text = route.rating.toString()
 
             routeDetailsEditButton.setOnClickListener {
-                Log.e("edit", route.toString())
+                route.routeId?.let {
+                    findNavController().navigate(
+                        PrivateRoutesFragmentDirections
+                            .actionPrivateRoutesFragmentToRouteDetailsFragment(it)
+                    )
+                }
             }
-
-            Log.e("dialog", route.toString())
 
             routeDetailsDeleteButton.setOnClickListener {
                 deleteRoute(route)
-                Log.e("route", route.toString())
 
                 pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
