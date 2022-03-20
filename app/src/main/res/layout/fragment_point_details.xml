@@ -23,15 +23,12 @@
             android:fitsSystemWindows="true"
             app:contentScrim="@color/teal_200">
 
-            <ImageView
-                android:id="@+id/pointImage"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/imageRecycler"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:fitsSystemWindows="true"
-                android:src="@drawable/bottom_nav_color_transparent"
-                app:layout_collapseMode="parallax"
-                />
+                app:fastScrollEnabled="false"
+                app:layout_collapseMode="parallax"/>
 
             <Toolbar
                 android:id="@+id/toolbar"
