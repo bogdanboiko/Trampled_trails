@@ -1,8 +1,9 @@
 package com.example.gh_coursework.ui.private_route.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -14,14 +15,8 @@ interface RoutesListAdapterCallback {
     fun onRouteItemClick(route: PrivateRouteModel)
 }
 
-class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.Adapter<RoutesListAdapter.RouteViewHolder>() {
-
-    var currentList: List<PrivateRouteModel> = emptyList()
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
+    ListAdapter<PrivateRouteModel, RoutesListAdapter.RouteViewHolder>(Diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
         val binding = ItemRouteBinding.inflate(
@@ -34,7 +29,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.
     }
 
     override fun onBindViewHolder(holder: RouteViewHolder, position: Int) {
-        currentList[position].let { holder.bind(it) }
+        holder.bind(getItem(position))
     }
 
     override fun getItemCount(): Int = currentList.size
@@ -59,6 +54,23 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.
             binding.root.setOnClickListener {
                 callback.onRouteItemClick(item)
             }
+        }
+    }
+
+    object Diff : DiffUtil.ItemCallback<PrivateRouteModel>() {
+        override fun areItemsTheSame(
+            oldItem: PrivateRouteModel,
+            newItem: PrivateRouteModel
+        ): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(
+            oldItem: PrivateRouteModel,
+            newItem: PrivateRouteModel
+        ): Boolean {
+            return oldItem.routeId == newItem.routeId
+                    && oldItem.coordinatesList == newItem.coordinatesList
         }
     }
 }

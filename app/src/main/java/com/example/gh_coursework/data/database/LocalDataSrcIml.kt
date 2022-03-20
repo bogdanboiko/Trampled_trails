@@ -22,9 +22,18 @@ class LocalDataSrcIml(
         pointDetailsDao.updateOrInsertPointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
-    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
+    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain): Long {
         val pointId = pointDao.addPointPreview(mapPointDomainToEntity(poi))
-        addOrUpdatePointOfInterestDetails(PointDetailsDomain(pointId, emptyList(), "", ""))
+        addOrUpdatePointOfInterestDetails(
+            PointDetailsDomain(
+                pointId,
+                emptyList(),
+                "Empty caption",
+                "Empty description"
+            )
+        )
+
+        return pointId
     }
 
     override fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>> {
@@ -42,8 +51,8 @@ class LocalDataSrcIml(
         coordinatesList.forEach {
             routePointEntitiesList.add(
                 RoutePointEntity(
-                    route.routeId?.toLong(),
-                    pointDao.addPointPreview(it),
+                    route.routeId,
+                    addPointOfInterestCoordinates(mapPointEntityToDomain(it)),
                     position
                 )
             )

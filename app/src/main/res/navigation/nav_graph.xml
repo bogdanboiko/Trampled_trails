@@ -49,6 +49,9 @@
         <action
             android:id="@+id/action_privateRoutesFragment_to_routeDetailsFragment"
             app:destination="@id/routeDetailsFragment" />
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_pointDetailsFragment"
+            app:destination="@id/pointDetailsFragment" />
     </fragment>
 
     <fragment
