@@ -460,7 +460,7 @@ class PrivateRoutesFragment :
                             )
                     }
 
-                    routesListAdapter.currentList = route
+                    routesListAdapter.submitList(route)
                 }
             }
         }
@@ -470,7 +470,7 @@ class PrivateRoutesFragment :
         val annotatedPointsList = mutableListOf<PrivateRoutePointDetailsPreviewModel>()
 
         pointAnnotationManager.deleteAll()
-        pointsListAdapter.currentList = emptyList()
+        pointsListAdapter.submitList(emptyList())
 
         if (route.coordinatesList.first().isRoutePoint) {
             addFlagAnnotationToMap(
@@ -525,7 +525,7 @@ class PrivateRoutesFragment :
                                 )
                             }
 
-                            pointsListAdapter.currentList = annotatedPointsList
+                            pointsListAdapter.submitList(annotatedPointsList)
                         }
                     }
                 }

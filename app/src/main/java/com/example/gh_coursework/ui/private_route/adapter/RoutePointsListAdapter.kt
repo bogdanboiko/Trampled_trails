@@ -1,8 +1,9 @@
 package com.example.gh_coursework.ui.private_route.adapter
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.databinding.ItemPointBinding
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
@@ -12,14 +13,7 @@ interface RoutePointsListCallback {
 }
 
 class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
-    RecyclerView.Adapter<RoutePointsListAdapter.PointViewHolder>() {
-
-    var currentList: List<PrivateRoutePointDetailsPreviewModel> = emptyList()
-        @SuppressLint("NotifyDataSetChanged")
-        set(value) {
-            field = value
-            notifyDataSetChanged()
-        }
+    ListAdapter<PrivateRoutePointDetailsPreviewModel, RoutePointsListAdapter.PointViewHolder>(Diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PointViewHolder {
         val binding = ItemPointBinding.inflate(
@@ -32,7 +26,7 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
     }
 
     override fun onBindViewHolder(holder: PointViewHolder, position: Int) {
-        currentList[position].let { holder.bind(it) }
+        holder.bind(getItem(position))
     }
 
     override fun getItemCount(): Int = currentList.size
@@ -44,18 +38,27 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
             with(binding) {
                 txtName.text = item.caption
                 txtDescription.text = item.description
-
-//                Glide.with(itemView)
-//                    .load(item.imgResources)
-//                    .placeholder(imgMapImage.drawable)
-//                    .error(R.drawable.ic_launcher_background)
-//                    .transform(RoundedCorners(10))
-//                    .into(imgMapImage)
             }
 
             binding.root.setOnClickListener {
                 callback.onPointItemClick(item)
             }
+        }
+    }
+
+    object Diff : DiffUtil.ItemCallback<PrivateRoutePointDetailsPreviewModel>() {
+        override fun areItemsTheSame(
+            oldItem: PrivateRoutePointDetailsPreviewModel,
+            newItem: PrivateRoutePointDetailsPreviewModel
+        ): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areContentsTheSame(
+            oldItem: PrivateRoutePointDetailsPreviewModel,
+            newItem: PrivateRoutePointDetailsPreviewModel
+        ): Boolean {
+            return oldItem.x == newItem.x && oldItem.y == newItem.y
         }
     }
 }
