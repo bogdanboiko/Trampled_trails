@@ -3,7 +3,7 @@ package com.example.gh_coursework.ui.private_route.model
 import android.graphics.drawable.Drawable
 
 data class PrivateRouteModel(
-    val routeId: Int?,
+    val routeId: Long?,
     val name: String?,
     val description: String?,
     val rating: Double?,

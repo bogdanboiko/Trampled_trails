@@ -1,4 +1,4 @@
-package com.example.gh_coursework.ui.private_route
+package com.example.gh_coursework.ui.private_route.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -11,7 +11,6 @@ import com.example.gh_coursework.databinding.ItemRouteBinding
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 
 interface RoutesListAdapterCallback {
-    fun onRouteItemLongPressed(route: PrivateRouteModel)
     fun onRouteItemClick(route: PrivateRouteModel)
 }
 
@@ -34,7 +33,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.
         return RouteViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: RoutesListAdapter.RouteViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RouteViewHolder, position: Int) {
         currentList[position].let { holder.bind(it) }
     }
 
@@ -55,12 +54,6 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) : RecyclerView.
                     .error(R.drawable.ic_launcher_background)
                     .transform(RoundedCorners(10))
                     .into(imgMapImage)
-            }
-
-            binding.root.setOnLongClickListener {
-                item.routeId?.let { id -> callback.onRouteItemLongPressed(item) }
-
-                return@setOnLongClickListener true
             }
 
             binding.root.setOnClickListener {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/routesBottomSheetDialog"
+    android:id="@+id/routePointsBottomSheetDialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -11,7 +11,7 @@
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/routesRecyclerView"
+        android:id="@+id/routePointsRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/light_gray"

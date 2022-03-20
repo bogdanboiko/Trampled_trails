@@ -6,7 +6,7 @@ import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetails
 
 fun mapRoutePointDetailsDomainToModel(details: PointDetailsDomain?): PrivateRoutePointDetailsPreviewModel? {
     return if (details != null) {
-        PrivateRoutePointDetailsPreviewModel(details.tagList.map(::mapPointTagDomainToModel), details.caption, details.description)
+        PrivateRoutePointDetailsPreviewModel(details.tagList.map(::mapPointTagDomainToModel), details.caption, details.description, 0.0, 0.0)
     } else {
         null
     }

@@ -61,7 +61,7 @@ class LocalDataSrcIml(
        return getPointOfInterestDetails(pointId).map { it?.tagList ?: emptyList() }
     }
 
-    override suspend fun deletePoint(pointId: Int) {
+    override suspend fun deletePoint(pointId: Long) {
         pointDao.deletePoint(pointId)
     }
 

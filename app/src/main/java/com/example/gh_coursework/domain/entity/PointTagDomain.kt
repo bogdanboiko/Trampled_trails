@@ -1,6 +1,6 @@
 package com.example.gh_coursework.domain.entity
 
 data class PointTagDomain(
-    val tagId: Int?,
+    val tagId: Long?,
     val name: String
 )

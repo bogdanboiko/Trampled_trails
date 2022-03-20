@@ -27,7 +27,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addPointsTagsList(pointsTagsList)
     }
 
-    override suspend fun deletePoint(pointId: Int) {
+    override suspend fun deletePoint(pointId: Long) {
         localDataSrcIml.deletePoint(pointId)
     }
 

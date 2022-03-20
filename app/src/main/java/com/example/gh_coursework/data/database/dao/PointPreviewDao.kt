@@ -13,5 +13,5 @@ abstract class PointPreviewDao {
     abstract fun getPointPreview() : Flow<List<PointCoordinatesEntity>>
 
     @Query("DELETE FROM point_coordinates WHERE pointId = :pointId")
-    abstract fun deletePoint(pointId: Int)
+    abstract fun deletePoint(pointId: Long)
 }

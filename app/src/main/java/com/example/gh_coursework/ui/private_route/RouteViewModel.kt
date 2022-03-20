@@ -2,11 +2,14 @@ package com.example.gh_coursework.ui.private_route
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gh_coursework.domain.usecase.point_details.AddPointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
 import com.example.gh_coursework.domain.usecase.route.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route.DeleteRouteUseCase
 import com.example.gh_coursework.domain.usecase.route.GetRoutesListUseCase
+import com.example.gh_coursework.ui.point_details.mapper.mapPointDetailsModelToDomain
+import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteModelToDomainMapper
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDetailsDomainToModel
@@ -20,6 +23,7 @@ import kotlinx.coroutines.launch
 class RouteViewModel(
     getRoutesListUseCase: GetRoutesListUseCase,
     private val addRouteUseCase: AddRouteUseCase,
+    private val addPointDetailsUseCase: AddPointDetailsUseCase,
     private val getPointDetailsUseCase: GetPointDetailsUseCase,
     private val deletePointUseCase: DeletePointUseCase,
     private val deleteRouteUseCase: DeleteRouteUseCase
@@ -34,12 +38,18 @@ class RouteViewModel(
         }
     }
 
+    fun addPointDetails(details: PointDetailsModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            addPointDetailsUseCase.invoke(mapPointDetailsModelToDomain(details))
+        }
+    }
+
     fun getPointDetailsPreview(pointId: Long): Flow<PrivateRoutePointDetailsPreviewModel?> {
         return getPointDetailsUseCase.invoke(pointId)
             .map { details -> mapRoutePointDetailsDomainToModel(details) }
     }
 
-    fun deletePoint(pointId: Int) {
+    fun deletePoint(pointId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deletePointUseCase.invoke(pointId)
         }

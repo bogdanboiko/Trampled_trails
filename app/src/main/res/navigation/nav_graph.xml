@@ -16,19 +16,6 @@
             android:id="@+id/action_privatePointsFragment_to_pointDetailsFragment"
             app:destination="@id/pointDetailsFragment" />
     </fragment>
-
-    <fragment
-        android:id="@+id/privateRoutesFragment"
-        android:name="com.example.gh_coursework.ui.private_route.PrivateRoutesFragment"
-        android:label="fragment_private_routes"
-        tools:layout="@layout/fragment_private_route">
-        <action
-            android:id="@+id/action_privateRoutesFragment_to_privatePointsFragment"
-            app:destination="@id/privatePointsFragment" />
-        <action
-            android:id="@+id/action_privateRoutesFragment_to_pointDetailsFragment"
-            app:destination="@id/pointDetailsFragment" />
-    </fragment>
     <fragment
         android:id="@+id/pointDetailsFragment"
         android:name="com.example.gh_coursework.ui.point_details.PointDetailsFragment"
@@ -47,6 +34,41 @@
         android:label="TagDialog">
         <argument
             android:name="pointId"
+            app:argType="long" />
+    </dialog>
+
+    <!--Fragments-->
+    <fragment
+        android:id="@+id/privateRoutesFragment"
+        android:name="com.example.gh_coursework.ui.private_route.PrivateRoutesFragment"
+        android:label="fragment_private_routes"
+        tools:layout="@layout/fragment_private_route">
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_privatePointsFragment"
+            app:destination="@id/privatePointsFragment" />
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_routeDetailsFragment"
+            app:destination="@id/routeDetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/routeDetailsFragment"
+        android:name="com.example.gh_coursework.ui.route_details.RouteDetailsFragment"
+        android:label="fragment_route_details"
+        tools:layout="@layout/fragment_route_details">
+        <action
+            android:id="@+id/action_privateDetailsFragment_to_routeTagDialogFragment"
+            app:destination="@id/routeTagsDialogFragment" />
+        <argument
+            android:name="routeId"
+            app:argType="long" />
+    </fragment>
+    <dialog
+        android:id="@+id/routeTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogFragment"
+        android:label="TagDialog">
+        <argument
+            android:name="routeId"
             app:argType="long" />
     </dialog>
 </navigation>

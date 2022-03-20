@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class PointTagEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "tagId")
-    val tagId: Int?,
+    val tagId: Long?,
     @ColumnInfo(name = "name")
     val name: String
 )

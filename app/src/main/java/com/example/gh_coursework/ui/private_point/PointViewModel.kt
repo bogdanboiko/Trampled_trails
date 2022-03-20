@@ -35,7 +35,7 @@ class PointViewModel(
         return getPointDetailsUseCase.invoke(pointId).map { details -> mapPointDetailsDomainToModel(details) }
     }
 
-    fun deletePoint(pointId: Int) {
+    fun deletePoint(pointId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deletePointUseCase.invoke(pointId)
         }
