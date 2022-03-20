@@ -10,11 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
-import com.example.gh_coursework.ui.point_details.adapter.DeleteTag
-import com.example.gh_coursework.ui.point_details.adapter.TagAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
-import com.example.gh_coursework.ui.point_details.model.PointTagModel
-import com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogFragment
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
