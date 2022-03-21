@@ -118,12 +118,4 @@
         </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_margin="@dimen/cardview_default_elevation"
-        app:layout_anchor="@id/pointDetailsAppBar"
-        app:layout_anchorGravity="bottom|right|end"
-        />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

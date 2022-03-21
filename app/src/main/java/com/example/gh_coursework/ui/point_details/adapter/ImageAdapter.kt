@@ -26,10 +26,10 @@ class ImageAdapter(private val deleteImage: DeleteImage) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: PointImageModel) {
             val imageUri = Uri.parse(imageModel.image)
-            itemView.context?.contentResolver?.takePersistableUriPermission(
-                imageUri,
-                Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
+//            itemView.context?.contentResolver?.takePersistableUriPermission(
+//                imageUri,
+//                Intent.FLAG_GRANT_READ_URI_PERMISSION
+//            )
             itemView.context?.contentResolver?.openInputStream(imageUri).use {
                 val image = Drawable.createFromStream(it, imageUri.toString())
                 if (image != null) {
