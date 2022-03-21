@@ -6,7 +6,7 @@ import com.example.gh_coursework.data.database.entity.PointsTagsEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class TagDao {
+abstract class PointTagDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun addTag(tag: PointTagEntity)
 
