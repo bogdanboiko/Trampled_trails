@@ -1,24 +1,76 @@
 package com.example.gh_coursework.ui.point_details
 
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
+import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
+import com.example.gh_coursework.ui.point_details.adapter.ImageDetailsAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
+import com.example.gh_coursework.ui.point_details.model.PointImageModel
+import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
+
 
 class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
+    private lateinit var layoutManager: LinearLayoutManager
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
+    private val imageAdapter = ImageAdapter {
+        findNavController().navigate(
+            PointDetailsFragmentDirections.actionPointDetailsFragmentToPrivateImageDetails(
+                arguments.pointId,
+                layoutManager.findFirstVisibleItemPosition()
+            )
+        )
+    }
+
+    private val imageTakerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                val imageList = data?.clipData
+                if (imageList != null) {
+                    val imageUriList = mutableListOf<PointImageModel>()
+
+                    for (i in 0 until imageList.itemCount) {
+                        imageUriList.add(createPointImageModel(imageList.getItemAt(i).uri))
+                    }
+
+                    viewModel.addPointImageList(imageUriList)
+                } else {
+                    val imageUri = data?.data
+
+                    if (imageUri != null) {
+                        viewModel.addPointImageList(listOf(createPointImageModel(imageUri)))
+                    }
+                }
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,7 +86,17 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         configToolBar()
         configConfirmButton()
         configTagButton()
+        configImageRecycler()
         configData()
+    }
+
+    private fun configImageRecycler() {
+        PagerSnapHelper().attachToRecyclerView(binding.imageRecycler)
+        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        binding.imageRecycler.apply {
+            adapter = imageAdapter
+            layoutManager = this@PointDetailsFragment.layoutManager
+        }
     }
 
     private fun configData() {
@@ -43,7 +105,25 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 viewModel.pointDetails.collect {
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
-                    //  it?.tagList?.let { it1 -> dialog.updatePointTagList(it1) }
+                    imageAdapter.submitList(it?.imageList)
+
+                    val layoutParams =
+                        pointDetailsAppBar.layoutParams as CoordinatorLayout.LayoutParams
+                    val behavior = AppBarLayout.Behavior()
+                    behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+                        override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                            val hasImage = it?.imageList?.isEmpty() == true
+                            if (hasImage) {
+                                imageRecycler.visibility = View.GONE
+                            } else {
+                                imageRecycler.visibility = View.VISIBLE
+                            }
+
+                            return hasImage
+                        }
+                    })
+                    layoutParams.behavior = behavior
+
                 }
             }
         }
@@ -61,6 +141,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 viewModel.addPointDetails(
                     PointDetailsModel(
                         arguments.pointId,
+                        emptyList(),
                         emptyList(),
                         pointCaptionText.text.toString(),
                         pointDescriptionText.text.toString()
@@ -90,6 +171,56 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 pointCaptionText.hint = "Put in point caption..."
                 pointDescriptionText.hint = "Put in point description..."
             }
+
+            pointImageAddButton.setOnClickListener {
+                val transitionToGallery = Intent()
+                transitionToGallery.type = "image/*"
+                transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
+                transitionToGallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                imageTakerLauncher.launch(
+                    Intent.createChooser(
+                        transitionToGallery,
+                        "Select pictures"
+                    )
+                )
+            }
         }
+    }
+
+    private fun createPointImageModel(imageUri: Uri): PointImageModel {
+        context?.contentResolver?.openInputStream(imageUri).use {
+            val image = Drawable.createFromStream(it, imageUri.toString())
+            return PointImageModel(
+                arguments.pointId,
+                saveToCacheAndGetUri(
+                    image.toBitmap(
+                        (image.intrinsicWidth * 0.9).toInt(),
+                        (image.intrinsicHeight * 0.9).toInt()
+                    ),
+                    Date().time.toString()
+                ).toString()
+            )
+        }
+    }
+
+    private fun saveToCacheAndGetUri(bitmap: Bitmap, name: String): Uri {
+        val file = saveImgToCache(bitmap, name)
+        return getImageUri(file, name)
+    }
+
+    private fun saveImgToCache(bitmap: Bitmap, name: String): File {
+        val fileName: String = name
+        val cachePath = File(context?.cacheDir, "/images")
+        cachePath.mkdirs()
+        FileOutputStream("$cachePath/$fileName.jpeg").use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
+
+        return cachePath
+    }
+
+    private fun getImageUri(fileDir: File, name: String): Uri {
+        val newFile = File(fileDir, "$name.jpeg")
+        return newFile.toUri()
     }
 }
