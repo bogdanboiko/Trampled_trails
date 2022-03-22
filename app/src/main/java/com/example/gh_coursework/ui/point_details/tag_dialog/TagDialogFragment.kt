@@ -47,6 +47,11 @@ class TagDialogFragment : DialogFragment(), DeleteTag {
     }
 
     private fun configTagRecycler() {
+        binding.tagRecycler.apply {
+            adapter = tagAdapter
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.tags.collect {
                 tagAdapter.submitList(it)
@@ -62,11 +67,6 @@ class TagDialogFragment : DialogFragment(), DeleteTag {
 
     private fun configView() {
         with(binding) {
-            tagRecycler.apply {
-                adapter = tagAdapter
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            }
-
             addTagEditText.setOnFocusChangeListener { view, b ->
                 if (b) {
                     tagRecycler.visibility = View.GONE
