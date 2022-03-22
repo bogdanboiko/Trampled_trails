@@ -34,13 +34,15 @@ import java.util.*
 
 
 class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
+    private lateinit var layoutManager: LinearLayoutManager
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
     private val imageAdapter = ImageAdapter {
         findNavController().navigate(
             PointDetailsFragmentDirections.actionPointDetailsFragmentToPrivateImageDetails(
-                arguments.pointId
+                arguments.pointId,
+                layoutManager.findFirstVisibleItemPosition()
             )
         )
     }
@@ -88,9 +90,10 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
 
     private fun configImageRecycler() {
         PagerSnapHelper().attachToRecyclerView(binding.imageRecycler)
+        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         binding.imageRecycler.apply {
             adapter = imageAdapter
-            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = this@PointDetailsFragment.layoutManager
         }
     }
 

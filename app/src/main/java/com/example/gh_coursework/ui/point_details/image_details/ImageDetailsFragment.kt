@@ -9,6 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentImageDetailsBinding
 import com.example.gh_coursework.ui.point_details.adapter.ImageDetailsAdapter
@@ -57,6 +58,7 @@ class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.pointImages.collect {
                 imageAdapter.submitList(it)
+                layoutManager.scrollToPosition(arguments.clickedItemCount)
             }
         }
     }

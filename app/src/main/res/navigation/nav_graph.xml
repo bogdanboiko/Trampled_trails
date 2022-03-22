@@ -75,6 +75,8 @@
         <argument
             android:name="pointId"
             app:argType="long" />
+        <argument android:name="clickedItemCount"
+            app:argType="integer" />
     </fragment>
     <dialog
         android:id="@+id/routeTagsDialogFragment"
