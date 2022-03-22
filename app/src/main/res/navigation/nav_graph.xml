@@ -52,6 +52,9 @@
         <action
             android:id="@+id/action_privateRoutesFragment_to_routeDetailsFragment"
             app:destination="@id/routeDetailsFragment" />
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_pointDetailsFragment"
+            app:destination="@id/pointDetailsFragment" />
     </fragment>
 
     <fragment
@@ -80,7 +83,7 @@
     </fragment>
     <dialog
         android:id="@+id/routeTagsDialogFragment"
-        android:name="com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogFragment"
+        android:name="com.example.gh_coursework.ui.route_details.tag_dialog.RouteTagDialogFragment"
         android:label="TagDialog">
         <argument
             android:name="routeId"

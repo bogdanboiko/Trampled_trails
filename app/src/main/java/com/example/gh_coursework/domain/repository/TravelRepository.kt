@@ -16,7 +16,11 @@ interface TravelRepository {
     suspend fun deletePointImage(image: PointImageDomain)
 
     suspend fun addRoute(route: RouteDomain)
+    suspend fun updateRoute(route: RouteDetailsDomain)
     suspend fun deleteRoute(route: RouteDomain)
+
+    suspend fun addRouteTagsList(routeTagsList: List<RouteTagsDomain>)
+    suspend fun deleteTagsFromRoute(routeTagsList: List<RouteTagsDomain>)
 
     fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>>
     fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
@@ -25,4 +29,7 @@ interface TravelRepository {
     fun getPointImages(pointId: Long): Flow<List<PointImageDomain>>
 
     fun getRoutesList(): Flow<List<RouteDomain>>
+    fun getRouteDetails(routeId: Long): Flow<RouteDetailsDomain>
+
+    fun getRouteTags(): Flow<List<RouteTagDomain>>
 }

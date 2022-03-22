@@ -13,7 +13,6 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gh_coursework.databinding.DialogTagBinding
 import com.example.gh_coursework.ui.point_details.PointDetailsFragmentArgs
-import com.example.gh_coursework.ui.point_details.PointDetailsViewModel
 import com.example.gh_coursework.ui.point_details.adapter.DeleteTag
 import com.example.gh_coursework.ui.point_details.adapter.TagAdapter
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
@@ -41,7 +40,10 @@ class TagDialogFragment : DialogFragment(), DeleteTag {
         super.onViewCreated(view, savedInstanceState)
         configTagRecycler()
         configView()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun configTagRecycler() {

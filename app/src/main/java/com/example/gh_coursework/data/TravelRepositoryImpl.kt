@@ -11,8 +11,8 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addOrUpdatePointOfInterestDetails(poi)
     }
 
-    override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {
-        localDataSrcIml.addPointOfInterestCoordinatesWithDetails(poi)
+    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
+        localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
     override suspend fun addRoute(route: RouteDomain) {
@@ -21,10 +21,6 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
 
     override suspend fun addPointTag(tag: PointTagDomain) {
         localDataSrcIml.addPointTag(tag)
-    }
-
-    override suspend fun addPointImages(images: List<PointImageDomain>) {
-        localDataSrcIml.addPointImages(images)
     }
 
     override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
@@ -37,10 +33,6 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
 
     override suspend fun deletePointTag(tag: PointTagDomain) {
         localDataSrcIml.deletePointTag(tag)
-    }
-
-    override suspend fun deletePointImage(image: PointImageDomain) {
-        localDataSrcIml.deletePointImage(image)
     }
 
     override suspend fun deleteRoute(route: RouteDomain) {
@@ -60,8 +52,6 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
     override fun getPointOfInterestDetails(id: Long) = localDataSrcIml.getPointOfInterestDetails(id)
 
     override fun getPointTagList() = localDataSrcIml.getPointTagList()
-
-    override fun getPointImages(pointId: Long) = localDataSrcIml.getPointImages(pointId)
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 }
