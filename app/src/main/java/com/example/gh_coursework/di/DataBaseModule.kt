@@ -40,6 +40,10 @@ val localDataBaseModule = module {
     }
 
     single {
-        get<TravelDatabase>().getTagDao()
+        get<TravelDatabase>().getPointTagDao()
+    }
+
+    single {
+        get<TravelDatabase>().getRouteTagDao()
     }
 }

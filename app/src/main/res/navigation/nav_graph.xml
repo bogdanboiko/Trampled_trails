@@ -68,7 +68,7 @@
     </fragment>
     <dialog
         android:id="@+id/routeTagsDialogFragment"
-        android:name="com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogFragment"
+        android:name="com.example.gh_coursework.ui.route_details.tag_dialog.RouteTagDialogFragment"
         android:label="TagDialog">
         <argument
             android:name="routeId"

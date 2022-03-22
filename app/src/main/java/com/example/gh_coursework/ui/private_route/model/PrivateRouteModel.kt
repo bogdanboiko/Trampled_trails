@@ -4,9 +4,9 @@ import android.graphics.drawable.Drawable
 
 data class PrivateRouteModel(
     val routeId: Long?,
-    val name: String?,
-    val description: String?,
-    val rating: Double?,
+    val name: String,
+    val description: String,
+    val rating: Double,
     val coordinatesList: List<PrivateRoutePointModel>,
     val imgResources: Drawable?
 )

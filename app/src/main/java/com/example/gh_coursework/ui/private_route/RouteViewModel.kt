@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
-import com.example.gh_coursework.domain.usecase.route.AddRouteUseCase
-import com.example.gh_coursework.domain.usecase.route.DeleteRouteUseCase
-import com.example.gh_coursework.domain.usecase.route.GetRoutesListUseCase
+import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
+import com.example.gh_coursework.domain.usecase.route_preview.DeleteRouteUseCase
+import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteModelToDomainMapper
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDetailsDomainToModel

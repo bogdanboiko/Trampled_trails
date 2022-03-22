@@ -2,9 +2,9 @@ package com.example.gh_coursework.ui.route_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.route.AddRouteUseCase
-import com.example.gh_coursework.domain.usecase.route.GetRoutesListUseCase
-import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
+import com.example.gh_coursework.domain.usecase.route_details.GetRouteDetailsUseCase
+import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
+import com.example.gh_coursework.ui.route_details.mapper.mapRouteDetailsDomainToModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteDetailsModelToDomain
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
 import kotlinx.coroutines.Dispatchers
@@ -12,20 +12,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class RouteDetailsViewModel(
-    private val routeId: Long,
-    getRoutesListUseCase: GetRoutesListUseCase,
-    private val addRouteUseCase: AddRouteUseCase,
+    routeId: Long,
+    getRouteDetailsUseCase: GetRouteDetailsUseCase,
+    private val updateRouteDetailsUseCase: UpdateRouteDetailsUseCase,
 ) : ViewModel() {
 
-    val route = getRoutesListUseCase.invoke().map { route ->
-        route.map(::mapRouteDomainToModel).find {
-            it.routeId == routeId
-        }
-    }
+    val route = getRouteDetailsUseCase.invoke(routeId).map(::mapRouteDetailsDomainToModel)
 
-    fun addRoute(route: RouteDetailsModel) {
+    fun updateRouteDetails(route: RouteDetailsModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            addRouteUseCase.invoke(mapRouteDetailsModelToDomain(route))
+            updateRouteDetailsUseCase.invoke(mapRouteDetailsModelToDomain(route))
         }
     }
 }
