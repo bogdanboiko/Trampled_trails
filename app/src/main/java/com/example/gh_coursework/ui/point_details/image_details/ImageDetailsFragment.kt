@@ -50,6 +50,14 @@ class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
     private fun configRecycler() {
         PagerSnapHelper().attachToRecyclerView(binding.pointImageRecycler)
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        imageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(
+                positionStart: Int,
+                itemCount: Int
+            ) {
+                layoutManager.scrollToPosition(arguments.clickedItemCount)
+            }
+        })
         binding.pointImageRecycler.apply {
             adapter = imageAdapter
             layoutManager = this@ImageDetailsFragment.layoutManager
@@ -58,7 +66,6 @@ class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.pointImages.collect {
                 imageAdapter.submitList(it)
-                layoutManager.scrollToPosition(arguments.clickedItemCount)
             }
         }
     }
