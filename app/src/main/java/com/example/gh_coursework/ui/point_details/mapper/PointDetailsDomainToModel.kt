@@ -8,7 +8,6 @@ fun mapPointDetailsDomainToModel(details: PointDetailsDomain?): PointDetailsMode
         PointDetailsModel(
             details.pointId,
             details.tagList.map(::mapPointTagDomainToModel),
-            details.imageList.map(::mapPointImageDomainToModel),
             details.caption,
             details.description
         )
