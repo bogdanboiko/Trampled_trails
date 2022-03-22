@@ -3,23 +3,21 @@ package com.example.gh_coursework.ui.point_details.adapter
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.gh_coursework.databinding.ItemImageDetailsBinding
 import com.example.gh_coursework.databinding.ItemImagePointBinding
 import com.example.gh_coursework.ui.point_details.model.PointImageModel
 
-class ImageAdapter(private val onItemCLick: View.OnClickListener) :
-    ListAdapter<PointImageModel, ImageAdapter.ImageViewHolder>(Diff) {
+class ImageDetailsAdapter :
+    ListAdapter<PointImageModel, ImageDetailsAdapter.ImageViewHolder>(Diff) {
 
-    inner class ImageViewHolder(private val binding: ItemImagePointBinding) :
+    inner class ImageViewHolder(private val binding: ItemImageDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: PointImageModel) {
-            itemView.setOnClickListener(onItemCLick)
-
             val imageUri = Uri.parse(imageModel.image)
             itemView.context?.contentResolver?.openInputStream(imageUri).use {
                 val image = Drawable.createFromStream(it, imageUri.toString())
@@ -36,7 +34,7 @@ class ImageAdapter(private val onItemCLick: View.OnClickListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         return ImageViewHolder(
-            ItemImagePointBinding.inflate(
+            ItemImageDetailsBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

@@ -21,8 +21,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
-import com.example.gh_coursework.ui.point_details.adapter.DeleteImage
 import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
+import com.example.gh_coursework.ui.point_details.adapter.ImageDetailsAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import kotlinx.coroutines.launch
@@ -33,11 +33,17 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteImage {
+class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
-    private val imageAdapter = ImageAdapter(this)
+    private val imageAdapter = ImageAdapter {
+        findNavController().navigate(
+            PointDetailsFragmentDirections.actionPointDetailsFragmentToPrivateImageDetails(
+                arguments.pointId
+            )
+        )
+    }
 
     private val imageTakerLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -95,7 +101,6 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteIm
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
                     imageAdapter.submitList(it?.imageList)
-                    Log.e("e", it?.imageList.toString())
                 }
             }
         }
@@ -149,7 +154,6 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteIm
                 transitionToGallery.type = "image/*"
                 transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
                 transitionToGallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                transitionToGallery.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
                 imageTakerLauncher.launch(
                     Intent.createChooser(
                         transitionToGallery,
@@ -160,17 +164,14 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details), DeleteIm
         }
     }
 
-    override fun deleteImage(tag: PointImageModel) {
-        TODO("Not yet implemented")
-    }
-
     private fun createPointImageModel(imageUri: Uri): PointImageModel {
         context?.contentResolver?.openInputStream(imageUri).use {
             val image = Drawable.createFromStream(it, imageUri.toString())
             return PointImageModel(
                 arguments.pointId,
                 saveToCacheAndGetUri(
-                    image.toBitmap((image.intrinsicWidth * 0.9).toInt(),
+                    image.toBitmap(
+                        (image.intrinsicWidth * 0.9).toInt(),
                         (image.intrinsicHeight * 0.9).toInt()
                     ),
                     Date().time.toString()

@@ -1,6 +1,7 @@
 package com.example.gh_coursework.di
 
 import com.example.gh_coursework.ui.point_details.PointDetailsViewModel
+import com.example.gh_coursework.ui.point_details.image_details.ImageDetailsViewModel
 import com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogViewModel
 import com.example.gh_coursework.ui.private_point.PointViewModel
 import com.example.gh_coursework.ui.private_route.RouteViewModel
@@ -24,6 +25,10 @@ val viewModelModule = module {
 
     viewModel { parameters ->
         PointDetailsViewModel(parameters[0], get(), get(), get())
+    }
+
+    viewModel { parameters ->
+        ImageDetailsViewModel(parameters[0], get(), get())
     }
 
     viewModel { parameters ->
