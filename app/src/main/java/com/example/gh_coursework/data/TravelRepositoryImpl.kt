@@ -1,6 +1,6 @@
 package com.example.gh_coursework.data
 
-import com.example.gh_coursework.data.database.mapper.mapPointDomainToEntity
+import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
@@ -11,7 +11,7 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addOrUpdatePointOfInterestDetails(poi)
     }
 
-    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
+    override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {
         localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
@@ -19,8 +19,16 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.addRoute(route, route.coordinatesList.map(::mapPointDomainToEntity))
     }
 
+    override suspend fun updateRoute(route: RouteDetailsDomain) {
+        localDataSrcIml.updateRoute(route)
+    }
+
     override suspend fun addPointTag(tag: PointTagDomain) {
         localDataSrcIml.addPointTag(tag)
+    }
+
+    override suspend fun addPointImages(images: List<PointImageDomain>) {
+        localDataSrcIml.addPointImages(images)
     }
 
     override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
@@ -35,8 +43,20 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
         localDataSrcIml.deletePointTag(tag)
     }
 
+    override suspend fun deletePointImage(image: PointImageDomain) {
+        localDataSrcIml.deletePointImage(image)
+    }
+
     override suspend fun deleteRoute(route: RouteDomain) {
         localDataSrcIml.deleteRoute(route)
+    }
+
+    override suspend fun addRouteTagsList(routeTagsList: List<RouteTagsDomain>) {
+        localDataSrcIml.addRouteTagsList(routeTagsList)
+    }
+
+    override suspend fun deleteTagsFromRoute(routeTagsList: List<RouteTagsDomain>) {
+        localDataSrcIml.deleteTagsFromRoute(routeTagsList)
     }
 
     override fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>> {
@@ -53,5 +73,11 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
 
     override fun getPointTagList() = localDataSrcIml.getPointTagList()
 
+    override fun getPointImages(pointId: Long) = localDataSrcIml.getPointImages(pointId)
+
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
+
+    override fun getRouteDetails(routeId: Long) = localDataSrcIml.getRouteDetails(routeId)
+
+    override fun getRouteTags() = localDataSrcIml.getRouteTags()
 }

@@ -26,7 +26,7 @@ class RouteViewModel(
 ) : ViewModel() {
 
     val routes = getRoutesListUseCase.invoke()
-            .map { route -> route.map(::mapRouteDomainToModel) }
+        .map { route -> route.map(::mapRouteDomainToModel) }
 
     fun addRoute(route: PrivateRouteModel) {
         viewModelScope.launch(Dispatchers.IO) {
