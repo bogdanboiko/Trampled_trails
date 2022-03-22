@@ -10,7 +10,6 @@ fun mapPointDetailsEntityToDomain(details: PointDetailsResponse?): PointDetailsD
             PointDetailsDomain(
                 pointId,
                 details.tagList.map(::mapPointTagEntityToDomain),
-                details.imageList.map(::mapPointImageEntityToDomain),
                 caption,
                 description
             )

@@ -27,9 +27,6 @@
         <argument
             android:name="pointId"
             app:argType="long" />
-        <action
-            android:id="@+id/action_pointDetailsFragment_to_privateImageDetails"
-            app:destination="@id/privateImageDetails" />
     </fragment>
     <dialog
         android:id="@+id/pointTagsDialogFragment"
@@ -68,18 +65,6 @@
         <argument
             android:name="routeId"
             app:argType="long" />
-    </fragment>
-
-    <fragment
-        android:id="@+id/privateImageDetails"
-        android:name="com.example.gh_coursework.ui.point_details.image_details.ImageDetailsFragment"
-        android:label="image_details_fragment"
-        tools:layout="@layout/fragment_image_details">
-        <argument
-            android:name="pointId"
-            app:argType="long" />
-        <argument android:name="clickedItemCount"
-            app:argType="integer" />
     </fragment>
     <dialog
         android:id="@+id/routeTagsDialogFragment"

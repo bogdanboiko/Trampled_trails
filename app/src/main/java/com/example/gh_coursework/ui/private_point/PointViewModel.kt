@@ -2,7 +2,7 @@ package com.example.gh_coursework.ui.private_point
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.point_preview.AddPointPreviewWithDetailsUseCase
+import com.example.gh_coursework.domain.usecase.point_preview.AddPointPreviewUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
 import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.GetPointsPreviewUseCase
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class PointViewModel(
-    private val addPointPreviewWithDetailsUseCase: AddPointPreviewWithDetailsUseCase,
+    private val addPointPreviewUseCase: AddPointPreviewUseCase,
     private val getPointsPreviewUseCase: GetPointsPreviewUseCase,
     private val getPointDetailsUseCase: GetPointDetailsUseCase,
     private val deletePointUseCase: DeletePointUseCase
@@ -27,7 +27,7 @@ class PointViewModel(
 
     fun addPoint(point: PrivatePointModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            addPointPreviewWithDetailsUseCase.invoke(mapPointModelToDomain(point))
+            addPointPreviewUseCase.invoke(mapPointModelToDomain(point))
         }
     }
 

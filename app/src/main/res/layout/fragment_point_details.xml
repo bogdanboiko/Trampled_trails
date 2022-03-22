@@ -10,9 +10,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/pointDetailsAppBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/teal_200"
-        app:expanded="true"
+        android:layout_height="300dp"
+        app:expanded="false"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:fitsSystemWindows="true">
 
@@ -24,12 +23,15 @@
             android:fitsSystemWindows="true"
             app:contentScrim="@color/teal_200">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/imageRecycler"
+            <ImageView
+                android:id="@+id/pointImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:fastScrollEnabled="false"
-                app:layout_collapseMode="parallax"/>
+                android:scaleType="centerCrop"
+                android:fitsSystemWindows="true"
+                android:src="@drawable/bottom_nav_color_transparent"
+                app:layout_collapseMode="parallax"
+                />
 
             <Toolbar
                 android:id="@+id/toolbar"
@@ -67,16 +69,6 @@
                     android:src="@drawable/ic_tag"
                     android:background="@color/transparent"
                     android:padding="20dp" />
-
-                <ImageButton
-                    android:id="@+id/pointImageAddButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="end"
-                    android:src="@drawable/ic_image"
-                    android:background="@color/transparent"
-                    android:padding="20dp"
-                    />
 
             </Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -119,4 +111,12 @@
         </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="@dimen/cardview_default_elevation"
+        app:layout_anchor="@id/pointDetailsAppBar"
+        app:layout_anchorGravity="bottom|right|end"
+        />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

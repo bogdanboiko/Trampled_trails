@@ -1,12 +1,21 @@
 package com.example.gh_coursework.data.database
 
-import com.example.gh_coursework.data.database.dao.PointDetailsDao
-import com.example.gh_coursework.data.database.dao.PointPreviewDao
-import com.example.gh_coursework.data.database.dao.RoutePreviewDao
-import com.example.gh_coursework.data.database.dao.TagDao
+import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
-import com.example.gh_coursework.data.database.mapper.*
+import com.example.gh_coursework.data.database.mapper.mapPointDetailsDomainToEntity
+import com.example.gh_coursework.data.database.mapper.mapPointDetailsEntityToDomain
+import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
+import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEntityToDomain
+import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
+import com.example.gh_coursework.data.database.mapper.point_tag.mapPointsTagsDomainToEntity
+import com.example.gh_coursework.data.database.mapper.point_tag.mapTagDomainToEntity
+import com.example.gh_coursework.data.database.mapper.route_details.mapRouteDetailsDomainToEntity
+import com.example.gh_coursework.data.database.mapper.route_details.mapRouteDetailsResponseToDomain
+import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteDomainToEntity
+import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteResponseListToDomain
+import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagEntityToDomain
+import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagsDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
@@ -14,17 +23,25 @@ import kotlinx.coroutines.flow.map
 
 class LocalDataSrcIml(
     private val pointDao: PointPreviewDao,
-    private val routeDao: RoutePreviewDao,
     private val pointDetailsDao: PointDetailsDao,
-    private val tagDao: TagDao
+    private val pointPointTagDao: PointTagDao,
+    private val routeDao: RoutePreviewDao,
+    private val routeTagDao: RouteTagDao
 ) : TravelDatasource.Local {
-    override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
-        pointDetailsDao.updateOrInsertPointDetails(mapPointDetailsDomainToEntity(poi))
-    }
 
-    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
+    //PointPreview
+    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain): Long {
         val pointId = pointDao.addPointPreview(mapPointDomainToEntity(poi))
-        addOrUpdatePointOfInterestDetails(PointDetailsDomain(pointId, emptyList(), "", ""))
+        addOrUpdatePointOfInterestDetails(
+            PointDetailsDomain(
+                pointId,
+                emptyList(),
+                "Empty caption",
+                "Empty description"
+            )
+        )
+
+        return pointId
     }
 
     override fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>> {
@@ -32,6 +49,46 @@ class LocalDataSrcIml(
             .map { pointPreview -> pointPreview.map(::mapPointEntityToDomain) }
     }
 
+    override suspend fun deletePoint(pointId: Long) {
+        pointDao.deletePoint(pointId)
+    }
+
+    //PointDetails
+    override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
+        pointDetailsDao.updateOrInsertPointDetails(mapPointDetailsDomainToEntity(poi))
+    }
+
+    override fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?> {
+        return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
+    }
+
+    //PointTag
+    override suspend fun addPointTag(tag: PointTagDomain) {
+        pointPointTagDao.addTag(mapTagDomainToEntity(tag))
+    }
+
+    override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
+        pointPointTagDao.addTagsToPoint(pointsTagsList.map(::mapPointsTagsDomainToEntity))
+    }
+
+    override suspend fun deletePointTag(tag: PointTagDomain) {
+        pointPointTagDao.deleteTag(mapTagDomainToEntity(tag))
+    }
+
+    override fun getPointTagList(): Flow<List<PointTagDomain>> {
+        return pointPointTagDao.getPointTags()
+            .map { tagList -> tagList.map(::mapPointTagEntityToDomain) }
+    }
+
+    override fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>> {
+        return getPointOfInterestDetails(pointId).map { it?.tagList ?: emptyList() }
+    }
+
+    override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
+        pointPointTagDao.deleteTagsFromPoint(pointsTagsList.map(::mapPointsTagsDomainToEntity))
+    }
+
+    //RoutePreview
     override suspend fun addRoute(
         route: RouteDomain,
         coordinatesList: List<PointCoordinatesEntity>
@@ -42,8 +99,8 @@ class LocalDataSrcIml(
         coordinatesList.forEach {
             routePointEntitiesList.add(
                 RoutePointEntity(
-                    route.routeId?.toLong(),
-                    pointDao.addPointPreview(it),
+                    route.routeId,
+                    addPointOfInterestCoordinates(mapPointEntityToDomain(it)),
                     position
                 )
             )
@@ -57,40 +114,31 @@ class LocalDataSrcIml(
         routeDao.deleteRoute(mapRouteDomainToEntity(route))
     }
 
-    override fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>> {
-       return getPointOfInterestDetails(pointId).map { it?.tagList ?: emptyList() }
-    }
-
-    override suspend fun deletePoint(pointId: Long) {
-        pointDao.deletePoint(pointId)
-    }
-
     override fun getRoutesList(): Flow<List<RouteDomain>> {
         return routeDao.getRoutesResponse()
             .map { it.map { entity -> (mapRouteResponseListToDomain(entity)) } }
     }
 
-    override fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?> {
-        return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
+    override fun getRouteDetails(routeId: Long): Flow<RouteDetailsDomain> {
+        return routeDao.getRouteDetails(routeId).map(::mapRouteDetailsResponseToDomain)
     }
 
-    override fun getPointTagList(): Flow<List<PointTagDomain>> {
-        return tagDao.getPointTags().map { tagList -> tagList.map(::mapPointTagEntityToDomain) }
+    override suspend fun updateRoute(route: RouteDetailsDomain) {
+        routeDao.updateRouteDetails(mapRouteDetailsDomainToEntity(route))
     }
 
-    override suspend fun addPointTag(tag: PointTagDomain) {
-        tagDao.addTag(mapTagDomainToEntity(tag))
+    //RouteTag
+    override suspend fun addRouteTagsList(routeTagsList: List<RouteTagsDomain>) {
+        routeTagDao.addRouteTags(routeTagsList.map(::mapRouteTagsDomainToEntity))
     }
 
-    override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
-        tagDao.addTagsToPoint(pointsTagsList.map(::mapPointsTagsDomainToEntity))
+    override suspend fun deleteTagsFromRoute(routeTagsList: List<RouteTagsDomain>) {
+        routeTagDao.deleteTagsFromRoute(routeTagsList.map(::mapRouteTagsDomainToEntity))
     }
 
-    override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
-        tagDao.deleteTagsFromPoint(pointsTagsList.map(::mapPointsTagsDomainToEntity))
-    }
+    override fun getRouteTags(): Flow<List<RouteTagDomain>> {
 
-    override suspend fun deletePointTag(tag: PointTagDomain) {
-        tagDao.deleteTag(mapTagDomainToEntity(tag))
+        return routeTagDao.getTagsList()
+            .map { it.map(::mapRouteTagEntityToDomain) }
     }
 }
