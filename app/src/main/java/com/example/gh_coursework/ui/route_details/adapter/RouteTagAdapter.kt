@@ -2,15 +2,62 @@ package com.example.gh_coursework.ui.route_details.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.databinding.ItemRouteTagBinding
 import com.example.gh_coursework.ui.route_details.model.RouteTagModel
+import java.util.*
 
-class RouteTagAdapter : RecyclerView.Adapter<RouteTagAdapter.TagViewHolder>() {
+class RouteTagAdapter : ListAdapter<RouteTagModel, RouteTagAdapter.TagViewHolder>(Diff) {
 
-    var tagsList = mutableListOf<RouteTagModel>()
-    var checkedTagList = mutableListOf<RouteTagModel>()
-    var uncheckedTagList = mutableListOf<RouteTagModel>()
+    private var checkedTagList = emptyList<RouteTagModel>()
+
+    private var _addTagList = LinkedList<RouteTagModel>()
+    val addTagList: LinkedList<RouteTagModel>
+        get() = _addTagList
+
+    private var _removeTagList = LinkedList<RouteTagModel>()
+    val removeTagList: LinkedList<RouteTagModel>
+        get() = _removeTagList
+
+    fun insertCheckedTagList(list: List<RouteTagModel>) {
+        checkedTagList = list
+    }
+
+    fun clearTagsLists() {
+        _addTagList = LinkedList<RouteTagModel>()
+        _removeTagList = LinkedList<RouteTagModel>()
+    }
+
+    inner class TagViewHolder(private val binding: ItemRouteTagBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(tagModel: RouteTagModel) {
+            binding.tagCheckbox.apply {
+                text = tagModel.name
+
+                isChecked =
+                    (checkedTagList.contains(tagModel) && !removeTagList.contains(tagModel)) ||
+                            addTagList.contains(tagModel)
+
+                setOnClickListener {
+                    if (isChecked) {
+                        if (!checkedTagList.contains(tagModel)) {
+                            _addTagList.add(tagModel)
+                        } else {
+                            _removeTagList.remove(tagModel)
+                        }
+                    } else {
+                        if (checkedTagList.contains(tagModel)) {
+                            _removeTagList.add(tagModel)
+                        } else {
+                            _addTagList.remove(tagModel)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagViewHolder {
         return TagViewHolder(
@@ -23,35 +70,16 @@ class RouteTagAdapter : RecyclerView.Adapter<RouteTagAdapter.TagViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: TagViewHolder, position: Int) {
-        holder.bind(tagsList[position])
+        holder.bind(currentList[position])
     }
 
-    override fun getItemCount(): Int {
-        return tagsList.size
-    }
+    object Diff : DiffUtil.ItemCallback<RouteTagModel>() {
+        override fun areItemsTheSame(oldItem: RouteTagModel, newItem: RouteTagModel): Boolean {
+            return oldItem == newItem
+        }
 
-    inner class TagViewHolder(private val binding: ItemRouteTagBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-        fun bind(tagModel: RouteTagModel) {
-            binding.tagCheckbox.apply {
-                text = tagModel.name
-
-                if (checkedTagList.contains(tagModel)) {
-                    isChecked = true
-                } else if (uncheckedTagList.contains(tagModel)) {
-                    isChecked = false
-                }
-
-                setOnClickListener {
-                    if (isChecked) {
-                        uncheckedTagList.remove(tagModel)
-                        checkedTagList.add(tagModel)
-                    } else {
-                        checkedTagList.remove(tagModel)
-                        uncheckedTagList.add(tagModel)
-                    }
-                }
-            }
+        override fun areContentsTheSame(oldItem: RouteTagModel, newItem: RouteTagModel): Boolean {
+            return oldItem.tagId == newItem.tagId && oldItem.name == newItem.name
         }
     }
 }

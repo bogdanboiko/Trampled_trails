@@ -1,7 +1,6 @@
 package com.example.gh_coursework.ui.route_details.tag_dialog
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,12 +8,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.gh_coursework.databinding.DialogTagBinding
 import com.example.gh_coursework.databinding.RouteDialogTagBinding
 import com.example.gh_coursework.ui.route_details.RouteDetailsFragmentArgs
 import com.example.gh_coursework.ui.route_details.adapter.RouteTagAdapter
-import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
-import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import com.example.gh_coursework.ui.route_details.model.RouteTagsModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -49,16 +45,15 @@ class RouteTagDialogFragment : DialogFragment() {
 
     private fun configTagRecycler() {
         viewLifecycleOwner.lifecycleScope.launch {
-            Log.e("routeId", arguments.routeId.toString())
             viewModel.tags.collect { defaultTags ->
-                tagAdapter.tagsList = defaultTags as MutableList<RouteTagModel>
+                tagAdapter.submitList(defaultTags)
             }
+        }
 
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.route.collect { route ->
-                Log.e("route", route.toString())
                 if (route.tagList.isNotEmpty()) {
-                    tagAdapter.checkedTagList = route.tagList as MutableList<RouteTagModel>
-                    Log.e("checked", tagAdapter.checkedTagList.toString())
+                    tagAdapter.insertCheckedTagList(route.tagList)
                 }
             }
         }
@@ -76,23 +71,21 @@ class RouteTagDialogFragment : DialogFragment() {
             }
 
             submitTagsButton.setOnClickListener {
-                viewModel.addTagsToRoute(tagAdapter.checkedTagList.map {
+                viewModel.addTagsToRoute(tagAdapter.addTagList.map {
                     RouteTagsModel(
                         arguments.routeId,
                         it.tagId
                     )
                 })
 
-                viewModel.deleteTagsFromRoute(tagAdapter.uncheckedTagList.map {
+                viewModel.deleteTagsFromRoute(tagAdapter.removeTagList.map {
                     RouteTagsModel(
                         arguments.routeId,
                         it.tagId
                     )
                 })
 
-                tagAdapter.tagsList.clear()
-                tagAdapter.checkedTagList.clear()
-                tagAdapter.uncheckedTagList.clear()
+                tagAdapter.clearTagsLists()
                 dismiss()
             }
         }

@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
-class RouteDetailsFragment : Fragment(R.layout.fragment_point_details) {
+class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
     private val arguments by navArgs<RouteDetailsFragmentArgs>()
     private val viewModel: RouteDetailsViewModel by viewModel { parametersOf(arguments.routeId) }
     private lateinit var binding: FragmentRouteDetailsBinding
@@ -40,12 +40,9 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_point_details) {
     private fun configData() {
         with(binding) {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.route.let { routeFlow ->
-                    routeFlow.collect {
-                        routeCaptionText.setText(it?.name)
-                        routeDescriptionText.setText(it?.description)
-                        //  it?.tagList?.let { it1 -> dialog.updatePointTagList(it1) }
-                    }
+                viewModel.route.collect {
+                    routeCaptionText.setText(it.name)
+                    routeDescriptionText.setText(it.description)
                 }
             }
         }
@@ -60,13 +57,12 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 routeDescriptionText.isEnabled = false
                 routeCaptionText.hint = ""
                 routeDescriptionText.hint = ""
-                viewModel.addRoute(
+                viewModel.updateRouteDetails(
                     RouteDetailsModel(
                         arguments.routeId,
                         routeCaptionText.text.toString(),
                         routeDescriptionText.text.toString(),
                         0.0,
-                        emptyList(),
                         emptyList(),
                         null
                     )
@@ -77,11 +73,11 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_point_details) {
 
     private fun configTagButton() {
         binding.routeDetailsTagButton.setOnClickListener {
-//            findNavController().navigate(
-//                com.example.gh_coursework.ui.point_details.PointDetailsFragmentDirections.actionPrivateDetailsFragmentToPointTagDialogFragment(
-//                    arguments.routetId
-//                )
-//            )
+            findNavController().navigate(
+                RouteDetailsFragmentDirections.actionPrivateDetailsFragmentToRouteTagDialogFragment(
+                    arguments.routeId
+                )
+            )
         }
     }
 
@@ -92,8 +88,8 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_point_details) {
                 confirmEditButton.visibility = View.VISIBLE
                 routeCaptionText.isEnabled = true
                 routeDescriptionText.isEnabled = true
-                routeCaptionText.hint = "Put in point caption..."
-                routeDescriptionText.hint = "Put in point description..."
+                routeCaptionText.hint = "Put in route caption..."
+                routeDescriptionText.hint = "Put in route description..."
             }
         }
     }
