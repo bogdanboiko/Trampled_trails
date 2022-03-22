@@ -42,7 +42,9 @@ class TagAdapter(private val deleteTag: DeleteTag) :
                 text = tagModel.name
 
                 isChecked =
-                    (checkedTagList.contains(tagModel) && !removeTagList.contains(tagModel)) || addTagList.contains(tagModel)
+                    (checkedTagList.contains(tagModel) && !removeTagList.contains(tagModel)) || addTagList.contains(
+                        tagModel
+                    )
 
                 setOnClickListener {
                     if (isChecked) {
