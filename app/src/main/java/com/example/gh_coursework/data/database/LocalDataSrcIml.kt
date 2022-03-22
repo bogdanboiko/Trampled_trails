@@ -40,7 +40,7 @@ class LocalDataSrcIml(
         coordinatesList.forEach {
             routePointEntitiesList.add(
                 RoutePointEntity(
-                    route.routeId?.toLong(),
+                    route.routeId,
                     pointDao.addPointPreview(it),
                     position
                 )
@@ -76,6 +76,10 @@ class LocalDataSrcIml(
         return tagDao.getPointTags().map { tagList -> tagList.map(::mapPointTagEntityToDomain) }
     }
 
+    override fun getPointImages(pointId: Long): Flow<List<PointImageDomain>> {
+        return imageDao.getPointImages(pointId).map { it.map(::mapPointImageEntityToDomain) }
+    }
+
     override suspend fun addPointTag(tag: PointTagDomain) {
         tagDao.addTag(mapTagDomainToEntity(tag))
     }
@@ -90,6 +94,10 @@ class LocalDataSrcIml(
 
     override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
         tagDao.deleteTagsFromPoint(pointsTagsList.map(::mapPointsTagsDomainToEntity))
+    }
+
+    override suspend fun deletePointImage(image: PointImageDomain) {
+        imageDao.deletePointImage(mapPointImageDomainToEntity(image))
     }
 
     override suspend fun deletePointTag(tag: PointTagDomain) {

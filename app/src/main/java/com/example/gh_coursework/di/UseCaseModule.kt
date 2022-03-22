@@ -1,5 +1,9 @@
 package com.example.gh_coursework.di
 
+import com.example.gh_coursework.domain.usecase.image.DeletePointImageUseCase
+import com.example.gh_coursework.domain.usecase.image.DeletePointImageUseCaseImpl
+import com.example.gh_coursework.domain.usecase.image.GetPointImagesUseCase
+import com.example.gh_coursework.domain.usecase.image.GetPointImagesUseCaseImpl
 import com.example.gh_coursework.domain.usecase.point_details.*
 import com.example.gh_coursework.domain.usecase.point_preview.*
 import com.example.gh_coursework.domain.usecase.point_tag.*
@@ -28,6 +32,19 @@ val pointUseCasesModule = module {
 
     single<GetPointDetailsUseCase> {
         GetPointDetailsUseCaseImpl(get())
+    }
+
+    //Point images
+    single<AddPointImageListUseCase> {
+        PointImageListUseCaseImpl(get())
+    }
+
+    single<DeletePointImageUseCase> {
+        DeletePointImageUseCaseImpl(get())
+    }
+
+    single<GetPointImagesUseCase> {
+        GetPointImagesUseCaseImpl(get())
     }
 
     //Point tag
@@ -66,9 +83,5 @@ val pointUseCasesModule = module {
 
     single<DeleteRouteUseCase> {
         DeleteRouteUseCaseImpl(get())
-    }
-
-    single<AddPointImageListUseCase> {
-        PointImageListUseCaseImpl(get())
     }
 }
