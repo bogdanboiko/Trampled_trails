@@ -6,7 +6,12 @@ import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUse
 import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCaseImpl
 import com.example.gh_coursework.domain.usecase.point_preview.*
 import com.example.gh_coursework.domain.usecase.point_tag.*
-import com.example.gh_coursework.domain.usecase.route.*
+import com.example.gh_coursework.domain.usecase.route_details.GetRouteDetailsUseCase
+import com.example.gh_coursework.domain.usecase.route_details.GetRouteDetailsUseCaseImpl
+import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
+import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCaseImpl
+import com.example.gh_coursework.domain.usecase.route_preview.*
+import com.example.gh_coursework.domain.usecase.route_tag.*
 import org.koin.dsl.module
 
 val pointUseCasesModule = module {
@@ -58,7 +63,7 @@ val pointUseCasesModule = module {
         DeletePointTagUseCaseImpl(get())
     }
 
-    //Routes
+    //RoutePreview
     single<AddRouteUseCase> {
         AddRouteUseCaseImpl(get())
     }
@@ -69,5 +74,27 @@ val pointUseCasesModule = module {
 
     single<DeleteRouteUseCase> {
         DeleteRouteUseCaseImpl(get())
+    }
+
+    //RouteDetails
+    single<GetRouteDetailsUseCase> {
+        GetRouteDetailsUseCaseImpl(get())
+    }
+
+    single<UpdateRouteDetailsUseCase> {
+        UpdateRouteDetailsUseCaseImpl(get())
+    }
+
+    //RouteTag
+    single<AddRouteTagsUseCase> {
+        AddRouteTagsUseCaseImpl(get())
+    }
+
+    single<GetRouteTagsUseCase> {
+        GetRouteTagsUseCaseImpl(get())
+    }
+
+    single<DeleteTagsFromRouteUseCase> {
+        DeleteTagsFromRouteUseCaseImpl(get())
     }
 }
