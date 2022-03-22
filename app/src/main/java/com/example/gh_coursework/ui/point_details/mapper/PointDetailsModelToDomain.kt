@@ -7,6 +7,7 @@ fun mapPointDetailsModelToDomain(details: PointDetailsModel): PointDetailsDomain
     return PointDetailsDomain(
         details.pointId,
         details.tagList.map(::mapPointTagModelToDomain),
+        details.imageList.map(::mapPointImageModelToDomain),
         details.caption,
         details.description
     )
