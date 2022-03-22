@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -25,6 +26,7 @@ import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
 import com.example.gh_coursework.ui.point_details.adapter.ImageDetailsAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.point_details.model.PointImageModel
+import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -104,6 +106,24 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
                     imageAdapter.submitList(it?.imageList)
+
+                    val layoutParams =
+                        pointDetailsAppBar.layoutParams as CoordinatorLayout.LayoutParams
+                    val behavior = AppBarLayout.Behavior()
+                    behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
+                        override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                            val hasImage = it?.imageList?.isEmpty() == true
+                            if (hasImage) {
+                                imageRecycler.visibility = View.GONE
+                            } else {
+                                imageRecycler.visibility = View.VISIBLE
+                            }
+
+                            return hasImage
+                        }
+                    })
+                    layoutParams.behavior = behavior
+
                 }
             }
         }

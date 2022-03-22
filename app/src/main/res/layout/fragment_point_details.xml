@@ -10,8 +10,9 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/pointDetailsAppBar"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
-        app:expanded="false"
+        android:layout_height="wrap_content"
+        android:background="@color/teal_200"
+        app:expanded="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:fitsSystemWindows="true">
 
