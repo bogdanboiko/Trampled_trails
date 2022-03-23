@@ -11,11 +11,14 @@ interface TravelDatasource {
         suspend fun deletePoint(pointId: Long)
 
         suspend fun addPointTag(tag: PointTagDomain)
-        suspend fun addPointImages(images: List<PointImageDomain>)
         suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>)
         suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>)
-        suspend fun deletePointImage(image: PointImageDomain)
         suspend fun deletePointTag(tag: PointTagDomain)
+
+        suspend fun addPointImages(images: List<PointImageDomain>)
+        suspend fun addRouteImages(images: List<RouteImageDomain>)
+        suspend fun deletePointImage(image: PointImageDomain)
+        suspend fun deleteRouteImage(image: RouteImageDomain)
 
         suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointCoordinatesEntity>)
         suspend fun updateRoute(route: RouteDetailsDomain)
@@ -28,7 +31,9 @@ interface TravelDatasource {
         fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
         fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?>
         fun getPointTagList(): Flow<List<PointTagDomain>>
+
         fun getPointImages(pointId: Long): Flow<List<PointImageDomain>>
+        fun getRouteImages(routeId: Long): Flow<List<RouteImageDomain>>
 
         fun getRoutesList(): Flow<List<RouteDomain>>
         fun getRouteDetails(routeId: Long): Flow<RouteDetailsDomain>

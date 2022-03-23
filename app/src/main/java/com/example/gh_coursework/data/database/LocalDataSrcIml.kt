@@ -4,6 +4,8 @@ import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.data.database.mapper.*
+import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomainToEntity
+import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
@@ -138,6 +140,21 @@ class LocalDataSrcIml(
 
     override suspend fun updateRoute(route: RouteDetailsDomain) {
         routeDao.updateRouteDetails(mapRouteDetailsDomainToEntity(route))
+    }
+
+    //RouteImage
+    override suspend fun addRouteImages(images: List<RouteImageDomain>) {
+        imageDao.addRouteImages(images.map(::mapRouteImageDomainToEntity))
+    }
+
+    override suspend fun deleteRouteImage(image: RouteImageDomain) {
+        imageDao.deleteRouteImage(mapRouteImageDomainToEntity(image))
+    }
+
+    override fun getRouteImages(routeId: Long): Flow<List<RouteImageDomain>> {
+        return imageDao.getRouteImages(routeId).map {
+            image -> image.map(::mapRouteImageEntityToDomain)
+        }
     }
 
     //RouteTag
