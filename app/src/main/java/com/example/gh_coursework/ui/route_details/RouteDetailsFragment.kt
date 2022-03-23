@@ -21,7 +21,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentRouteDetailsBinding
-import com.example.gh_coursework.ui.point_details.PointDetailsFragmentDirections
 import com.example.gh_coursework.ui.route_details.adapter.RouteImageAdapter
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
 import com.example.gh_coursework.ui.route_details.model.RouteImageModel
