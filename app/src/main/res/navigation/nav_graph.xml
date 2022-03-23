@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/privatePointsFragment">
+
+    <!--Points-->
     <fragment
         android:id="@+id/privatePointsFragment"
         android:name="com.example.gh_coursework.ui.private_point.PrivatePointsFragment"
@@ -43,7 +45,19 @@
             app:argType="long" />
     </dialog>
 
-    <!--Fragments-->
+    <fragment
+        android:id="@+id/privateImageDetails"
+        android:name="com.example.gh_coursework.ui.point_details.image_details.ImageDetailsFragment"
+        android:label="image_details_fragment"
+        tools:layout="@layout/fragment_image_details">
+        <argument
+            android:name="pointId"
+            app:argType="long" />
+        <argument android:name="clickedItemCount"
+            app:argType="integer" />
+    </fragment>
+
+    <!--Routes-->
     <fragment
         android:id="@+id/privateRoutesFragment"
         android:name="com.example.gh_coursework.ui.private_route.PrivateRoutesFragment"
@@ -74,19 +88,12 @@
         <argument
             android:name="routeId"
             app:argType="long" />
+        <action
+            android:id="@+id/action_routeDetailsFragment_to_privateRouteImageDetails"
+            app:destination="@id/privateRouteImageDetails"
+            app:popUpTo="@id/routeDetailsFragment"/>
     </fragment>
 
-    <fragment
-        android:id="@+id/privateImageDetails"
-        android:name="com.example.gh_coursework.ui.point_details.image_details.ImageDetailsFragment"
-        android:label="image_details_fragment"
-        tools:layout="@layout/fragment_image_details">
-        <argument
-            android:name="pointId"
-            app:argType="long" />
-        <argument android:name="clickedItemCount"
-            app:argType="integer" />
-    </fragment>
     <dialog
         android:id="@+id/routeTagsDialogFragment"
         android:name="com.example.gh_coursework.ui.route_details.tag_dialog.RouteTagDialogFragment"
@@ -95,4 +102,16 @@
             android:name="routeId"
             app:argType="long" />
     </dialog>
+
+    <fragment
+        android:id="@+id/privateRouteImageDetails"
+        android:name="com.example.gh_coursework.ui.route_details.image_details.RouteDetailsImageFragment"
+        android:label="image_details_fragment"
+        tools:layout="@layout/fragment_image_details">
+        <argument
+            android:name="routeId"
+            app:argType="long" />
+        <argument android:name="clickedItemCount"
+            app:argType="integer" />
+    </fragment>
 </navigation>
