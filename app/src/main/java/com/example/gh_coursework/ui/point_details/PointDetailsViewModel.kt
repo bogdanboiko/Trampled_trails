@@ -3,7 +3,7 @@ package com.example.gh_coursework.ui.point_details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.point_details.AddPointDetailsUseCase
-import com.example.gh_coursework.domain.usecase.point_details.AddPointImageListUseCase
+import com.example.gh_coursework.domain.usecase.image.AddPointImageListUseCase
 import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCase
 import com.example.gh_coursework.ui.point_details.mapper.*
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
