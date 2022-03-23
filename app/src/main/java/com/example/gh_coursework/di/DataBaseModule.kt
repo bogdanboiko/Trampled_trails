@@ -10,7 +10,7 @@ val localDataBaseModule = module {
     single {
         Room.databaseBuilder(get(), TravelDatabase::class.java, "Travel.db")
             .addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
+                override fun onOpen(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
                     db.execSQL(
                         """
@@ -21,6 +21,14 @@ val localDataBaseModule = module {
                             END
                         """.trimIndent()
                     )
+
+                    db.execSQL("INSERT OR REPLACE INTO route_tag VALUES " +
+                            "(1, \"Historical\"), " +
+                            "(2, \"Evening walk\"), " +
+                            "(3, \"Romantic date\"), " +
+                            "(4, \"Beer weekend\"), " +
+                            "(5, \"Nature\"), " +
+                            "(6, \"Deserted\")")
                 }
             })
             .fallbackToDestructiveMigration()

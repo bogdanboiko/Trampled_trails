@@ -24,12 +24,13 @@ val viewModelModule = module {
         TagDialogViewModel(parameters[0], get(), get(), get(), get(), get(), get())
     }
 
-    viewModel { parameters ->
-        PointDetailsViewModel(parameters[0], get(), get(), get())
-    }
 
     viewModel { parameters ->
         RouteTagDialogViewModel(parameters[0], get(), get(), get(), get())
+    }
+
+    viewModel { parameters ->
+        PointDetailsViewModel(parameters[0], get(), get(), get())
     }
 
     viewModel { parameters ->

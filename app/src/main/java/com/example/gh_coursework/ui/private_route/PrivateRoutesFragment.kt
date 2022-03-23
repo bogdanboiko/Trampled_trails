@@ -283,7 +283,6 @@ class PrivateRoutesFragment :
                     routeState.value = false
                     mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
-                    routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             } else if (routeState.value == false) {
                 binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
@@ -295,7 +294,6 @@ class PrivateRoutesFragment :
                     buildDefaultRoute()
                     mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
-                    routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
         }
@@ -458,9 +456,9 @@ class PrivateRoutesFragment :
                                 route.last().coordinatesList[0].y
                             )
                         }
-
-                        routesListAdapter.submitList(route)
                     }
+
+                    routesListAdapter.submitList(route)
                 }
         }
     }
@@ -554,8 +552,6 @@ class PrivateRoutesFragment :
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun switchMapMod() {
         mapState.observe(viewLifecycleOwner) {
-            routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
             with(binding) {
                 if (it == MapState.CREATOR) {
                     setEmptyRoute()
@@ -963,7 +959,7 @@ class PrivateRoutesFragment :
         binding.mapView.camera.easeTo(
             CameraOptions.Builder()
                 .center(Point.fromLngLat(x, y))
-                .zoom(15.0)
+                .zoom(16.0)
                 .build()
         )
     }
