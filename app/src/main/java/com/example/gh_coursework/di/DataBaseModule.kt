@@ -21,7 +21,8 @@ val localDataBaseModule = module {
                             END
                         """.trimIndent()
                     )
-                    db.execSQL("INSERT INTO route_tag VALUES " +
+
+                    db.execSQL("INSERT OR REPLACE INTO route_tag VALUES " +
                             "(1, \"Historical\"), " +
                             "(2, \"Evening walk\"), " +
                             "(3, \"Romantic date\"), " +
