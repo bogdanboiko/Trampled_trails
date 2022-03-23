@@ -1,5 +1,6 @@
 package com.example.gh_coursework.data.database.mapper.route_details
 
+import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagEntityToDomain
 import com.example.gh_coursework.data.database.response.RouteDetailsResponse
 import com.example.gh_coursework.domain.entity.RouteDetailsDomain
@@ -10,6 +11,7 @@ fun mapRouteDetailsResponseToDomain(route: RouteDetailsResponse): RouteDetailsDo
         route.routeDetails.name,
         route.routeDetails.description,
         route.routeDetails.rating,
-        route.tagList.map(::mapRouteTagEntityToDomain)
+        route.tagList.map(::mapRouteTagEntityToDomain),
+        route.imageList.map(::mapRouteImageEntityToDomain)
     )
 }

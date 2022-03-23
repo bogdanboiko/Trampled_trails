@@ -10,6 +10,7 @@ fun mapRouteDetailsDomainToModel(route: RouteDetailsDomain): RouteDetailsModel {
         route.description,
         route.rating,
         route.tagsList.map(::mapRouteTagDomainToModel),
+        route.imageList?.map(::mapRouteImageDomainToModel),
         null
     )
 }

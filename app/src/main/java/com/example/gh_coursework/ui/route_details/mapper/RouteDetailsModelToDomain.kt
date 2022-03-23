@@ -9,6 +9,7 @@ fun mapRouteDetailsModelToDomain(route: RouteDetailsModel): RouteDetailsDomain {
         route.name,
         route.description,
         route.rating,
-        route.tagList.map(::mapRouteTagModelToDomain)
+        route.tagList.map(::mapRouteTagModelToDomain),
+        route.imageList?.map(::mapRouteImageModelToDomain)
     )
 }
