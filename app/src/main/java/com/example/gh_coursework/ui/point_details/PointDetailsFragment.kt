@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,6 +26,8 @@ import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -104,24 +107,31 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                     pointCaptionText.setText(it?.caption)
                     pointDescriptionText.setText(it?.description)
                     imageAdapter.submitList(it?.imageList)
+                    if (it?.caption?.isEmpty() == true && it.description.isEmpty()) {
+                        emptyDataPlaceholder.visibility = View.VISIBLE
+                    } else {
+                        emptyDataPlaceholder.visibility = View.INVISIBLE
+                    }
 
                     val layoutParams =
                         pointDetailsAppBar.layoutParams as CoordinatorLayout.LayoutParams
-                    val behavior = AppBarLayout.Behavior()
-                    behavior.setDragCallback(object : AppBarLayout.Behavior.DragCallback() {
-                        override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                            val hasImage = (it?.imageList?.isNotEmpty() == true)
-                            if (hasImage) {
-                                imageRecycler.visibility = View.VISIBLE
-                            } else {
-                                imageRecycler.visibility = View.GONE
+                    val behavior = layoutParams.behavior
+
+                    if (behavior != null) {
+                        (behavior as AppBarLayout.Behavior).setDragCallback(object :
+                            AppBarLayout.Behavior.DragCallback() {
+                            override fun canDrag(appBarLayout: AppBarLayout): Boolean {
+                                val hasImage = (it?.imageList?.isNotEmpty() == true)
+                                if (hasImage) {
+                                    imageRecycler.visibility = View.VISIBLE
+                                } else {
+                                    imageRecycler.visibility = View.GONE
+                                }
+
+                                return hasImage
                             }
-
-                            return hasImage
-                        }
-                    })
-                    layoutParams.behavior = behavior
-
+                        })
+                    }
                 }
             }
         }
@@ -163,6 +173,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         with(binding) {
             pointDetailsEditButton.setOnClickListener {
                 it.visibility = View.GONE
+                emptyDataPlaceholder.visibility = View.INVISIBLE
                 confirmEditButton.visibility = View.VISIBLE
                 pointCaptionText.isEnabled = true
                 pointDescriptionText.isEnabled = true

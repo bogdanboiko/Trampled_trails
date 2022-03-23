@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -109,6 +110,14 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         view.viewTreeObserver?.addOnGlobalLayoutListener {
             center = Pair(view.width / 2f, view.height / 2f)
         }
+
+        val callback: OnBackPressedCallback =
+            object : OnBackPressedCallback(true /* enabled by default */) {
+                override fun handleOnBackPressed() {
+                    requireActivity().finishAffinity()
+                }
+            }
+        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun configMap() {
@@ -237,8 +246,18 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         binding.bottomSheetDialogLayout.apply {
             pointCaptionText.text = details?.caption ?: ""
             pointDescriptionText.text = details?.description ?: ""
-            tagListTextView.text = details?.tagList?.joinToString(",", "Tags: ")
-            { pointTagModel -> pointTagModel.name } ?: ""
+            if (details?.tagList?.isEmpty() != true) {
+                tagListTextView.text = details?.tagList?.joinToString(
+                    ",",
+                    "Tags: "
+                ) { pointTagModel -> pointTagModel.name } ?: ""
+            }
+
+            if (details?.caption?.isEmpty() == true && details.description.isEmpty()) {
+                emptyDataPlaceholder.visibility = View.VISIBLE
+            } else {
+                emptyDataPlaceholder.visibility = View.INVISIBLE
+            }
 
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(
