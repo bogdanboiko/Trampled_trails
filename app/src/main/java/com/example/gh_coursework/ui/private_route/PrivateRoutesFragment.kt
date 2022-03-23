@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -286,8 +285,6 @@ class PrivateRoutesFragment :
                     binding.cancelButton.visibility = View.INVISIBLE
                 }
             } else if (routeState.value == false) {
-                Log.e("state1 in button", routesDialogBehavior.state.toString())
-                Log.e("state2 in button", routePointsDialogBehavior.state.toString())
                 binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
                 binding.cancelButton.icon =
                     view?.context?.let { it1 -> AppCompatResources.getDrawable(it1, R.drawable.ic_close) }
@@ -339,7 +336,6 @@ class PrivateRoutesFragment :
 
     private fun getRoutesDialog() {
         binding.getRoutesList.setOnClickListener {
-            Log.e("state", routesDialogBehavior.state.toString())
             routePointsDialogBehavior.peekHeight = 0
             routeDetailsDialogBehavior.peekHeight = 0
             pointDetailsDialogBehavior.peekHeight = 0
@@ -460,9 +456,9 @@ class PrivateRoutesFragment :
                                 route.last().coordinatesList[0].y
                             )
                         }
-
-                        routesListAdapter.submitList(route)
                     }
+
+                    routesListAdapter.submitList(route)
                 }
         }
     }
@@ -589,9 +585,6 @@ class PrivateRoutesFragment :
                 } else if (it == MapState.PRESENTATION) {
                     getRoutePointsList.visibility = View.VISIBLE
                     getRoutesList.visibility = View.VISIBLE
-
-                    Log.e("state1 in mod", routesDialogBehavior.state.toString())
-                    Log.e("state2 in mod", routePointsDialogBehavior.state.toString())
 
                     centralPointer.visibility = View.INVISIBLE
                     undoPointCreatingButton.visibility = View.INVISIBLE
