@@ -310,8 +310,8 @@ class PrivateRoutesFragment :
     }
 
     private fun configBottomSheetDialogs() {
-        getRoutePointsDialog()
         getRoutesDialog()
+        getRoutePointsDialog()
 
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
@@ -959,7 +959,7 @@ class PrivateRoutesFragment :
         binding.mapView.camera.easeTo(
             CameraOptions.Builder()
                 .center(Point.fromLngLat(x, y))
-                .zoom(15.0)
+                .zoom(16.0)
                 .build()
         )
     }

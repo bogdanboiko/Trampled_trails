@@ -41,7 +41,7 @@ val pointUseCasesModule = module {
 
     //Point images
     single<AddPointImageListUseCase> {
-        PointImageListUseCaseImpl(get())
+        AddPointImageListUseCaseImpl(get())
     }
 
     single<DeletePointImageUseCase> {
