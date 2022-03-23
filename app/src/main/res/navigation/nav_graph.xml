@@ -11,10 +11,12 @@
         tools:layout="@layout/fragment_private_points">
         <action
             android:id="@+id/action_privatePointsFragment_to_privateRoutesFragment"
-            app:destination="@id/privateRoutesFragment" />
+            app:destination="@id/privateRoutesFragment"
+            app:popUpTo="@id/privatePointsFragment"/>
         <action
             android:id="@+id/action_privatePointsFragment_to_pointDetailsFragment"
-            app:destination="@id/pointDetailsFragment" />
+            app:destination="@id/pointDetailsFragment"
+            app:popUpTo="@id/privatePointsFragment"/>
     </fragment>
     <fragment
         android:id="@+id/pointDetailsFragment"
@@ -29,7 +31,8 @@
             app:argType="long" />
         <action
             android:id="@+id/action_pointDetailsFragment_to_privateImageDetails"
-            app:destination="@id/privateImageDetails" />
+            app:destination="@id/privateImageDetails"
+            app:popUpTo="@id/pointDetailsFragment"/>
     </fragment>
     <dialog
         android:id="@+id/pointTagsDialogFragment"
@@ -51,10 +54,12 @@
             app:destination="@id/privatePointsFragment" />
         <action
             android:id="@+id/action_privateRoutesFragment_to_routeDetailsFragment"
-            app:destination="@id/routeDetailsFragment" />
+            app:destination="@id/routeDetailsFragment"
+            app:popUpTo="@id/privateRoutesFragment"/>
         <action
             android:id="@+id/action_privateRoutesFragment_to_pointDetailsFragment"
-            app:destination="@id/pointDetailsFragment" />
+            app:destination="@id/pointDetailsFragment"
+            app:popUpTo="@id/privateRoutesFragment"/>
     </fragment>
 
     <fragment
@@ -64,7 +69,8 @@
         tools:layout="@layout/fragment_route_details">
         <action
             android:id="@+id/action_privateDetailsFragment_to_routeTagDialogFragment"
-            app:destination="@id/routeTagsDialogFragment" />
+            app:destination="@id/routeTagsDialogFragment"
+            app:popUpToInclusive="true" />
         <argument
             android:name="routeId"
             app:argType="long" />

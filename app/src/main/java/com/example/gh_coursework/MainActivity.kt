@@ -8,6 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.MutableLiveData
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import com.example.gh_coursework.databinding.ActivityMainBinding
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 import com.mapbox.android.core.permissions.PermissionsListener

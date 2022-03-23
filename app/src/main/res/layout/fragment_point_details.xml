@@ -20,9 +20,15 @@
             android:id="@+id/pointDetailsCollapsingToolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             android:fitsSystemWindows="true"
             app:contentScrim="@color/teal_200">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:elevation="1dp"
+                android:src="@drawable/fg_gradient_toolbar"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/imageRecycler"
@@ -35,6 +41,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:elevation="2dp"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:layout_collapseMode="pin">
 
@@ -115,8 +122,22 @@
                 android:enabled="false"
                 android:textColor="@color/black"
                 android:lineSpacingExtra="2dp" />
-
         </LinearLayout>
-
         </androidx.core.widget.NestedScrollView>
+    <TextView
+        android:id="@+id/emptyDataPlaceholder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:paddingStart="60dp"
+        android:paddingEnd="60dp"
+        app:layout_anchor="@id/pointDescriptionText"
+        app:layout_anchorGravity="bottom"
+        android:text="Text data is empty. Press edit button to start filling the data"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
