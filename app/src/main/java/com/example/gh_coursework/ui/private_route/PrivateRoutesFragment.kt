@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -283,9 +284,10 @@ class PrivateRoutesFragment :
                     routeState.value = false
                     mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
-                    routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             } else if (routeState.value == false) {
+                Log.e("state1 in button", routesDialogBehavior.state.toString())
+                Log.e("state2 in button", routePointsDialogBehavior.state.toString())
                 binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
                 binding.cancelButton.icon =
                     view?.context?.let { it1 -> AppCompatResources.getDrawable(it1, R.drawable.ic_close) }
@@ -295,7 +297,6 @@ class PrivateRoutesFragment :
                     buildDefaultRoute()
                     mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
-                    routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
                 }
             }
         }
@@ -312,8 +313,8 @@ class PrivateRoutesFragment :
     }
 
     private fun configBottomSheetDialogs() {
-        getRoutesDialog()
         getRoutePointsDialog()
+        getRoutesDialog()
 
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
@@ -338,6 +339,7 @@ class PrivateRoutesFragment :
 
     private fun getRoutesDialog() {
         binding.getRoutesList.setOnClickListener {
+            Log.e("state", routesDialogBehavior.state.toString())
             routePointsDialogBehavior.peekHeight = 0
             routeDetailsDialogBehavior.peekHeight = 0
             pointDetailsDialogBehavior.peekHeight = 0
@@ -554,8 +556,6 @@ class PrivateRoutesFragment :
     @SuppressLint("UseCompatLoadingForDrawables")
     private fun switchMapMod() {
         mapState.observe(viewLifecycleOwner) {
-            routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
             with(binding) {
                 if (it == MapState.CREATOR) {
                     setEmptyRoute()
@@ -589,6 +589,9 @@ class PrivateRoutesFragment :
                 } else if (it == MapState.PRESENTATION) {
                     getRoutePointsList.visibility = View.VISIBLE
                     getRoutesList.visibility = View.VISIBLE
+
+                    Log.e("state1 in mod", routesDialogBehavior.state.toString())
+                    Log.e("state2 in mod", routePointsDialogBehavior.state.toString())
 
                     centralPointer.visibility = View.INVISIBLE
                     undoPointCreatingButton.visibility = View.INVISIBLE
