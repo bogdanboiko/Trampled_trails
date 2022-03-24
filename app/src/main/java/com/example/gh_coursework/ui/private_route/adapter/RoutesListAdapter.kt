@@ -1,6 +1,7 @@
 package com.example.gh_coursework.ui.private_route.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -13,6 +14,7 @@ import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 
 interface RoutesListAdapterCallback {
     fun onRouteItemClick(route: PrivateRouteModel)
+    fun onRouteItemImageClick(route: PrivateRouteModel)
 }
 
 class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
@@ -39,20 +41,35 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
 
         fun bind(item: PrivateRouteModel) {
             with(binding) {
-                txtName.text = item.name
-                txtDescription.text = item.description
-                txtRating.text = item.rating.toString()
+                if (item.name?.isEmpty() == true && item.description?.isEmpty() == true && item.rating == null) {
+                    txtName.visibility = View.INVISIBLE
+                    txtDescription.visibility = View.INVISIBLE
+                    txtRating.visibility = View.INVISIBLE
+
+                    emptyDataPlaceholder.visibility = View.VISIBLE
+
+                } else {
+                    txtName.text = item.name
+                    txtDescription.text = item.description
+                    txtRating.text = item.rating.toString()
+                }
+
+                if (item.imgResources?.isEmpty() == true) {
+                    imgMapImage.setOnClickListener {
+                        callback.onRouteItemImageClick(item)
+                    }
+                }
 
                 Glide.with(itemView)
                     .load(item.imgResources)
                     .placeholder(imgMapImage.drawable)
-                    .error(R.drawable.ic_launcher_background)
+                    .error(R.drawable.ic_image_placeholder)
                     .transform(RoundedCorners(10))
                     .into(imgMapImage)
-            }
 
-            binding.root.setOnClickListener {
-                callback.onRouteItemClick(item)
+                root.setOnClickListener {
+                    callback.onRouteItemClick(item)
+                }
             }
         }
     }
