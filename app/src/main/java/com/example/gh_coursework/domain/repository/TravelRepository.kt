@@ -27,7 +27,7 @@ interface TravelRepository {
 
     fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>>
     fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
-    fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?>
+    fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain>
     fun getPointTagList(): Flow<List<PointTagDomain>>
 
     fun getPointImages(pointId: Long): Flow<List<PointImageDomain>>

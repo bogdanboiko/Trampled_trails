@@ -111,26 +111,10 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                         emptyDataPlaceholder.visibility = View.INVISIBLE
                     }
 
-                    val layoutParams =
-                        routeDetailsAppBar.layoutParams as CoordinatorLayout.LayoutParams
-                    val behavior = layoutParams.behavior
-
-                    if (behavior != null) {
-                        (behavior as AppBarLayout.Behavior).setDragCallback(object :
-                            AppBarLayout.Behavior.DragCallback() {
-
-                            override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                                val hasImage = (it.imageList?.isNotEmpty() == true)
-
-                                if (hasImage) {
-                                    imageRecycler.visibility = View.VISIBLE
-                                } else {
-                                    imageRecycler.visibility = View.GONE
-                                }
-
-                                return hasImage
-                            }
-                        })
+                    if (it.imageList.isNotEmpty()) {
+                        imageRecycler.visibility = View.VISIBLE
+                    } else {
+                        imageRecycler.visibility = View.GONE
                     }
                 }
             }

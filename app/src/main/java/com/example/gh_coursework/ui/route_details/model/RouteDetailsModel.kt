@@ -8,6 +8,6 @@ data class RouteDetailsModel(
     val description: String?,
     val rating: Double,
     val tagList: List<RouteTagModel>,
-    val imageList: List<RouteImageModel>?,
+    val imageList: List<RouteImageModel>,
     val imgResources: Drawable?
 )

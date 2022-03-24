@@ -104,33 +104,19 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         with(binding) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.pointDetails.collect {
-                    pointCaptionText.setText(it?.caption)
-                    pointDescriptionText.setText(it?.description)
-                    imageAdapter.submitList(it?.imageList)
-                    if (it?.caption?.isEmpty() == true && it.description.isEmpty()) {
+                    pointCaptionText.setText(it.caption)
+                    pointDescriptionText.setText(it.description)
+                    imageAdapter.submitList(it.imageList)
+                    if (it.caption.isEmpty() && it.description.isEmpty()) {
                         emptyDataPlaceholder.visibility = View.VISIBLE
                     } else {
                         emptyDataPlaceholder.visibility = View.INVISIBLE
                     }
 
-                    val layoutParams =
-                        pointDetailsAppBar.layoutParams as CoordinatorLayout.LayoutParams
-                    val behavior = layoutParams.behavior
-
-                    if (behavior != null) {
-                        (behavior as AppBarLayout.Behavior).setDragCallback(object :
-                            AppBarLayout.Behavior.DragCallback() {
-                            override fun canDrag(appBarLayout: AppBarLayout): Boolean {
-                                val hasImage = (it?.imageList?.isNotEmpty() == true)
-                                if (hasImage) {
-                                    imageRecycler.visibility = View.VISIBLE
-                                } else {
-                                    imageRecycler.visibility = View.GONE
-                                }
-
-                                return hasImage
-                            }
-                        })
+                    if (it.imageList.isNotEmpty()) {
+                        imageRecycler.visibility = View.VISIBLE
+                    } else {
+                        imageRecycler.visibility = View.GONE
                     }
                 }
             }
