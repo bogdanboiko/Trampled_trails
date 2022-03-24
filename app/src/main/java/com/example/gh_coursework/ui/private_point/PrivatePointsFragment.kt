@@ -1,14 +1,11 @@
 package com.example.gh_coursework.ui.private_point
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -18,6 +15,7 @@ import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
+import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
@@ -27,7 +25,6 @@ import com.mapbox.geojson.Point
 import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.*
@@ -48,7 +45,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
-    private lateinit var center: Pair<Float, Float>
 
     private val onMapClickListener = OnMapClickListener { point ->
         val result = pointAnnotationManager.annotations.find {
@@ -107,9 +103,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         configCancelButton()
         configBottomSheetDialog()
         fetchPoints()
-        view.viewTreeObserver?.addOnGlobalLayoutListener {
-            center = Pair(view.width / 2f, view.height / 2f)
-        }
 
         val callback: OnBackPressedCallback =
             object : OnBackPressedCallback(true /* enabled by default */) {
@@ -117,7 +110,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                     requireActivity().finishAffinity()
                 }
             }
-        requireActivity().onBackPressedDispatcher.addCallback(this, callback)
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
 
     private fun configMap() {
@@ -210,14 +203,24 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     }
 
     private fun executeClickAtPoint() {
-        val clickEvent = createOnMapClickEvent(center)
+        val clickEvent = createOnMapClickEvent(
+            Pair(
+                resources.displayMetrics.widthPixels / 2,
+                resources.displayMetrics.heightPixels / 2
+            )
+        )
         binding.mapView.dispatchTouchEvent(clickEvent.first)
         binding.mapView.dispatchTouchEvent(clickEvent.second)
     }
 
     private fun addAnnotationToMap(point: PrivatePointModel) {
         activity?.applicationContext?.let {
-            bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
+            convertDrawableToBitmap(
+                AppCompatResources.getDrawable(
+                    it,
+                    R.drawable.ic_pin_point
+                )
+            )?.let { image ->
                 pointAnnotationManager.create(
                     createAnnotationPoint(
                         image,
@@ -278,14 +281,4 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             }
         }
     }
-
-    private fun createAnnotationPoint(bitmap: Bitmap, point: Point): PointAnnotationOptions {
-        return PointAnnotationOptions()
-            .withPoint(point)
-            .withIconImage(bitmap)
-            .withIconAnchor(IconAnchor.BOTTOM)
-    }
-
-    private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
-        convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
 }

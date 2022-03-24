@@ -1,15 +1,12 @@
 package com.example.gh_coursework.ui.private_route
 
 import android.annotation.SuppressLint
-import android.content.Context
-import android.graphics.Bitmap
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -20,6 +17,8 @@ import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
+import com.example.gh_coursework.ui.helper.createAnnotationPoint
+import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
@@ -39,7 +38,6 @@ import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
@@ -97,8 +95,6 @@ class PrivateRoutesFragment :
     private var mapState = MutableLiveData(MapState.PRESENTATION)
     private var routeState = MutableLiveData<Boolean>()
     private val navigationLocationProvider = NavigationLocationProvider()
-
-    private lateinit var center: Pair<Float, Float>
 
     @OptIn(MapboxExperimental::class)
     private lateinit var viewAnnotationManager: ViewAnnotationManager
@@ -216,12 +212,7 @@ class PrivateRoutesFragment :
         initRouteLine()
         buildDefaultRoute()
 
-        view.viewTreeObserver?.addOnGlobalLayoutListener {
-            center = Pair(view.width / 2f, view.height / 2f)
-        }
-
         mapboxNavigation.startTripSession(withForegroundService = false)
-        mapboxMap.loadStyleUri(Style.MAPBOX_STREETS)
     }
 
     @OptIn(MapboxExperimental::class)
@@ -252,7 +243,12 @@ class PrivateRoutesFragment :
     }
 
     private fun executeClickAtPoint() {
-        val clickEvent = createOnMapClickEvent(center)
+        val clickEvent = createOnMapClickEvent(
+            Pair(
+                resources.displayMetrics.widthPixels / 2,
+                resources.displayMetrics.heightPixels / 2
+            )
+        )
         binding.mapView.dispatchTouchEvent(clickEvent.first)
         binding.mapView.dispatchTouchEvent(clickEvent.second)
     }
@@ -287,7 +283,12 @@ class PrivateRoutesFragment :
             } else if (routeState.value == false) {
                 binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
                 binding.cancelButton.icon =
-                    view?.context?.let { it1 -> AppCompatResources.getDrawable(it1, R.drawable.ic_close) }
+                    view?.context?.let { it1 ->
+                        AppCompatResources.getDrawable(
+                            it1,
+                            R.drawable.ic_close
+                        )
+                    }
 
                 binding.cancelButton.setOnClickListener {
                     resetCurrentRoute()
@@ -828,33 +829,25 @@ class PrivateRoutesFragment :
 
     private fun addFlagAnnotationToMap(point: Point, resourceId: Int) {
         activity?.applicationContext?.let {
-            bitmapFromDrawableRes(it, resourceId)?.let { image ->
+            convertDrawableToBitmap(AppCompatResources.getDrawable(it, resourceId))?.let { image ->
                 pointAnnotationManager.create(
                     createFlagAnnotationPoint(
                         image,
                         point
                     )
                 )
-                pointAnnotationManager.addLongClickListener(OnPointAnnotationLongClickListener {
-
-
-                    true
-                })
             }
         }
     }
 
-    private fun createFlagAnnotationPoint(bitmap: Bitmap, point: Point): PointAnnotationOptions {
-        return PointAnnotationOptions()
-            .withPoint(point)
-            .withIconImage(bitmap)
-            .withIconAnchor(IconAnchor.BOTTOM_LEFT)
-            .withIconOffset(listOf(-9.6, 3.8))
-    }
-
     private fun addEmptyAnnotationToMap(point: PrivateRoutePointModel) {
         activity?.applicationContext?.let {
-            bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
+            convertDrawableToBitmap(
+                AppCompatResources.getDrawable(
+                    it,
+                    R.drawable.ic_pin_point
+                )
+            )?.let { image ->
                 pointAnnotationManager.create(
                     createAnnotationPoint(
                         image,
@@ -867,7 +860,12 @@ class PrivateRoutesFragment :
 
     private fun addAnnotationToMap(point: PrivateRoutePointModel) {
         activity?.applicationContext?.let {
-            bitmapFromDrawableRes(it, R.drawable.ic_pin_point)?.let { image ->
+            convertDrawableToBitmap(
+                AppCompatResources.getDrawable(
+                    it,
+                    R.drawable.ic_pin_point
+                )
+            )?.let { image ->
                 pointAnnotationManager.create(
                     createAnnotationPoint(
                         image,
@@ -944,16 +942,6 @@ class PrivateRoutesFragment :
             }
         }
     }
-
-    private fun createAnnotationPoint(bitmap: Bitmap, point: Point): PointAnnotationOptions {
-        return PointAnnotationOptions()
-            .withPoint(point)
-            .withIconImage(bitmap)
-            .withIconAnchor(IconAnchor.BOTTOM)
-    }
-
-    private fun bitmapFromDrawableRes(context: Context, @DrawableRes resourceId: Int) =
-        convertDrawableToBitmap(AppCompatResources.getDrawable(context, resourceId))
 
     private fun eraseCameraToPoint(x: Double, y: Double) {
         binding.mapView.camera.easeTo(

@@ -6,7 +6,7 @@ data class RouteDetailsDomain(
     val description: String?,
     val rating: Double,
     val tagsList: List<RouteTagDomain>,
-    val imageList: List<RouteImageDomain>?
+    val imageList: List<RouteImageDomain>
 )
 
 
