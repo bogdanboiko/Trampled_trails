@@ -11,6 +11,6 @@ fun mapRouteDomainToModel(routeDomain: RouteDomain): PrivateRouteModel {
         routeDomain.description,
         routeDomain.rating,
         routeDomain.coordinatesList.map(::mapPointDomainToModel),
-        null
+        ""
     )
 }

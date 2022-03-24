@@ -14,5 +14,5 @@ data class RouteEntity(
     @ColumnInfo(name = "description")
     val description: String?,
     @ColumnInfo(name = "rating")
-    val rating: Double
+    val rating: Double?
 )

@@ -1,14 +1,22 @@
 package com.example.gh_coursework.ui.private_route
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -23,7 +31,6 @@ import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
-import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -32,6 +39,7 @@ import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointMod
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointModel
+import com.example.gh_coursework.ui.route_details.model.RouteImageModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
@@ -45,7 +53,10 @@ import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.animation.MapAnimationOptions
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
@@ -70,6 +81,9 @@ import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
+import java.io.FileOutputStream
+import java.util.*
 
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
@@ -194,6 +208,41 @@ class PrivateRoutesFragment :
             )
         }
     }
+
+    private val imageTakerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                val imageList = data?.clipData
+                if (imageList != null) {
+                    val imageUriList = mutableListOf<RouteImageModel>()
+
+                    for (i in 0 until imageList.itemCount) {
+                        imageUriList.add(
+                            createPointImageModel(
+                                imageList.getItemAt(i).uri,
+                                focusedRoute.routeId!!
+                            )
+                        )
+                    }
+
+                    viewModel.addPointImageList(imageUriList)
+                } else {
+                    val imageUri = data?.data
+
+                    if (imageUri != null) {
+                        viewModel.addPointImageList(
+                            listOf(
+                                createPointImageModel(
+                                    imageUri,
+                                    focusedRoute.routeId!!
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -471,9 +520,22 @@ class PrivateRoutesFragment :
                                 route.last().coordinatesList[0].y
                             )
                         }
-                    }
 
-                    routesListAdapter.submitList(route)
+                        route.forEach { _route ->
+                            viewLifecycleOwner.lifecycleScope.launch {
+                                _route.routeId?.let { routeId ->
+                                    viewModel.getRouteImages(routeId).collect {
+                                        if (it.isNotEmpty()) {
+                                            _route.imgResources = it.first().image
+                                            routesListAdapter.submitList(route)
+                                        } else {
+                                            routesListAdapter.submitList(route)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
         }
     }
@@ -774,9 +836,9 @@ class PrivateRoutesFragment :
         if (currentRouteCoordinatesList.isNotEmpty()) {
             val route = PrivateRouteModel(
                 null,
-                "Empty route caption",
-                "Empty route description",
-                0.0,
+                "",
+                "",
+                null,
                 currentRouteCoordinatesList.map { it.copy() },
                 null
             )
@@ -791,6 +853,12 @@ class PrivateRoutesFragment :
             resetCurrentRoute()
             pointAnnotationManager.deleteAll()
             viewModel.deleteRoute(route)
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.routes.collect {
+                    routesListAdapter.submitList(it)
+                }
+            }
         }
     }
 
@@ -831,6 +899,25 @@ class PrivateRoutesFragment :
         rebuildRoute(route)
         focusedRoute = route
         routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    override fun onRouteItemImageClick(route: PrivateRouteModel) {
+        val transitionToGallery = Intent()
+        transitionToGallery.type = "image/*"
+        transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
+        transitionToGallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+        imageTakerLauncher.launch(
+            Intent.createChooser(
+                transitionToGallery,
+                "Select pictures"
+            )
+        )
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.routes.collect {
+                routesListAdapter.submitList(it)
+            }
+        }
     }
 
     override fun onPointItemClick(pointId: Long) {
@@ -981,5 +1068,44 @@ class PrivateRoutesFragment :
                 .zoom(16.0)
                 .build()
         )
+    }
+
+    private fun createPointImageModel(imageUri: Uri, routeId: Long): RouteImageModel {
+
+        context?.contentResolver?.openInputStream(imageUri).use {
+            val image = Drawable.createFromStream(it, imageUri.toString())
+
+            return RouteImageModel(
+                routeId,
+                saveToCacheAndGetUri(
+                    image.toBitmap(
+                        (image.intrinsicWidth * 0.9).toInt(),
+                        (image.intrinsicHeight * 0.9).toInt()
+                    ),
+                    Date().time.toString()
+                ).toString()
+            )
+        }
+    }
+
+    private fun saveToCacheAndGetUri(bitmap: Bitmap, name: String): Uri {
+        val file = saveImgToCache(bitmap, name)
+        return getImageUri(file, name)
+    }
+
+    private fun saveImgToCache(bitmap: Bitmap, name: String): File {
+        val fileName: String = name
+        val cachePath = File(context?.cacheDir, "/images")
+        cachePath.mkdirs()
+        FileOutputStream("$cachePath/$fileName.jpeg").use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
+
+        return cachePath
+    }
+
+    private fun getImageUri(fileDir: File, name: String): Uri {
+        val newFile = File(fileDir, "$name.jpeg")
+        return newFile.toUri()
     }
 }
