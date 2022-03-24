@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
@@ -20,6 +22,8 @@ import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
+import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -74,6 +78,8 @@ class PrivateRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
+    private lateinit var imageAdapter: ImageAdapter
+    private lateinit var pointImageLayoutManager: LinearLayoutManager
     private lateinit var binding: FragmentPrivateRouteBinding
 
     private val viewModel: RouteViewModel by viewModel()
@@ -207,12 +213,19 @@ class PrivateRoutesFragment :
         configMapSwitcherButton()
         configCancelButton()
         configRecyclers()
+        configPointImageRecycler()
         configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
         buildDefaultRoute()
 
         mapboxNavigation.startTripSession(withForegroundService = false)
+    }
+
+    private fun configPointImageRecycler() {
+        PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogPointDetails.imageRecycler)
+        pointImageLayoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
     @OptIn(MapboxExperimental::class)
@@ -396,6 +409,7 @@ class PrivateRoutesFragment :
     }
 
     private fun getPointDetailsDialog(annotation: PointAnnotation) {
+
         viewLifecycleOwner.lifecycleScope.launch {
             annotation.getData()?.asLong?.let { pointId ->
                 viewModel.getPointDetailsPreview(pointId).collect { details ->
@@ -511,17 +525,15 @@ class PrivateRoutesFragment :
                 viewLifecycleOwner.lifecycleScope.launch {
                     _route.pointId?.let { id ->
                         viewModel.getPointDetailsPreview(id).collect { details ->
-                            details?.let {
                                 annotatedPointsList.add(
                                     PrivateRoutePointDetailsPreviewModel(
+                                        details.pointId,
+                                        details.imageList,
                                         details.tagList,
                                         details.caption,
-                                        details.description,
-                                        _route.x,
-                                        _route.y
+                                        details.description
                                     )
                                 )
-                            }
 
                             pointsListAdapter.submitList(annotatedPointsList)
                         }
@@ -821,8 +833,11 @@ class PrivateRoutesFragment :
         routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    override fun onPointItemClick(point: PrivateRoutePointDetailsPreviewModel) {
-        eraseCameraToPoint(point.x, point.y)
+    override fun onPointItemClick(pointId: Long) {
+        val pointPreview = currentRouteCoordinatesList.find {
+            it.pointId == pointId
+        }
+        pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
 
         routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
@@ -888,13 +903,29 @@ class PrivateRoutesFragment :
 
     private fun preparePointDetailsDialog(
         pointAnnotation: PointAnnotation,
-        details: PrivateRoutePointDetailsPreviewModel?
+        details: PrivateRoutePointDetailsPreviewModel
     ) {
         binding.bottomSheetDialogPointDetails.apply {
-            pointCaptionText.text = details?.caption ?: ""
-            pointDescriptionText.text = details?.description ?: ""
-            tagListTextView.text = details?.tagList?.joinToString(",", "Tags: ")
-            { pointTagModel -> pointTagModel.name } ?: ""
+            pointCaptionText.text = details.caption
+            pointDescriptionText.text = details.description
+            tagListTextView.text = details.tagList.joinToString(",", "Tags: ")
+            { pointTagModel -> pointTagModel.name }
+
+            imageAdapter = ImageAdapter {
+                findNavController().navigate(
+                    PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateImageDetails(
+                        details.pointId,
+                        pointImageLayoutManager.findFirstVisibleItemPosition()
+                    )
+                )
+            }
+
+            imageRecycler.apply {
+                adapter = imageAdapter
+                layoutManager = pointImageLayoutManager
+            }
+
+            imageAdapter.submitList(details.imageList)
 
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(

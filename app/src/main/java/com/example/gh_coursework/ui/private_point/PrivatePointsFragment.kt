@@ -11,12 +11,16 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.point_details.PointDetailsFragmentDirections
+import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -37,9 +41,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
+    private lateinit var imageAdapter: ImageAdapter
+    private lateinit var layoutManager: LinearLayoutManager
     private val viewModel: PointViewModel by viewModel()
     private var pointCoordinates = emptyList<PrivatePointModel>()
-    private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
     private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
@@ -115,7 +120,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
 
     private fun configMap() {
         mapboxMap = binding.mapView.getMapboxMap().also {
-            viewAnnotationManager = binding.mapView.viewAnnotationManager
             it.loadStyleUri(Style.MAPBOX_STREETS)
         }
 
@@ -133,6 +137,8 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     }
 
     private fun configBottomSheetDialog() {
+        PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogLayout.imageRecycler)
+        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         sheetBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogLayout.pointBottomSheetDialog)
 
@@ -244,19 +250,35 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
 
     private fun prepareDetailsDialog(
         pointAnnotation: PointAnnotation,
-        details: PrivatePointDetailsPreviewModel?
+        details: PrivatePointDetailsPreviewModel
     ) {
         binding.bottomSheetDialogLayout.apply {
-            pointCaptionText.text = details?.caption ?: ""
-            pointDescriptionText.text = details?.description ?: ""
-            if (details?.tagList?.isEmpty() != true) {
-                tagListTextView.text = details?.tagList?.joinToString(
+            pointCaptionText.text = details.caption
+            pointDescriptionText.text = details.description
+            if (details.tagList.isNotEmpty()) {
+                tagListTextView.text = details.tagList.joinToString(
                     ",",
                     "Tags: "
-                ) { pointTagModel -> pointTagModel.name } ?: ""
+                ) { pointTagModel -> pointTagModel.name }
             }
 
-            if (details?.caption?.isEmpty() == true && details.description.isEmpty()) {
+            imageAdapter = ImageAdapter {
+                findNavController().navigate(
+                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPrivateImageDetails(
+                        details.pointId,
+                        this@PrivatePointsFragment.layoutManager.findFirstVisibleItemPosition()
+                    )
+                )
+            }
+
+            imageRecycler.apply {
+                adapter = imageAdapter
+                layoutManager = this@PrivatePointsFragment.layoutManager
+            }
+
+            imageAdapter.submitList(details.imageList)
+
+            if (details.caption.isEmpty() && details.description.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
                 emptyDataPlaceholder.visibility = View.INVISIBLE

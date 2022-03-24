@@ -9,7 +9,7 @@ import com.example.gh_coursework.databinding.ItemPointBinding
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
 
 interface RoutePointsListCallback {
-    fun onPointItemClick(point: PrivateRoutePointDetailsPreviewModel)
+    fun onPointItemClick(pointId: Long)
 }
 
 class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
@@ -41,7 +41,7 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
             }
 
             binding.root.setOnClickListener {
-                callback.onPointItemClick(item)
+                callback.onPointItemClick(item.pointId)
             }
         }
     }
@@ -58,7 +58,7 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
             oldItem: PrivateRoutePointDetailsPreviewModel,
             newItem: PrivateRoutePointDetailsPreviewModel
         ): Boolean {
-            return oldItem.x == newItem.x && oldItem.y == newItem.y
+            return oldItem.pointId == newItem.pointId
         }
     }
 }
