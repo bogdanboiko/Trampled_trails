@@ -6,6 +6,7 @@ import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.data.database.mapper.*
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntityToDomain
+import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEntityToDomain
@@ -21,6 +22,7 @@ import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagsDoma
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class LocalDataSrcIml(
@@ -40,8 +42,8 @@ class LocalDataSrcIml(
                 pointId,
                 emptyList(),
                 emptyList(),
-                "Empty caption",
-                "Empty description"
+                "",
+                ""
             )
         )
 
@@ -70,7 +72,7 @@ class LocalDataSrcIml(
         imageDao.deletePointImage(mapPointImageDomainToEntity(image))
     }
 
-    override fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain> {
+    override fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?> {
         return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
     }
 

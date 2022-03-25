@@ -70,7 +70,9 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
 
             annotation.getData()?.asLong?.let { pointId ->
                 viewModel.getPointDetailsPreview(pointId).collect { details ->
-                    prepareDetailsDialog(annotation, details)
+                    if (details != null) {
+                        prepareDetailsDialog(annotation, details)
+                    }
                 }
             }
         }
@@ -242,7 +244,9 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
 
             annotation.getData()?.asLong?.let { pointId ->
                 viewModel.getPointDetailsPreview(pointId).collect { details ->
-                    prepareDetailsDialog(annotation, details)
+                    if (details != null) {
+                        prepareDetailsDialog(annotation, details)
+                    }
                 }
             }
         }

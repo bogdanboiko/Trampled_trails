@@ -31,7 +31,7 @@ class PointViewModel(
         }
     }
 
-    fun getPointDetailsPreview(pointId: Long): Flow<PrivatePointDetailsPreviewModel> {
+    fun getPointDetailsPreview(pointId: Long): Flow<PrivatePointDetailsPreviewModel?> {
         return getPointDetailsUseCase.invoke(pointId).map { details -> mapPointDetailsDomainToModel(details) }
     }
 
