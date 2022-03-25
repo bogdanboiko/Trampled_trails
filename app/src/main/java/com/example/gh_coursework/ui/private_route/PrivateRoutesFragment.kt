@@ -37,6 +37,7 @@ import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallbac
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapterCallback
 import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointModelToPoint
+import com.example.gh_coursework.ui.private_route.mapper.mapRouteImageModelToPointImageModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointModel
@@ -1084,6 +1085,28 @@ class PrivateRoutesFragment :
                         PrivateRoutesFragmentDirections
                             .actionPrivateRoutesFragmentToRouteDetailsFragment(it)
                     )
+                }
+            }
+
+            imageAdapter = ImageAdapter {
+                findNavController().navigate(
+                    PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateImageDetails(
+                        focusedRoute.routeId!!,
+                        pointImageLayoutManager.findFirstVisibleItemPosition()
+                    )
+                )
+            }
+
+            imageRecycler.apply {
+                adapter = imageAdapter
+                layoutManager = pointImageLayoutManager
+            }
+
+            viewLifecycleOwner.lifecycleScope.launch {
+                focusedRoute.routeId?.let { routeId ->
+                    viewModel.getRouteImages(routeId).collect {
+                        imageAdapter.submitList(it.map(::mapRouteImageModelToPointImageModel))
+                    }
                 }
             }
 
