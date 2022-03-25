@@ -41,13 +41,13 @@ class RouteViewModel(
         }
     }
 
-    fun addPointImageList(images: List<RouteImageModel>) {
+    fun addRouteImageList(images: List<RouteImageModel>) {
         viewModelScope.launch(Dispatchers.IO) {
             addRouteImageListUseCase.invoke(images.map(::mapRouteImageModelToDomain))
         }
     }
 
-    fun getPointDetailsPreview(pointId: Long): Flow<PrivateRoutePointDetailsPreviewModel> {
+    fun getPointDetailsPreview(pointId: Long): Flow<PrivateRoutePointDetailsPreviewModel?> {
         return getPointDetailsUseCase.invoke(pointId)
             .map { details -> mapRoutePointDetailsDomainToModel(details) }
     }
