@@ -209,41 +209,6 @@ class PrivateRoutesFragment :
         }
     }
 
-    private val imageTakerLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                val imageList = data?.clipData
-                if (imageList != null) {
-                    val imageUriList = mutableListOf<RouteImageModel>()
-
-                    for (i in 0 until imageList.itemCount) {
-                        imageUriList.add(
-                            createPointImageModel(
-                                imageList.getItemAt(i).uri,
-                                focusedRoute.routeId!!
-                            )
-                        )
-                    }
-
-                    viewModel.addPointImageList(imageUriList)
-                } else {
-                    val imageUri = data?.data
-
-                    if (imageUri != null) {
-                        viewModel.addPointImageList(
-                            listOf(
-                                createPointImageModel(
-                                    imageUri,
-                                    focusedRoute.routeId!!
-                                )
-                            )
-                        )
-                    }
-                }
-            }
-        }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -459,13 +424,7 @@ class PrivateRoutesFragment :
 
     private fun getPointDetailsDialog(annotation: PointAnnotation) {
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            annotation.getData()?.asLong?.let { pointId ->
-                viewModel.getPointDetailsPreview(pointId).collect { details ->
-                    preparePointDetailsDialog(annotation, details)
-                }
-            }
-        }
+        loadPointData(annotation)
 
         routesDialogBehavior.peekHeight = 0
         routePointsDialogBehavior.peekHeight = 0
@@ -529,6 +488,22 @@ class PrivateRoutesFragment :
                                             _route.imgResources = it.first().image
                                             routesListAdapter.submitList(route)
                                         } else {
+                                            _route.coordinatesList.forEach { routePoint ->
+                                                if (!routePoint.isRoutePoint) {
+                                                    routePoint.pointId?.let { pointId ->
+                                                        viewModel.getPointDetailsPreview(pointId)
+                                                            .collect { details ->
+                                                                if (details != null && details.imageList.isNotEmpty()) {
+                                                                    _route.imgResources =
+                                                                        details.imageList.first().image
+                                                                    routesListAdapter.submitList(
+                                                                        route
+                                                                    )
+                                                                }
+                                                            }
+                                                    }
+                                                }
+                                            }
                                             routesListAdapter.submitList(route)
                                         }
                                     }
@@ -587,6 +562,7 @@ class PrivateRoutesFragment :
                 viewLifecycleOwner.lifecycleScope.launch {
                     _route.pointId?.let { id ->
                         viewModel.getPointDetailsPreview(id).collect { details ->
+                            if (details != null) {
                                 annotatedPointsList.add(
                                     PrivateRoutePointDetailsPreviewModel(
                                         details.pointId,
@@ -596,6 +572,7 @@ class PrivateRoutesFragment :
                                         details.description
                                     )
                                 )
+                            }
 
                             pointsListAdapter.submitList(annotatedPointsList)
                         }
@@ -856,6 +833,10 @@ class PrivateRoutesFragment :
 
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.routes.collect {
+                    if (it.isEmpty()) {
+                        routesListAdapter.submitList(emptyList())
+                    }
+
                     routesListAdapter.submitList(it)
                 }
             }
@@ -906,7 +887,7 @@ class PrivateRoutesFragment :
         transitionToGallery.type = "image/*"
         transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
         transitionToGallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        imageTakerLauncher.launch(
+        routeImageTakerLauncher.launch(
             Intent.createChooser(
                 transitionToGallery,
                 "Select pictures"
@@ -915,6 +896,10 @@ class PrivateRoutesFragment :
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.routes.collect {
+                if (it.isEmpty()) {
+                    routesListAdapter.submitList(emptyList())
+                }
+
                 routesListAdapter.submitList(it)
             }
         }
@@ -982,7 +967,9 @@ class PrivateRoutesFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             annotation.getData()?.asLong?.let { pointId ->
                 viewModel.getPointDetailsPreview(pointId).collect { details ->
-                    preparePointDetailsDialog(annotation, details)
+                    if (details != null) {
+                        preparePointDetailsDialog(annotation, details)
+                    }
                 }
             }
         }
@@ -1070,7 +1057,42 @@ class PrivateRoutesFragment :
         )
     }
 
-    private fun createPointImageModel(imageUri: Uri, routeId: Long): RouteImageModel {
+    private val routeImageTakerLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data
+                val imageList = data?.clipData
+                if (imageList != null) {
+                    val imageUriList = mutableListOf<RouteImageModel>()
+
+                    for (i in 0 until imageList.itemCount) {
+                        imageUriList.add(
+                            createRouteImageModel(
+                                imageList.getItemAt(i).uri,
+                                focusedRoute.routeId!!
+                            )
+                        )
+                    }
+
+                    viewModel.addRouteImageList(imageUriList)
+                } else {
+                    val imageUri = data?.data
+
+                    if (imageUri != null) {
+                        viewModel.addRouteImageList(
+                            listOf(
+                                createRouteImageModel(
+                                    imageUri,
+                                    focusedRoute.routeId!!
+                                )
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+    private fun createRouteImageModel(imageUri: Uri, routeId: Long): RouteImageModel {
 
         context?.contentResolver?.openInputStream(imageUri).use {
             val image = Drawable.createFromStream(it, imageUri.toString())
