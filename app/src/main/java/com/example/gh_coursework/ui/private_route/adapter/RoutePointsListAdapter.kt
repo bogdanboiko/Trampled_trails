@@ -1,10 +1,14 @@
 package com.example.gh_coursework.ui.private_route.adapter
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.ItemPointBinding
 import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
 
@@ -36,13 +40,39 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
 
         fun bind(item: PrivateRoutePointDetailsPreviewModel) {
             with(binding) {
-                txtName.text = item.caption
-                txtDescription.text = item.description
+                if (item.caption.isEmpty() && item.description.isEmpty()) {
+                    txtName.visibility = View.INVISIBLE
+                    txtDescription.visibility = View.INVISIBLE
+
+                    emptyDataPlaceholder.visibility = View.VISIBLE
+
+                } else {
+                    txtName.text = item.caption
+                    txtDescription.text = item.description
+                }
+
+                if (item.imageList.isEmpty()) {
+                    Glide.with(itemView)
+                        .load(R.drawable.ic_image_placeholder)
+                        .placeholder(imgMapImage.drawable)
+                        .transform(RoundedCorners(10))
+                        .into(imgMapImage)
+                }
+
+                if (item.imageList.isNotEmpty()) {
+                    Glide.with(itemView)
+                        .load(item.imageList[0])
+                        .placeholder(imgMapImage.drawable)
+                        .error(R.drawable.ic_image_placeholder)
+                        .transform(RoundedCorners(10))
+                        .into(imgMapImage)
+                }
+
+                root.setOnClickListener {
+                    item.pointId.let { it1 -> callback.onPointItemClick(it1) }
+                }
             }
 
-            binding.root.setOnClickListener {
-                callback.onPointItemClick(item.pointId)
-            }
         }
     }
 

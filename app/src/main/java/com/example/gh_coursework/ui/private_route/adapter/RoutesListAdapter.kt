@@ -54,12 +54,6 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
                     txtRating.text = item.rating.toString()
                 }
 
-                if (item.imgResources?.isEmpty() == true) {
-                    imgMapImage.setOnClickListener {
-                        callback.onRouteItemImageClick(item)
-                    }
-                }
-
                 Glide.with(itemView)
                     .load(item.imgResources)
                     .placeholder(imgMapImage.drawable)
