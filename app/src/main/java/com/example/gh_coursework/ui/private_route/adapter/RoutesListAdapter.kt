@@ -14,7 +14,6 @@ import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
 
 interface RoutesListAdapterCallback {
     fun onRouteItemClick(route: PrivateRouteModel)
-    fun onRouteItemImageClick(route: PrivateRouteModel)
 }
 
 class RoutesListAdapter(val callback: RoutesListAdapterCallback) :

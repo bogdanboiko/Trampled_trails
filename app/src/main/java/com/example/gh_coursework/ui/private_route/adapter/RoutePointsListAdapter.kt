@@ -89,6 +89,10 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
             newItem: PrivateRoutePointDetailsPreviewModel
         ): Boolean {
             return oldItem.pointId == newItem.pointId
+                    && oldItem.caption == newItem.caption
+                    && oldItem.description == newItem.description
+                    && oldItem.imageList == newItem.imageList
+                    && oldItem.tagList == newItem.tagList
         }
     }
 }

@@ -475,6 +475,7 @@ class PrivateRoutesFragment :
             viewModel.routes
                 .distinctUntilChanged()
                 .collect { route ->
+                    Log.e("e", route.toString())
                     if (route.isNotEmpty()) {
                         if (route.last().coordinatesList.isNotEmpty()) {
                             buildRouteFromList((route.last().coordinatesList.map(::mapPrivateRoutePointModelToPoint)))
@@ -493,7 +494,6 @@ class PrivateRoutesFragment :
                                     viewModel.getRouteImages(routeId).collect {
                                         if (it.isNotEmpty()) {
                                             _route.imgResources = it.first().image
-                                            routesListAdapter.submitList(route)
                                         } else {
                                             _route.coordinatesList.forEach { routePoint ->
                                                 if (!routePoint.isRoutePoint) {
@@ -503,24 +503,22 @@ class PrivateRoutesFragment :
                                                                 if (details != null && details.imageList.isNotEmpty()) {
                                                                     _route.imgResources =
                                                                         details.imageList.first().image
-                                                                    routesListAdapter.submitList(
-                                                                        route
-                                                                    )
                                                                 }
                                                             }
                                                     }
                                                 }
                                             }
                                         }
-
-                                        routesListAdapter.submitList(route)
                                     }
                                 }
                             }
                         }
 
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.INVISIBLE
+                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                            View.INVISIBLE
                     }
+
+                    routesListAdapter.submitList(route)
                 }
         }
     }
@@ -529,7 +527,6 @@ class PrivateRoutesFragment :
         val annotatedPointsList = mutableListOf<PrivateRoutePointDetailsPreviewModel>()
 
         pointAnnotationManager.deleteAll()
-        pointsListAdapter.submitList(emptyList())
 
         if (route.coordinatesList.first().isRoutePoint) {
             addFlagAnnotationToMap(
@@ -900,29 +897,6 @@ class PrivateRoutesFragment :
         routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    override fun onRouteItemImageClick(route: PrivateRouteModel) {
-        val transitionToGallery = Intent()
-        transitionToGallery.type = "image/*"
-        transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
-        transitionToGallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-        routeImageTakerLauncher.launch(
-            Intent.createChooser(
-                transitionToGallery,
-                "Select pictures"
-            )
-        )
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.routes.collect {
-                if (it.isEmpty()) {
-                    routesListAdapter.submitList(emptyList())
-                }
-
-                routesListAdapter.submitList(it)
-            }
-        }
-    }
-
     override fun onPointItemClick(pointId: Long) {
         val pointPreview = focusedRoute.coordinatesList.find {
             it.pointId == pointId
@@ -997,9 +971,6 @@ class PrivateRoutesFragment :
         pointAnnotation: PointAnnotation,
         details: PrivateRoutePointDetailsPreviewModel
     ) {
-
-        var annotatedPointsList = mutableListOf<PrivateRoutePointDetailsPreviewModel>()
-
         binding.bottomSheetDialogPointDetails.apply {
             pointCaptionText.text = details.caption
             pointDescriptionText.text = details.description
@@ -1041,16 +1012,8 @@ class PrivateRoutesFragment :
                         viewModel.deletePoint(pointId)
                         pointAnnotationManager.delete(pointAnnotation)
 
-                        if (pointsListAdapter.currentList.size == 1) {
-                            pointsListAdapter.submitList(emptyList())
-                        } else {
-                            annotatedPointsList = pointsListAdapter.currentList.toMutableList()
-                            annotatedPointsList.remove(details)
-                            pointsListAdapter.submitList(annotatedPointsList)
-                            annotatedPointsList.clear()
-                        }
-
-                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.INVISIBLE
+                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
+                            View.INVISIBLE
                     }
                 }
 
