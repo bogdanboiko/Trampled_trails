@@ -80,7 +80,6 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -97,6 +96,7 @@ class PrivateRoutesFragment :
 
     private lateinit var imageAdapter: ImageAdapter
     private lateinit var pointImageLayoutManager: LinearLayoutManager
+    private lateinit var routeImageLayoutManager: LinearLayoutManager
     private lateinit var binding: FragmentPrivateRouteBinding
 
     private val viewModel: RouteViewModel by viewModel()
@@ -230,7 +230,7 @@ class PrivateRoutesFragment :
         configMapSwitcherButton()
         configCancelButton()
         configRecyclers()
-        configPointImageRecycler()
+        configImageRecyclers()
         configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
@@ -239,9 +239,13 @@ class PrivateRoutesFragment :
         mapboxNavigation.startTripSession(withForegroundService = false)
     }
 
-    private fun configPointImageRecycler() {
+    private fun configImageRecyclers() {
         PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogPointDetails.imageRecycler)
+        PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogRouteDetails.imageRecycler)
+
         pointImageLayoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        routeImageLayoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
@@ -507,8 +511,9 @@ class PrivateRoutesFragment :
                                                     }
                                                 }
                                             }
-                                            routesListAdapter.submitList(route)
                                         }
+
+                                        routesListAdapter.submitList(route)
                                     }
                                 }
                             }
@@ -672,7 +677,7 @@ class PrivateRoutesFragment :
             mapboxMap.addOnMapClickListener(regularOnMapClickListener)
 
             binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
-        } else {
+        } else if (!isChecked) {
             mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
             mapboxMap.addOnMapClickListener(namedOnMapClickListener)
 
@@ -842,13 +847,18 @@ class PrivateRoutesFragment :
                 viewModel.routes.collect {
                     if (it.isEmpty()) {
                         routesListAdapter.submitList(emptyList())
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.VISIBLE
+                        pointsListAdapter.submitList(emptyList())
+
+                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                            View.VISIBLE
+                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
+                            View.VISIBLE
                     }
 
                     routesListAdapter.submitList(it)
                 }
             }
-        }
+        }.cancel()
     }
 
     private fun rebuildRoute(route: PrivateRouteModel) {
@@ -988,7 +998,7 @@ class PrivateRoutesFragment :
         details: PrivateRoutePointDetailsPreviewModel
     ) {
 
-        val annotatedPointsList = mutableListOf<PrivateRoutePointDetailsPreviewModel>()
+        var annotatedPointsList = mutableListOf<PrivateRoutePointDetailsPreviewModel>()
 
         binding.bottomSheetDialogPointDetails.apply {
             pointCaptionText.text = details.caption
@@ -1000,14 +1010,14 @@ class PrivateRoutesFragment :
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateImageDetails(
                         details.pointId,
-                        pointImageLayoutManager.findFirstVisibleItemPosition()
+                        routeImageLayoutManager.findFirstVisibleItemPosition()
                     )
                 )
             }
 
             imageRecycler.apply {
                 adapter = imageAdapter
-                layoutManager = pointImageLayoutManager
+                layoutManager = routeImageLayoutManager
             }
 
             imageAdapter.submitList(details.imageList)
@@ -1022,50 +1032,28 @@ class PrivateRoutesFragment :
             }
 
             pointDetailsDeleteButton.setOnClickListener {
-                pointAnnotation.getData()?.asLong?.let { pointId ->
-                    viewModel.deletePoint(
-                        pointId
-                    )
+                binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.VISIBLE
 
-                    annotatedPointsList.clear()
-                    binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.VISIBLE
+                if (focusedRoute.coordinatesList.size == 2) {
+                    deleteRoute(focusedRoute)
+                } else {
+                    pointAnnotation.getData()?.asLong?.let { pointId ->
+                        viewModel.deletePoint(pointId)
+                        pointAnnotationManager.delete(pointAnnotation)
 
-                    viewLifecycleOwner.lifecycleScope.launch {
-                        pointsListAdapter.submitList(emptyList())
-                        viewModel.routes.collect { _route ->
-                            _route.forEach { routePoint ->
-                                routePoint.coordinatesList.forEach { details ->
-                                    if (!details.isRoutePoint) {
-                                        details.pointId?.let { id ->
-                                            viewModel.getPointDetailsPreview(id)
-                                                .distinctUntilChanged()
-                                                .collect { details ->
-                                                if (details != null) {
-                                                    annotatedPointsList.add(
-                                                        PrivateRoutePointDetailsPreviewModel(
-                                                            details.pointId,
-                                                            details.imageList,
-                                                            details.tagList,
-                                                            details.caption,
-                                                            details.description
-                                                        )
-                                                    )
-
-                                                }
-
-                                                pointsListAdapter.submitList(annotatedPointsList)
-                                            }
-                                        }
-
-                                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.INVISIBLE
-                                    }
-                                }
-                            }
+                        if (pointsListAdapter.currentList.size == 1) {
+                            pointsListAdapter.submitList(emptyList())
+                        } else {
+                            annotatedPointsList = pointsListAdapter.currentList.toMutableList()
+                            annotatedPointsList.remove(details)
+                            pointsListAdapter.submitList(annotatedPointsList)
+                            annotatedPointsList.clear()
                         }
+
+                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.INVISIBLE
                     }
                 }
 
-                pointAnnotationManager.delete(pointAnnotation)
                 pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
