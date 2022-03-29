@@ -10,6 +10,14 @@ import com.example.gh_coursework.data.database.entity.RoutePointEntity
 data class RoutePreviewResponse(
     @Embedded
     val route: RouteEntity,
+    @Embedded
+    val details: RouteDetailsResponse,
+    @Relation(
+        parentColumn = "routeId",
+        entityColumn = "pointId",
+        associateBy = Junction(RoutePointEntity::class)
+    )
+    val points: List<PointDetailsResponse>,
     @Relation(
         parentColumn = "routeId",
         entityColumn = "pointId",

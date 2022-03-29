@@ -13,7 +13,7 @@ import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteModelToDomainMapper
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDetailsDomainToModel
 import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
-import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
+import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageDomainToModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageModelToDomain
 import com.example.gh_coursework.ui.route_details.model.RouteImageModel
@@ -47,7 +47,7 @@ class RouteViewModel(
         }
     }
 
-    fun getPointDetailsPreview(pointId: Long): Flow<PrivateRoutePointDetailsPreviewModel?> {
+    fun getPointDetailsPreview(pointId: Long): Flow<PrivateRoutePointDetailsModel?> {
         return getPointDetailsUseCase.invoke(pointId)
             .map { details -> mapRoutePointDetailsDomainToModel(details) }
     }
