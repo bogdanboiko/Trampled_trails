@@ -16,6 +16,9 @@ abstract class PointDetailsDao {
     @Query("SELECT * FROM point_details WHERE pointId = :pointId")
     abstract fun getPointDetails(pointId: Long): Flow<PointDetailsResponse?>
 
+    @Query("SELECT * FROM point_details")
+    abstract fun getAllPointsDetails(): Flow<PointDetailsResponse?>
+
     @Transaction
     open suspend fun updateOrInsertPointDetails(details: PointDetailsEntity) {
         if (addPointDetails(details) == -1L) {
