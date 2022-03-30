@@ -10,14 +10,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.ItemRouteBinding
-import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
+import com.example.gh_coursework.ui.private_route.model.RouteModel
 
 interface RoutesListAdapterCallback {
-    fun onRouteItemClick(route: PrivateRouteModel)
+    fun onRouteItemClick(route: RouteModel)
 }
 
 class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
-    ListAdapter<PrivateRouteModel, RoutesListAdapter.RouteViewHolder>(Diff) {
+    ListAdapter<RouteModel, RoutesListAdapter.RouteViewHolder>(Diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
         val binding = ItemRouteBinding.inflate(
@@ -38,7 +38,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
     inner class RouteViewHolder(private val binding: ItemRouteBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: PrivateRouteModel) {
+        fun bind(item: RouteModel) {
             with(binding) {
                 if (item.name?.isEmpty() == true && item.description?.isEmpty() == true && item.rating == null) {
                     txtName.visibility = View.INVISIBLE
@@ -53,10 +53,18 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
                     txtRating.text = item.rating.toString()
                 }
 
+                if (item.imageList.isNotEmpty()) {
+                    Glide.with(itemView)
+                        .load(item.imageList.first())
+                        .placeholder(imgMapImage.drawable)
+                        .error(R.drawable.ic_image_placeholder)
+                        .transform(RoundedCorners(10))
+                        .into(imgMapImage)
+                }
+
                 Glide.with(itemView)
-                    .load(item.imgResources)
+                    .load(R.drawable.ic_image_placeholder)
                     .placeholder(imgMapImage.drawable)
-                    .error(R.drawable.ic_image_placeholder)
                     .transform(RoundedCorners(10))
                     .into(imgMapImage)
 
@@ -67,20 +75,19 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
         }
     }
 
-    object Diff : DiffUtil.ItemCallback<PrivateRouteModel>() {
+    object Diff : DiffUtil.ItemCallback<RouteModel>() {
         override fun areItemsTheSame(
-            oldItem: PrivateRouteModel,
-            newItem: PrivateRouteModel
+            oldItem: RouteModel,
+            newItem: RouteModel
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: PrivateRouteModel,
-            newItem: PrivateRouteModel
+            oldItem: RouteModel,
+            newItem: RouteModel
         ): Boolean {
-            return oldItem.routeId == newItem.routeId
-                    && oldItem.coordinatesList == newItem.coordinatesList
+            return oldItem.routeId == newItem.routeId && oldItem.description == newItem.description
         }
     }
 }

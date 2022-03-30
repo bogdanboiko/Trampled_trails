@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -24,7 +23,6 @@ import com.example.gh_coursework.databinding.FragmentRouteDetailsBinding
 import com.example.gh_coursework.ui.route_details.adapter.RouteImageAdapter
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
 import com.example.gh_coursework.ui.route_details.model.RouteImageModel
-import com.google.android.material.appbar.AppBarLayout
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -137,8 +135,7 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                         routeDescriptionText.text.toString(),
                         0.0,
                         emptyList(),
-                        emptyList(),
-                        null
+                        emptyList()
                     )
                 )
             }

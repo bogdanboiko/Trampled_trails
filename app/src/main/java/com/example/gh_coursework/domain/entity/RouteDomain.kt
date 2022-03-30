@@ -5,8 +5,6 @@ data class RouteDomain(
     val name: String?,
     val description: String?,
     val rating: Double?,
-    val points: List<PointDetailsDomain?>,
     val tagsList: List<RouteTagDomain>,
-    val imageList: List<RouteImageDomain>,
-    val coordinates: List<PointPreviewDomain>
+    val imageList: List<RouteImageDomain>
 )

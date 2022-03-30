@@ -1,21 +1,19 @@
 package com.example.gh_coursework.ui.private_route.mapper
 
 import com.example.gh_coursework.domain.entity.RouteDomain
-import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
+import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageDomainToModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteTagDomainToModel
 
-fun mapRouteDomainToModel(routeDomain: RouteDomain): PrivateRouteModel {
+fun mapRouteDomainToModel(routeDomain: RouteDomain): RouteModel {
     with(routeDomain) {
-        return PrivateRouteModel(
+        return RouteModel(
             routeId,
             name,
             description,
             rating,
-            points.map(::mapRoutePointDetailsDomainToModel),
             tagsList.map(::mapRouteTagDomainToModel),
-            imageList.map(::mapRouteImageDomainToModel),
-            coordinates.map(::mapPointDomainToModel)
+            imageList.map(::mapRouteImageDomainToModel)
         )
     }
 }

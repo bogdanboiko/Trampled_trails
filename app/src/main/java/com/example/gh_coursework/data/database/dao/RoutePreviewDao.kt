@@ -3,7 +3,7 @@ package com.example.gh_coursework.data.database.dao
 import androidx.room.*
 import com.example.gh_coursework.data.database.entity.RouteEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
-import com.example.gh_coursework.data.database.response.RouteDetailsResponse
+import com.example.gh_coursework.data.database.response.RoutePointsResponse
 import com.example.gh_coursework.data.database.response.RoutePreviewResponse
 import kotlinx.coroutines.flow.Flow
 
@@ -36,7 +36,10 @@ abstract class RoutePreviewDao {
     abstract fun getRoutesResponse(): Flow<List<RoutePreviewResponse>>
 
     @Query("SELECT * FROM route_details WHERE routeId = :routeId")
-    abstract fun getRouteDetails(routeId: Long): Flow<RouteDetailsResponse>
+    abstract fun getRouteDetails(routeId: Long): Flow<RoutePreviewResponse>
+
+    @Query("SELECT * FROM routes_points WHERE routeId = :routeId")
+    abstract fun getRoutePoints(routeId: Long): Flow<List<RoutePointsResponse>>
 
     @Delete
     abstract fun deleteRoute(route: RouteEntity)

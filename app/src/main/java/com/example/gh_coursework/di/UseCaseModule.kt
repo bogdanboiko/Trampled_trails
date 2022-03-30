@@ -8,6 +8,8 @@ import com.example.gh_coursework.domain.usecase.route_details.GetRouteDetailsUse
 import com.example.gh_coursework.domain.usecase.route_details.GetRouteDetailsUseCaseImpl
 import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
 import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCaseImpl
+import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
+import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCaseImpl
 import com.example.gh_coursework.domain.usecase.route_preview.*
 import com.example.gh_coursework.domain.usecase.route_tag.*
 import org.koin.dsl.module
@@ -90,6 +92,10 @@ val pointUseCasesModule = module {
     //RouteDetails
     single<GetRouteDetailsUseCase> {
         GetRouteDetailsUseCaseImpl(get())
+    }
+
+    single<GetRoutePointsListUseCase> {
+        GetRoutePointsListUseCaseImpl(get())
     }
 
     single<UpdateRouteDetailsUseCase> {

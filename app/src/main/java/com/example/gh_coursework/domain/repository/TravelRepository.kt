@@ -18,8 +18,8 @@ interface TravelRepository {
     suspend fun deletePointImage(image: PointImageDomain)
     suspend fun deleteRouteImage(image: RouteImageDomain)
 
-    suspend fun addRoute(route: RouteDomain)
-    suspend fun updateRoute(route: RouteDetailsDomain)
+    suspend fun addRoute(route: RouteDomain, coordinatesList: List<RoutePointDomain>)
+    suspend fun updateRoute(route: RouteDomain)
     suspend fun deleteRoute(route: RouteDomain)
 
     suspend fun addRouteTagsList(routeTagsList: List<RouteTagsDomain>)
@@ -34,7 +34,8 @@ interface TravelRepository {
     fun getRouteImages(routeId: Long): Flow<List<RouteImageDomain>>
 
     fun getRoutesList(): Flow<List<RouteDomain>>
-    fun getRouteDetails(routeId: Long): Flow<RouteDetailsDomain>
+    fun getRouteDetails(routeId: Long): Flow<RouteDomain>
+    fun getRoutePointsList(routeId: Long): Flow<List<RoutePointDomain>>
 
     fun getRouteTags(): Flow<List<RouteTagDomain>>
 }

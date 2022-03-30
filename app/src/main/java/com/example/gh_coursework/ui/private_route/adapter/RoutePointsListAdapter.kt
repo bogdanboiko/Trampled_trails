@@ -10,14 +10,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.ItemPointBinding
-import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointDetailsPreviewModel
+import com.example.gh_coursework.ui.private_route.model.RoutePointModel
 
 interface RoutePointsListCallback {
     fun onPointItemClick(pointId: Long)
 }
 
 class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
-    ListAdapter<PrivateRoutePointDetailsPreviewModel, RoutePointsListAdapter.PointViewHolder>(Diff) {
+    ListAdapter<RoutePointModel, RoutePointsListAdapter.PointViewHolder>(Diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PointViewHolder {
         val binding = ItemPointBinding.inflate(
@@ -38,7 +38,7 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
     inner class PointViewHolder(private val binding: ItemPointBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: PrivateRoutePointDetailsPreviewModel) {
+        fun bind(item: RoutePointModel) {
             with(binding) {
                 if (item.caption.isEmpty() && item.description.isEmpty()) {
                     txtName.visibility = View.INVISIBLE
@@ -69,24 +69,28 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
                 }
 
                 root.setOnClickListener {
-                    item.pointId.let { it1 -> callback.onPointItemClick(it1) }
+                    item.pointId.let { pointId ->
+                        if (pointId != null) {
+                            callback.onPointItemClick(pointId)
+                        }
+                    }
                 }
             }
 
         }
     }
 
-    object Diff : DiffUtil.ItemCallback<PrivateRoutePointDetailsPreviewModel>() {
+    object Diff : DiffUtil.ItemCallback<RoutePointModel>() {
         override fun areItemsTheSame(
-            oldItem: PrivateRoutePointDetailsPreviewModel,
-            newItem: PrivateRoutePointDetailsPreviewModel
+            oldItem: RoutePointModel,
+            newItem: RoutePointModel
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: PrivateRoutePointDetailsPreviewModel,
-            newItem: PrivateRoutePointDetailsPreviewModel
+            oldItem: RoutePointModel,
+            newItem: RoutePointModel
         ): Boolean {
             return oldItem.pointId == newItem.pointId
                     && oldItem.caption == newItem.caption

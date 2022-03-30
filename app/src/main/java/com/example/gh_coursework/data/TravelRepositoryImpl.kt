@@ -1,10 +1,9 @@
 package com.example.gh_coursework.data
 
-import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
+import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
-import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) : TravelRepository {
 
@@ -58,8 +57,8 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
     }
 
     //RoutePreview
-    override suspend fun addRoute(route: RouteDomain) {
-        localDataSrcIml.addRoute(route, route.coordinatesList.map(::mapPointDomainToEntity))
+    override suspend fun addRoute(route: RouteDomain, coordinatesList: List<RoutePointDomain>) {
+        localDataSrcIml.addRoute(route, coordinatesList.map(::mapRoutePointDomainToEntity))
     }
 
     override suspend fun deleteRoute(route: RouteDomain) {
@@ -71,7 +70,9 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
     //RouteDetails
     override fun getRouteDetails(routeId: Long) = localDataSrcIml.getRouteDetails(routeId)
 
-    override suspend fun updateRoute(route: RouteDetailsDomain) {
+    override fun getRoutePointsList(routeId: Long) = localDataSrcIml.getRoutePointsList(routeId)
+
+    override suspend fun updateRoute(route: RouteDomain) {
         localDataSrcIml.updateRoute(route)
     }
 

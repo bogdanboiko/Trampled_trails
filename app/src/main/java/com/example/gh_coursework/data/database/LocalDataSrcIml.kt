@@ -3,9 +3,10 @@ package com.example.gh_coursework.data.database
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
-import com.example.gh_coursework.data.database.mapper.*
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntityToDomain
+import com.example.gh_coursework.data.database.mapper.mapPointImageDomainToEntity
+import com.example.gh_coursework.data.database.mapper.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
@@ -13,16 +14,15 @@ import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEnti
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointsTagsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_tag.mapTagDomainToEntity
-import com.example.gh_coursework.data.database.mapper.route_details.mapRouteDetailsDomainToEntity
-import com.example.gh_coursework.data.database.mapper.route_details.mapRouteDetailsResponseToDomain
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteDomainToEntity
-import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteResponseListToDomain
+import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointEntityToDomain
+import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteResponseToDomain
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagEntityToDomain
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagsDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 class LocalDataSrcIml(
@@ -132,17 +132,21 @@ class LocalDataSrcIml(
         routeDao.deleteRoute(mapRouteDomainToEntity(route))
     }
 
+    override fun getRouteDetails(routeId: Long): Flow<RouteDomain> {
+        return routeDao.getRouteDetails(routeId).map(::mapRouteResponseToDomain)
+    }
+
+    @OptIn(FlowPreview::class)
     override fun getRoutesList(): Flow<List<RouteDomain>> {
-        return routeDao.getRoutesResponse()
-            .map { it.map { entity -> (mapRouteResponseListToDomain(entity)) } }
+        return routeDao.getRoutesResponse().map { it.map(::mapRouteResponseToDomain) }
     }
 
-    override fun getRouteDetails(routeId: Long): Flow<RouteDetailsDomain> {
-        return routeDao.getRouteDetails(routeId).map(::mapRouteDetailsResponseToDomain)
+    override fun getRoutePointsList(routeId: Long): Flow<List<RoutePointDomain>> {
+        return routeDao.getRoutePoints(routeId).map { it.map(::mapRoutePointEntityToDomain) }
     }
 
-    override suspend fun updateRoute(route: RouteDetailsDomain) {
-        routeDao.updateRouteDetails(mapRouteDetailsDomainToEntity(route))
+    override suspend fun updateRoute(route: RouteDomain) {
+        routeDao.updateRouteDetails(mapRouteDomainToEntity(route))
     }
 
     //RouteImage
