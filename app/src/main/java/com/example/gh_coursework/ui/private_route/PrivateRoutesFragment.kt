@@ -71,9 +71,8 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
@@ -94,6 +93,8 @@ class PrivateRoutesFragment :
     private var currentRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private lateinit var focusedRoute: RouteModel
+
+    private var job = Job()
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var routePointsDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -241,7 +242,7 @@ class PrivateRoutesFragment :
         configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
-        buildDefaultRoute()
+        fetchRoutes()
 
         mapboxNavigation.startTripSession(withForegroundService = false)
     }
@@ -333,7 +334,7 @@ class PrivateRoutesFragment :
 
                 binding.cancelButton.setOnClickListener {
                     resetCurrentRoute()
-                    buildDefaultRoute()
+                    fetchRoutes()
                     mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
                 }
@@ -477,42 +478,36 @@ class PrivateRoutesFragment :
         routeLineView = MapboxRouteLineView(mapboxRouteLineOptions)
     }
 
-    private fun buildDefaultRoute() {
+    private fun fetchRoutes() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.routes
-                .distinctUntilChanged()
                 .collect { route ->
+                    Log.e("route", route.toString())
                     if (route.isNotEmpty()) {
-                        if (route.last().routeId != null) {
-                            viewModel.getRoutePointsList(route.last().routeId!!)
-                                .collect { routePoint ->
-                                    currentRouteCoordinatesList =
-                                        routePoint.map { it.copy() } as MutableList<RoutePointModel>
-                                    buildRouteFromList(currentRouteCoordinatesList.map(::mapPrivateRoutePointModelToPoint))
+                        rebuildRoute(route.last())
+                        routesListAdapter.submitList(route)
+                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                            View.INVISIBLE
 
-                                    fetchAnnotatedRoutePoints()
-                                    focusedRoute = route.last()
+                    } else if (route.isEmpty()) {
+                        routesListAdapter.submitList(route)
+                        pointsListAdapter.submitList(emptyList())
 
-                                    eraseCameraToPoint(
-                                        currentRouteCoordinatesList[0].x,
-                                        currentRouteCoordinatesList[0].y
-                                    )
-
-                                    Log.e("list", currentRouteCoordinatesList.toString())
-                                    routesListAdapter.submitList(route)
-                                    binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                                        View.INVISIBLE
-                                }
-                        }
+                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                            View.VISIBLE
+                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
+                            View.VISIBLE
                     }
-
-                    routesListAdapter.submitList(route)
                 }
         }
     }
 
     private fun fetchAnnotatedRoutePoints() {
+        val annotatedPoints = mutableListOf<RoutePointModel>()
+
         pointAnnotationManager.deleteAll()
+        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
+            View.VISIBLE
 
         if (currentRouteCoordinatesList.first().isRoutePoint) {
             addFlagAnnotationToMap(
@@ -553,12 +548,13 @@ class PrivateRoutesFragment :
         currentRouteCoordinatesList.forEach {
             if (!it.isRoutePoint) {
                 addAnnotationToMap(it)
+                annotatedPoints.add(it)
                 binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
                     View.INVISIBLE
             }
-        }
 
-        pointsListAdapter.submitList(currentRouteCoordinatesList)
+            pointsListAdapter.submitList(annotatedPoints)
+        }
     }
 
     override fun onStart() {
@@ -803,47 +799,29 @@ class PrivateRoutesFragment :
     }
 
     private fun deleteRoute(route: RouteModel) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            resetCurrentRoute()
-            viewModel.deleteRoute(route)
-
-            viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.routes.collect {
-                    if (it.isEmpty()) {
-                        routesListAdapter.submitList(emptyList())
-                        pointsListAdapter.submitList(emptyList())
-
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                            View.VISIBLE
-                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
-                            View.VISIBLE
-                    }
-
-                    routesListAdapter.submitList(it)
-                }
-            }.cancelAndJoin()
-        }.cancel()
+        resetCurrentRoute()
+        viewModel.deleteRoute(route)
     }
 
     private fun rebuildRoute(route: RouteModel) {
-        setEmptyRoute()
-        pointAnnotationManager.deleteAll()
-
+        focusedRoute = route
         viewLifecycleOwner.lifecycleScope.launch {
             route.routeId?.let { routeId ->
                 viewModel.getRoutePointsList(routeId).collect { pointsList ->
-                    currentRouteCoordinatesList =
-                        pointsList.map { it.copy() } as MutableList<RoutePointModel>
+                    if (pointsList.isNotEmpty()) {
+                        currentRouteCoordinatesList =
+                            pointsList.map { it.copy() } as MutableList<RoutePointModel>
 
-                    buildRouteFromList(currentRouteCoordinatesList.map(::mapPrivateRoutePointModelToPoint))
-                    fetchAnnotatedRoutePoints()
-                    eraseCameraToPoint(
-                        currentRouteCoordinatesList[0].x,
-                        currentRouteCoordinatesList[0].y
-                    )
+                        buildRouteFromList(currentRouteCoordinatesList.map(::mapPrivateRoutePointModelToPoint))
+                        fetchAnnotatedRoutePoints()
+                        eraseCameraToPoint(
+                            currentRouteCoordinatesList[0].x,
+                            currentRouteCoordinatesList[0].y
+                        )
+                    }
                 }
             }
-        }.cancel()
+        }
     }
 
     private fun resetCurrentRoute() {
