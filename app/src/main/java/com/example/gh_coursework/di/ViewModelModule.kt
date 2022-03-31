@@ -38,7 +38,7 @@ val viewModelModule = module {
     }
 
     viewModel { parameters ->
-        RouteDetailsViewModel(parameters[0], get(), get(), get())
+        RouteDetailsViewModel(parameters[0], get(), get(), get(), get())
     }
 
     viewModel { parameters ->

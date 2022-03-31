@@ -87,6 +87,9 @@ class TravelRepositoryImpl(private val localDataSrcIml: TravelDatasource.Local) 
 
     override fun getRouteImages(routeId: Long) = localDataSrcIml.getRouteImages(routeId)
 
+    override fun getRoutePointsImagesList(routeId: Long) =
+        localDataSrcIml.getRoutePointsImagesList(routeId)
+
     //RouteTag
     override suspend fun addRouteTagsList(routeTagsList: List<RouteTagsDomain>) {
         localDataSrcIml.addRouteTagsList(routeTagsList)

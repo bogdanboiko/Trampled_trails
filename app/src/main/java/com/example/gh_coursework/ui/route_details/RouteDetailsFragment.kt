@@ -20,9 +20,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentRouteDetailsBinding
+import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import com.example.gh_coursework.ui.route_details.adapter.RouteImageAdapter
+import com.example.gh_coursework.ui.route_details.mapper.mapPointImageToRouteImageModel
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
 import com.example.gh_coursework.ui.route_details.model.RouteImageModel
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -32,10 +35,10 @@ import java.util.*
 
 class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
 
+    private lateinit var binding: FragmentRouteDetailsBinding
     private lateinit var layoutManager: LinearLayoutManager
     private val arguments by navArgs<RouteDetailsFragmentArgs>()
     private val viewModel: RouteDetailsViewModel by viewModel { parametersOf(arguments.routeId) }
-    private lateinit var binding: FragmentRouteDetailsBinding
     private val imageAdapter = RouteImageAdapter {
         findNavController().navigate(
             RouteDetailsFragmentDirections.actionRouteDetailsFragmentToPrivateRouteImageDetails(
@@ -44,6 +47,8 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
             )
         )
     }
+
+    private var pointsImages = mutableListOf<PointImageModel>()
 
     private val imageTakerLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -72,7 +77,7 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentRouteDetailsBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -83,6 +88,7 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
         configConfirmButton()
         configTagButton()
         configImageRecycler()
+        fetchRoutePointsImages()
         configData()
     }
 
@@ -95,13 +101,24 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
         }
     }
 
+    private fun fetchRoutePointsImages() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.images.collect { imagesList ->
+                if (imagesList.isNotEmpty()) {
+                    imagesList.forEach { image ->
+                        pointsImages.addAll(image.imagesList)
+                    }
+                }
+            }
+        }
+    }
+
     private fun configData() {
         with(binding) {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.route.collect {
                     routeCaptionText.setText(it.name)
                     routeDescriptionText.setText(it.description)
-                    imageAdapter.submitList(it.imageList)
 
                     if (it.name?.isEmpty() == true && it.description?.isEmpty() == true) {
                         emptyDataPlaceholder.visibility = View.VISIBLE
@@ -109,10 +126,18 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                         emptyDataPlaceholder.visibility = View.INVISIBLE
                     }
 
-                    if (it.imageList.isNotEmpty()) {
-                        imageRecycler.visibility = View.VISIBLE
-                    } else {
-                        imageRecycler.visibility = View.GONE
+                    when {
+                        it.imageList.isNotEmpty() -> {
+                            imageAdapter.submitList(it.imageList)
+                            imageRecycler.visibility = View.VISIBLE
+                        }
+                        pointsImages.isNotEmpty() -> {
+                            imageAdapter.submitList(listOf(pointsImages.map(::mapPointImageToRouteImageModel), it.imageList).flatten())
+                            imageRecycler.visibility = View.VISIBLE
+                        }
+                        else -> {
+                            imageRecycler.visibility = View.GONE
+                        }
                     }
                 }
             }

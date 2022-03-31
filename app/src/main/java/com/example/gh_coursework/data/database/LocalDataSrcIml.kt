@@ -3,10 +3,10 @@ package com.example.gh_coursework.data.database
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
+import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.mapPointImageDomainToEntity
-import com.example.gh_coursework.data.database.mapper.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
@@ -14,6 +14,7 @@ import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEnti
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointsTagsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_tag.mapTagDomainToEntity
+import com.example.gh_coursework.data.database.mapper.route_details.mapRoutePointsImagesResponseToDomain
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteDomainToEntity
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteResponseToDomain
@@ -159,8 +160,14 @@ class LocalDataSrcIml(
     }
 
     override fun getRouteImages(routeId: Long): Flow<List<RouteImageDomain>> {
-        return imageDao.getRouteImages(routeId).map {
-            image -> image.map(::mapRouteImageEntityToDomain)
+        return imageDao.getRouteImages(routeId).map { image ->
+            image.map(::mapRouteImageEntityToDomain)
+        }
+    }
+
+    override fun getRoutePointsImagesList(routeId: Long): Flow<List<RoutePointsImagesDomain>> {
+        return routeDao.getRoutePointsImages(routeId).map { image ->
+            image.map(::mapRoutePointsImagesResponseToDomain)
         }
     }
 
