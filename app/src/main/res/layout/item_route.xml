@@ -58,6 +58,7 @@
         android:id="@+id/emptyDataPlaceholder"
         android:layout_width="240dp"
         android:layout_height="match_parent"
+        android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:gravity="center"
         android:text="Text data is empty. Press flag than edit to start filling the data"
@@ -66,5 +67,6 @@
         app:layout_anchorGravity="bottom"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/imgMapImage"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
