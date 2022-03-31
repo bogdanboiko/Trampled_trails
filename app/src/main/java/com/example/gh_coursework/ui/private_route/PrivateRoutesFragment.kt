@@ -1030,7 +1030,7 @@ class PrivateRoutesFragment :
         binding.mapView.camera.easeTo(
             CameraOptions.Builder()
                 .center(Point.fromLngLat(x, y))
-                .zoom(16.0)
+                .zoom(14.0)
                 .build()
         )
     }

@@ -4,6 +4,7 @@
     android:id="@+id/routesBottomSheetDialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_gray"
     android:orientation="vertical"
     android:paddingBottom="25dp"
     app:behavior_hideable="true"
@@ -14,19 +15,16 @@
         android:id="@+id/emptyDataPlaceholder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/light_gray"
+        android:layout_marginTop="50dp"
         android:gravity="center"
-        android:paddingTop="50dp"
         android:text="Routes list is empty. Press add button to create your first route!"
         android:textColor="@color/map_background"
         android:textSize="20sp"
-        android:visibility="visible"
-        app:layout_anchorGravity="bottom" />
+        android:visibility="visible" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/routesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/light_gray"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 </LinearLayout>
