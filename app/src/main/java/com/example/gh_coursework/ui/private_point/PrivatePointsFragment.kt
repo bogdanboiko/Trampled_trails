@@ -80,7 +80,6 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             loadPointData(annotation)
             sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             loadPointData(annotation)
             sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
