@@ -111,4 +111,7 @@ dependencies {
 
     //Switch Button
     implementation "com.rm:rmswitch:1.2.3"
+
+    //Round image
+    implementation 'com.makeramen:roundedimageview:2.3.0'
 }
