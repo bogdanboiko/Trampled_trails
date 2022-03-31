@@ -1,6 +1,6 @@
 package com.example.gh_coursework.data.database.mapper.route_preview
 
-import com.example.gh_coursework.data.database.mapper.mapPointImageEntityToDomain
+import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
 import com.example.gh_coursework.data.database.response.RoutePointsResponse
 import com.example.gh_coursework.domain.entity.RoutePointDomain

@@ -25,7 +25,6 @@ import com.example.gh_coursework.ui.route_details.adapter.RouteImageAdapter
 import com.example.gh_coursework.ui.route_details.mapper.mapPointImageToRouteImageModel
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
 import com.example.gh_coursework.ui.route_details.model.RouteImageModel
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf

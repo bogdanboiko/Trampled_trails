@@ -25,6 +25,7 @@ import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
+import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -71,6 +72,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -89,7 +91,7 @@ class PrivateRoutesFragment :
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
-    private var currentRouteCoordinatesList = mutableListOf<RoutePointModel>()
+    private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private lateinit var focusedRoute: RouteModel
 
@@ -481,7 +483,13 @@ class PrivateRoutesFragment :
                 .collect { route ->
                     Log.e("route", route.toString())
                     if (route.isNotEmpty()) {
-                        rebuildRoute(route.last())
+
+                        if (this@PrivateRoutesFragment::focusedRoute.isInitialized) {
+                            rebuildRoute(focusedRoute)
+                        } else {
+                            rebuildRoute(route.last())
+                        }
+
                         routesListAdapter.submitList(route)
                         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
                             View.GONE
@@ -505,43 +513,43 @@ class PrivateRoutesFragment :
         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
             View.VISIBLE
 
-        if (currentRouteCoordinatesList.first().isRoutePoint) {
+        if (currentRoutePointsList.first().isRoutePoint) {
             addFlagAnnotationToMap(
                 Point.fromLngLat(
-                    currentRouteCoordinatesList.first().x,
-                    currentRouteCoordinatesList.first().y,
+                    currentRoutePointsList.first().x,
+                    currentRoutePointsList.first().y,
                 ),
                 R.drawable.ic_start_flag
             )
         } else {
             addFlagAnnotationToMap(
                 Point.fromLngLat(
-                    currentRouteCoordinatesList.first().x,
-                    currentRouteCoordinatesList.first().y + 0.00005,
+                    currentRoutePointsList.first().x,
+                    currentRoutePointsList.first().y + 0.00005,
                 ),
                 R.drawable.ic_start_flag
             )
         }
 
-        if (currentRouteCoordinatesList.last().isRoutePoint) {
+        if (currentRoutePointsList.last().isRoutePoint) {
             addFlagAnnotationToMap(
                 Point.fromLngLat(
-                    currentRouteCoordinatesList.last().x,
-                    currentRouteCoordinatesList.last().y,
+                    currentRoutePointsList.last().x,
+                    currentRoutePointsList.last().y,
                 ),
                 R.drawable.ic_finish_flag
             )
         } else {
             addFlagAnnotationToMap(
                 Point.fromLngLat(
-                    currentRouteCoordinatesList.last().x,
-                    currentRouteCoordinatesList.last().y + 0.00005,
+                    currentRoutePointsList.last().x,
+                    currentRoutePointsList.last().y + 0.00005,
                 ),
                 R.drawable.ic_finish_flag
             )
         }
 
-        currentRouteCoordinatesList.forEach {
+        currentRoutePointsList.forEach {
             if (!it.isRoutePoint) {
                 addAnnotationToMap(it)
                 annotatedPoints.add(it)
@@ -744,8 +752,6 @@ class PrivateRoutesFragment :
     private fun addWaypoint(point: RoutePointModel) {
         creatingRouteCoordinatesList.add(point)
 
-        routeState.value = true
-
         if (creatingRouteCoordinatesList.size == 1) {
             if (binding.pointTypeSwitchButton.isChecked) {
                 addFlagAnnotationToMap(
@@ -775,11 +781,12 @@ class PrivateRoutesFragment :
             }
         }
 
+        routeState.value = true
         buildRoute()
     }
 
     private fun createRoute() {
-        if (creatingRouteCoordinatesList.isNotEmpty()) {
+        if (creatingRouteCoordinatesList.size > 1) {
             val route = RouteModel(
                 null,
                 "",
@@ -805,14 +812,14 @@ class PrivateRoutesFragment :
             route.routeId?.let { routeId ->
                 viewModel.getRoutePointsList(routeId).collect { pointsList ->
                     if (pointsList.isNotEmpty()) {
-                        currentRouteCoordinatesList =
+                        currentRoutePointsList =
                             pointsList.map { it.copy() } as MutableList<RoutePointModel>
 
-                        buildRouteFromList(currentRouteCoordinatesList.map(::mapPrivateRoutePointModelToPoint))
+                        buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
                         fetchAnnotatedRoutePoints()
                         eraseCameraToPoint(
-                            currentRouteCoordinatesList[0].x,
-                            currentRouteCoordinatesList[0].y
+                            currentRoutePointsList[0].x,
+                            currentRoutePointsList[0].y
                         )
                     }
                 }
@@ -847,6 +854,7 @@ class PrivateRoutesFragment :
                 }
 
                 creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList[creatingRouteCoordinatesList.lastIndex])
+                routeState.value = false
                 setEmptyRoute()
             }
 
@@ -863,7 +871,7 @@ class PrivateRoutesFragment :
     }
 
     override fun onPointItemClick(pointId: Long) {
-        val pointPreview = currentRouteCoordinatesList.find {
+        val pointPreview = currentRoutePointsList.find {
             it.pointId == pointId
         }
 
@@ -922,7 +930,7 @@ class PrivateRoutesFragment :
 
     private fun loadPointData(annotation: PointAnnotation) {
         annotation.getData()?.asLong?.let { pointId ->
-            val point = currentRouteCoordinatesList.find { it.pointId == pointId }
+            val point = currentRoutePointsList.find { it.pointId == pointId }
 
             if (point != null) {
                 preparePointDetailsDialog(annotation, point)
@@ -969,7 +977,7 @@ class PrivateRoutesFragment :
             pointDetailsDeleteButton.setOnClickListener {
                 binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.VISIBLE
 
-                if (currentRouteCoordinatesList.size == 2) {
+                if (currentRoutePointsList.size == 2) {
                     deleteRoute(focusedRoute)
                 } else {
                     pointAnnotation.getData()?.asLong?.let { pointId ->
@@ -989,6 +997,8 @@ class PrivateRoutesFragment :
     private fun prepareRouteDetailsDialog(
         route: RouteModel
     ) {
+        val pointsImages = mutableListOf<PointImageModel>()
+
         binding.bottomSheetDialogRouteDetails.apply {
             routeCaptionText.text = route.name
             routeDescriptionText.text = route.description
@@ -1006,7 +1016,7 @@ class PrivateRoutesFragment :
             imageAdapter = ImageAdapter {
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateImageDetails(
-                        focusedRoute.routeId!!,
+                        route.routeId!!,
                         pointImageLayoutManager.findFirstVisibleItemPosition()
                     )
                 )
@@ -1018,12 +1028,16 @@ class PrivateRoutesFragment :
                 addItemDecoration(ImageDecorator(30))
             }
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                focusedRoute.routeId?.let { routeId ->
-                    viewModel.getRouteImages(routeId).collect {
-                        imageAdapter.submitList(it.map(::mapRouteImageModelToPointImageModel))
+            if (route.imageList.isNotEmpty()) {
+                imageAdapter.submitList(route.imageList.map(::mapRouteImageModelToPointImageModel))
+            } else {
+                currentRoutePointsList.forEach {
+                    if (it.imageList.isNotEmpty()) {
+                        pointsImages.addAll(it.imageList)
                     }
                 }
+
+                imageAdapter.submitList(pointsImages)
             }
 
             routeDetailsDeleteButton.setOnClickListener {

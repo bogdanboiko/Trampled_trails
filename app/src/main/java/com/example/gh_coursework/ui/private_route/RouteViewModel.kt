@@ -57,11 +57,6 @@ class RouteViewModel(
         }
     }
 
-    fun getRouteImages(routeId: Long): Flow<List<RouteImageModel>> {
-        return getRouteImagesUseCase.invoke(routeId)
-            .map { image -> image.map(::mapRouteImageDomainToModel) }
-    }
-
     fun deletePoint(pointId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deletePointUseCase.invoke(pointId)
