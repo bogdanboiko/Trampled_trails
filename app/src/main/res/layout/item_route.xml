@@ -61,6 +61,7 @@
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         android:gravity="center"
+        android:padding="20dp"
         android:text="Text data is empty. Press flag than edit to start filling the data"
         android:textColor="@color/black"
         android:textSize="20sp"
