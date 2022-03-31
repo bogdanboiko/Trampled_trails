@@ -71,8 +71,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
@@ -93,8 +92,6 @@ class PrivateRoutesFragment :
     private var currentRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private lateinit var focusedRoute: RouteModel
-
-    private var job = Job()
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var routePointsDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -487,8 +484,7 @@ class PrivateRoutesFragment :
                         rebuildRoute(route.last())
                         routesListAdapter.submitList(route)
                         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                            View.INVISIBLE
-
+                            View.GONE
                     } else if (route.isEmpty()) {
                         routesListAdapter.submitList(route)
                         pointsListAdapter.submitList(emptyList())
@@ -521,7 +517,7 @@ class PrivateRoutesFragment :
             addFlagAnnotationToMap(
                 Point.fromLngLat(
                     currentRouteCoordinatesList.first().x,
-                    currentRouteCoordinatesList.first().y + 0.0005,
+                    currentRouteCoordinatesList.first().y + 0.00005,
                 ),
                 R.drawable.ic_start_flag
             )
@@ -539,7 +535,7 @@ class PrivateRoutesFragment :
             addFlagAnnotationToMap(
                 Point.fromLngLat(
                     currentRouteCoordinatesList.last().x,
-                    currentRouteCoordinatesList.last().y + 0.0005,
+                    currentRouteCoordinatesList.last().y + 0.00005,
                 ),
                 R.drawable.ic_finish_flag
             )
@@ -550,7 +546,7 @@ class PrivateRoutesFragment :
                 addAnnotationToMap(it)
                 annotatedPoints.add(it)
                 binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
-                    View.INVISIBLE
+                    View.GONE
             }
 
             pointsListAdapter.submitList(annotatedPoints)
@@ -763,7 +759,7 @@ class PrivateRoutesFragment :
                 addFlagAnnotationToMap(
                     Point.fromLngLat(
                         creatingRouteCoordinatesList[0].x,
-                        creatingRouteCoordinatesList[0].y + 0.0005
+                        creatingRouteCoordinatesList[0].y + 0.00005
                     ),
                     R.drawable.ic_start_flag
                 )
@@ -830,21 +826,33 @@ class PrivateRoutesFragment :
         creatingRouteCoordinatesList.clear()
         routeState.value = false
 
-        binding.undoPointCreatingButton.visibility = View.INVISIBLE
-        binding.resetRouteButton.visibility = View.INVISIBLE
+        binding.undoPointCreatingButton.visibility = View.GONE
+        binding.resetRouteButton.visibility = View.GONE
     }
 
     private fun undoPointCreating() {
-        if (creatingRouteCoordinatesList.size > 2) {
-            if (!creatingRouteCoordinatesList.last().isRoutePoint) {
-                pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
+        when {
+            creatingRouteCoordinatesList.size > 2 -> {
+                if (!creatingRouteCoordinatesList.last().isRoutePoint) {
+                    pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
+                }
+
+                creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList[creatingRouteCoordinatesList.lastIndex])
+                buildRoute()
             }
 
-            creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList[creatingRouteCoordinatesList.lastIndex])
-            buildRoute()
-        } else if (creatingRouteCoordinatesList.size == 1) {
-            resetCurrentRoute()
-            pointAnnotationManager.deleteAll()
+            creatingRouteCoordinatesList.size == 2 -> {
+                if (!creatingRouteCoordinatesList.last().isRoutePoint && pointAnnotationManager.annotations.size == 2) {
+                    pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
+                }
+
+                creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList[creatingRouteCoordinatesList.lastIndex])
+                setEmptyRoute()
+            }
+
+            creatingRouteCoordinatesList.size == 1 -> {
+                resetCurrentRoute()
+            }
         }
     }
 
@@ -969,7 +977,7 @@ class PrivateRoutesFragment :
                         pointAnnotationManager.delete(pointAnnotation)
 
                         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
-                            View.INVISIBLE
+                            View.GONE
                     }
                 }
 
