@@ -16,7 +16,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="25dp"
+        android:layout_marginTop="35dp"
         android:background="@drawable/ic_routes"
         android:elevation="-2dp"
         app:layout_constraintStart_toStartOf="parent"
