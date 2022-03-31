@@ -24,14 +24,13 @@ import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.model.ImageModel
 import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
-import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapterCallback
 import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointModelToPoint
-import com.example.gh_coursework.ui.private_route.mapper.mapRouteImageModelToPointImageModel
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -72,7 +71,6 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -82,7 +80,9 @@ class PrivateRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
-    private lateinit var imageAdapter: ImageAdapter
+    private lateinit var routeImageAdapter: ImageAdapter
+    private lateinit var pointImageAdapter: ImageAdapter
+
     private lateinit var pointImageLayoutManager: LinearLayoutManager
     private lateinit var routeImageLayoutManager: LinearLayoutManager
     private lateinit var binding: FragmentPrivateRouteBinding
@@ -152,7 +152,6 @@ class PrivateRoutesFragment :
     }
 
     private val onPointClickEvent = OnPointAnnotationClickListener { annotation ->
-
         if (annotation.getData()?.isJsonNull == false) {
             getPointDetailsDialog(annotation)
         } else if (annotation.getData()?.isJsonNull == true) {
@@ -483,13 +482,7 @@ class PrivateRoutesFragment :
                 .collect { route ->
                     Log.e("route", route.toString())
                     if (route.isNotEmpty()) {
-
-                        if (this@PrivateRoutesFragment::focusedRoute.isInitialized) {
-                            rebuildRoute(focusedRoute)
-                        } else {
-                            rebuildRoute(route.last())
-                        }
-
+                        rebuildRoute(route.last())
                         routesListAdapter.submitList(route)
                         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
                             View.GONE
@@ -948,22 +941,20 @@ class PrivateRoutesFragment :
             tagListTextView.text = details.tagList.joinToString(",", "Tags: ")
             { pointTagModel -> pointTagModel.name }
 
-            imageAdapter = ImageAdapter {
-                findNavController().navigate(
-                    PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateImageDetails(
-                        details.pointId!!,
-                        routeImageLayoutManager.findFirstVisibleItemPosition()
-                    )
-                )
+            pointImageAdapter = ImageAdapter {
+                findNavController().navigate(PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivatePointImageDetails(
+                    details.pointId!!,
+                    pointImageLayoutManager.findFirstVisibleItemPosition()
+                ))
             }
 
             imageRecycler.apply {
-                adapter = imageAdapter
-                layoutManager = routeImageLayoutManager
+                adapter = pointImageAdapter
+                layoutManager = pointImageLayoutManager
                 addItemDecoration(ImageDecorator(30))
             }
 
-            imageAdapter.submitList(details.imageList)
+            pointImageAdapter.submitList(details.imageList)
 
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(
@@ -997,7 +988,7 @@ class PrivateRoutesFragment :
     private fun prepareRouteDetailsDialog(
         route: RouteModel
     ) {
-        val pointsImages = mutableListOf<PointImageModel>()
+        val imageList = mutableListOf<ImageModel>()
 
         binding.bottomSheetDialogRouteDetails.apply {
             routeCaptionText.text = route.name
@@ -1013,32 +1004,28 @@ class PrivateRoutesFragment :
                 }
             }
 
-            imageAdapter = ImageAdapter {
+            routeImageAdapter = ImageAdapter {
                 findNavController().navigate(
-                    PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateImageDetails(
+                    PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateRouteImageDetails(
                         route.routeId!!,
-                        pointImageLayoutManager.findFirstVisibleItemPosition()
+                        routeImageLayoutManager.findFirstVisibleItemPosition()
                     )
                 )
             }
 
             imageRecycler.apply {
-                adapter = imageAdapter
-                layoutManager = pointImageLayoutManager
+                adapter = routeImageAdapter
+                layoutManager = routeImageLayoutManager
                 addItemDecoration(ImageDecorator(30))
             }
 
-            if (route.imageList.isNotEmpty()) {
-                imageAdapter.submitList(route.imageList.map(::mapRouteImageModelToPointImageModel))
-            } else {
-                currentRoutePointsList.forEach {
-                    if (it.imageList.isNotEmpty()) {
-                        pointsImages.addAll(it.imageList)
-                    }
-                }
+            imageList.addAll(route.imageList)
 
-                imageAdapter.submitList(pointsImages)
+            currentRoutePointsList.forEach {
+                imageList.addAll(it.imageList)
             }
+
+            routeImageAdapter.submitList(imageList)
 
             routeDetailsDeleteButton.setOnClickListener {
                 deleteRoute(route)

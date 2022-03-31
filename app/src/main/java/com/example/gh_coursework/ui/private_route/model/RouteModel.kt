@@ -1,7 +1,7 @@
 package com.example.gh_coursework.ui.private_route.model
 
-import com.example.gh_coursework.ui.route_details.model.RouteImageModel
 import com.example.gh_coursework.ui.route_details.model.RouteTagModel
+import com.example.gh_coursework.ui.model.ImageModel.RouteImageModel
 
 data class RouteModel(
     val routeId: Long?,

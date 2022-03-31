@@ -1,7 +1,8 @@
 package com.example.gh_coursework.ui.private_route.model
 
-import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
+import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
+
 
 data class RoutePointModel(
     val pointId: Long?,

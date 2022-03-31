@@ -1,7 +1,7 @@
 package com.example.gh_coursework.ui.private_point.model
 
-import com.example.gh_coursework.ui.point_details.model.PointImageModel
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
+import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
 
 data class PrivatePointDetailsPreviewModel(
     val pointId: Long,

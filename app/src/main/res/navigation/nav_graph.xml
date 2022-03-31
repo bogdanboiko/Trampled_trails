@@ -75,11 +75,15 @@
             app:destination="@id/routeDetailsFragment"
             app:popUpTo="@id/privateRoutesFragment"/>
         <action
+            android:id="@+id/action_privateRoutesFragment_to_privateRouteImageDetails"
+            app:destination="@id/privateRouteImageDetails"
+            app:popUpTo="@id/privateRoutesFragment"/>
+        <action
             android:id="@+id/action_privateRoutesFragment_to_pointDetailsFragment"
             app:destination="@id/pointDetailsFragment"
             app:popUpTo="@id/privateRoutesFragment"/>
         <action
-            android:id="@+id/action_privateRoutesFragment_to_privateImageDetails"
+            android:id="@+id/action_privateRoutesFragment_to_privatePointImageDetails"
             app:destination="@id/privateImageDetails"
             app:popUpTo="@id/privateRoutesFragment"/>
     </fragment>

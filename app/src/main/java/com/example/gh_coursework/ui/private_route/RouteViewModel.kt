@@ -9,15 +9,14 @@ import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListU
 import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.DeleteRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
+import com.example.gh_coursework.ui.model.ImageModel.RouteImageModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteModelToDomainMapper
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDomainToModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointModelToDomainMapper
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
-import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageDomainToModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageModelToDomain
-import com.example.gh_coursework.ui.route_details.model.RouteImageModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -28,7 +27,6 @@ class RouteViewModel(
     private val addRouteUseCase: AddRouteUseCase,
     private val addRouteImageListUseCase: AddRouteImageListUseCase,
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
-    private val getRouteImagesUseCase: GetRouteImagesUseCase,
     private val deletePointUseCase: DeletePointUseCase,
     private val deleteRouteUseCase: DeleteRouteUseCase
 ) : ViewModel() {

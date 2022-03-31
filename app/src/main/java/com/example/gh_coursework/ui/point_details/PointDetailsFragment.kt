@@ -6,12 +6,10 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -22,12 +20,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
+import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
 import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
-import com.example.gh_coursework.ui.point_details.model.PointImageModel
-import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf

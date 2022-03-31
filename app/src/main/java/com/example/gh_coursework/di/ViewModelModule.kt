@@ -18,7 +18,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        RouteViewModel(get(), get(), get(), get(), get(), get(), get())
+        RouteViewModel(get(), get(), get(), get(), get(), get())
     }
 
     viewModel { parameters ->
@@ -42,6 +42,6 @@ val viewModelModule = module {
     }
 
     viewModel { parameters ->
-        RouteDetailsImageViewModel(parameters[0], get(), get())
+        RouteDetailsImageViewModel(parameters[0], get(), get(), get(), get())
     }
 }

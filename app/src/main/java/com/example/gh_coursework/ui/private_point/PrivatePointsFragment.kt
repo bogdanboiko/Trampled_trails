@@ -19,7 +19,6 @@ import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.point_details.PointDetailsFragmentDirections
 import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel

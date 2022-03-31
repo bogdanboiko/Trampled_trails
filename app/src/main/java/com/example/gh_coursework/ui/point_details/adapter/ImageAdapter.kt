@@ -10,27 +10,27 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gh_coursework.databinding.ItemImagePointBinding
-import com.example.gh_coursework.ui.point_details.model.PointImageModel
+import com.example.gh_coursework.ui.model.ImageModel
 
 class ImageAdapter(private val onItemCLick: View.OnClickListener) :
-    ListAdapter<PointImageModel, ImageAdapter.ImageViewHolder>(Diff) {
+    ListAdapter<ImageModel, ImageAdapter.ImageViewHolder>(Diff) {
 
     inner class ImageViewHolder(private val binding: ItemImagePointBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(imageModel: PointImageModel) {
-            itemView.setOnClickListener(onItemCLick)
+        fun bind(imageModel: ImageModel) {
+                itemView.setOnClickListener(onItemCLick)
 
-            val imageUri = Uri.parse(imageModel.image)
-            itemView.context?.contentResolver?.openInputStream(imageUri).use {
-                val image = Drawable.createFromStream(it, imageUri.toString())
-                if (image != null) {
-                    itemView.context?.let { it1 ->
-                        Glide.with(it1)
-                            .load(image)
-                            .into(binding.pointImage)
+                val imageUri = Uri.parse(imageModel.image)
+                itemView.context?.contentResolver?.openInputStream(imageUri).use {
+                    val image = Drawable.createFromStream(it, imageUri.toString())
+                    if (image != null) {
+                        itemView.context?.let { it1 ->
+                            Glide.with(it1)
+                                .load(image)
+                                .into(binding.pointImage)
+                        }
                     }
                 }
-            }
         }
     }
 
@@ -48,19 +48,26 @@ class ImageAdapter(private val onItemCLick: View.OnClickListener) :
         holder.bind(currentList[position])
     }
 
-    object Diff : DiffUtil.ItemCallback<PointImageModel>() {
+    object Diff : DiffUtil.ItemCallback<ImageModel>() {
         override fun areItemsTheSame(
-            oldItem: PointImageModel,
-            newItem: PointImageModel
+            oldItem: ImageModel,
+            newItem: ImageModel
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: PointImageModel,
-            newItem: PointImageModel
+            oldItem: ImageModel,
+            newItem: ImageModel
         ): Boolean {
-            return oldItem.pointId == newItem.pointId && oldItem.image == newItem.image
+            return when (oldItem) {
+                is ImageModel.PointImageModel ->
+                    oldItem.pointId == (newItem as ImageModel.PointImageModel).pointId
+                            && oldItem.image == newItem.image
+                is ImageModel.RouteImageModel ->
+                    oldItem.routeId == (newItem as ImageModel.RouteImageModel).routeId
+                            && oldItem.image == newItem.image
+            }
         }
     }
 }

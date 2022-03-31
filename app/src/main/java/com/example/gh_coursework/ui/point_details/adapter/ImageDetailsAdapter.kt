@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gh_coursework.databinding.ItemImageDetailsBinding
-import com.example.gh_coursework.ui.point_details.model.PointImageModel
+import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
 
 class ImageDetailsAdapter :
     ListAdapter<PointImageModel, ImageDetailsAdapter.ImageViewHolder>(Diff) {
