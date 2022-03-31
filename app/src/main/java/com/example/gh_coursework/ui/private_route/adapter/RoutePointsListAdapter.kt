@@ -49,6 +49,7 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
                 } else {
                     txtName.text = item.caption
                     txtDescription.text = item.description
+                    emptyDataPlaceholder.visibility = View.INVISIBLE
                 }
 
                 if (item.imageList.isEmpty()) {
@@ -61,7 +62,7 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
 
                 if (item.imageList.isNotEmpty()) {
                     Glide.with(itemView)
-                        .load(item.imageList[0])
+                        .load(item.imageList)
                         .placeholder(imgMapImage.drawable)
                         .error(R.drawable.ic_image_placeholder)
                         .transform(RoundedCorners(10))

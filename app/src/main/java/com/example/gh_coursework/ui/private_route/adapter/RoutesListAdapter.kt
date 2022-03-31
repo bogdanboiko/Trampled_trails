@@ -51,6 +51,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
                     txtName.text = item.name
                     txtDescription.text = item.description
                     txtRating.text = item.rating.toString()
+                    emptyDataPlaceholder.visibility = View.INVISIBLE
                 }
 
                 if (item.imageList.isNotEmpty()) {
