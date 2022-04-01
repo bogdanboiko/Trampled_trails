@@ -9,6 +9,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.databinding.ItemImagePointBinding
 import com.example.gh_coursework.ui.model.ImageModel
 
@@ -27,6 +30,7 @@ class ImageAdapter(private val onItemCLick: View.OnClickListener) :
                         itemView.context?.let { it1 ->
                             Glide.with(it1)
                                 .load(image)
+                                .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
                                 .into(binding.pointImage)
                         }
                     }
