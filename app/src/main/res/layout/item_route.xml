@@ -19,7 +19,8 @@
         android:textColor="@color/light_gray"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:maxLines="2"
+        android:maxLines="1"
+        android:ellipsize="end"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
