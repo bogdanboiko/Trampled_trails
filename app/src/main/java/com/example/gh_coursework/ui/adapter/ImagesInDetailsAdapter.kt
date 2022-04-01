@@ -1,6 +1,5 @@
 package com.example.gh_coursework.ui.adapter
 
-import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.LayoutInflater
@@ -14,17 +13,16 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.gh_coursework.databinding.ItemImagesPreviewBinding
+import com.example.gh_coursework.databinding.ItemImagesDetailsBinding
 import com.example.gh_coursework.ui.model.ImageModel
 import java.io.File
 
 class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
     ListAdapter<ImageModel, ImagesInDetailsAdapter.ImageViewHolder>(Diff) {
 
-    inner class ImageViewHolder(private val binding: ItemImagesPreviewBinding) :
+    inner class ImageViewHolder(private val binding: ItemImagesDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
-            binding.root.setBackgroundColor(Color.parseColor("#00000000"))
             itemView.setOnClickListener(onItemCLick)
 
             val imageUri = Uri.parse(imageModel.image)
@@ -46,7 +44,7 @@ class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         return ImageViewHolder(
-            ItemImagesPreviewBinding.inflate(
+            ItemImagesDetailsBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
