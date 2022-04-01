@@ -82,7 +82,6 @@ class RouteDetailsImageFragment : Fragment(R.layout.fragment_image_details) {
 
                 return@combine images
             }.collect {
-                Log.e("e", it.toString())
                 imageAdapter.submitList(it)
             }
         }

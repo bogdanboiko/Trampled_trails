@@ -3,7 +3,6 @@ package com.example.gh_coursework.ui.private_route
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -480,7 +479,6 @@ class PrivateRoutesFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.routes
                 .collect { route ->
-                    Log.e("route", route.toString())
                     if (route.isNotEmpty()) {
                         rebuildRoute(route.last())
                         routesListAdapter.submitList(route)
@@ -501,6 +499,7 @@ class PrivateRoutesFragment :
 
     private fun fetchAnnotatedRoutePoints() {
         val annotatedPoints = mutableListOf<RoutePointModel>()
+        val imageList = mutableListOf<ImageModel>()
 
         pointAnnotationManager.deleteAll()
         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
@@ -548,6 +547,10 @@ class PrivateRoutesFragment :
                 annotatedPoints.add(it)
                 binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
                     View.GONE
+
+                if (it.imageList.isNotEmpty()) {
+                    imageList.addAll(it.imageList)
+                }
             }
 
             pointsListAdapter.submitList(annotatedPoints)
@@ -1020,7 +1023,6 @@ class PrivateRoutesFragment :
             }
 
             imageList.addAll(route.imageList)
-
             currentRoutePointsList.forEach {
                 imageList.addAll(it.imageList)
             }

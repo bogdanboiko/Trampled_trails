@@ -1,5 +1,7 @@
 package com.example.gh_coursework.ui.private_route.adapter
 
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -54,20 +56,20 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
                     emptyDataPlaceholder.visibility = View.INVISIBLE
                 }
 
-                if (item.imageList.isNotEmpty()) {
+                if (item.imageList.isEmpty()) {
                     Glide.with(itemView)
-                        .load(item.imageList.first())
+                        .load(R.drawable.ic_image_placeholder)
+                        .placeholder(imgMapImage.drawable)
+                        .transform(RoundedCorners(10))
+                        .into(imgMapImage)
+                } else if (item.imageList.isNotEmpty()) {
+                    Glide.with(itemView)
+                        .load(Drawable.createFromPath(Uri.parse(item.imageList[0].image).path))
                         .placeholder(imgMapImage.drawable)
                         .error(R.drawable.ic_image_placeholder)
                         .transform(RoundedCorners(10))
                         .into(imgMapImage)
                 }
-
-                Glide.with(itemView)
-                    .load(R.drawable.ic_image_placeholder)
-                    .placeholder(imgMapImage.drawable)
-                    .transform(RoundedCorners(10))
-                    .into(imgMapImage)
 
                 root.setOnClickListener {
                     callback.onRouteItemClick(item)

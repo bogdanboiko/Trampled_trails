@@ -1,5 +1,7 @@
 package com.example.gh_coursework.ui.private_route.adapter
 
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,7 +51,7 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
                 } else {
                     txtName.text = item.caption
                     txtDescription.text = item.description
-                    emptyDataPlaceholder.visibility = View.INVISIBLE
+                    emptyDataPlaceholder.visibility = View.GONE
                 }
 
                 if (item.imageList.isEmpty()) {
@@ -61,8 +63,9 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
                 }
 
                 if (item.imageList.isNotEmpty()) {
+
                     Glide.with(itemView)
-                        .load(item.imageList)
+                        .load(Drawable.createFromPath(Uri.parse(item.imageList[0].image).path))
                         .placeholder(imgMapImage.drawable)
                         .error(R.drawable.ic_image_placeholder)
                         .transform(RoundedCorners(10))
