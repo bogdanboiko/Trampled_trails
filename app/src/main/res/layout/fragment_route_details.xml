@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -9,10 +10,11 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/routeDetailsAppBar"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="wrap_content"
+        android:background="@color/teal_200"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        app:expanded="false">
+        app:expanded="true">
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/routeDetailsCollapsingToolbar"
@@ -20,21 +22,26 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="@color/teal_200"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed">
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
-                android:id="@+id/routeImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:fitsSystemWindows="true"
-                android:scaleType="centerCrop"
-                android:src="@drawable/bottom_nav_color_transparent"
+                android:elevation="1dp"
+                android:src="@drawable/fg_gradient_toolbar" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/imageRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:fastScrollEnabled="false"
                 app:layout_collapseMode="parallax" />
 
             <Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:elevation="2dp"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
@@ -65,6 +72,15 @@
                     android:background="@color/transparent"
                     android:padding="20dp"
                     android:src="@drawable/ic_tag" />
+
+                <ImageButton
+                    android:id="@+id/pointImageAddButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_image"
+                    android:background="@color/transparent"
+                    android:padding="20dp" />
 
             </Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -110,10 +126,20 @@
 
     </androidx.core.widget.NestedScrollView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <TextView
+        android:id="@+id/emptyDataPlaceholder"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/cardview_default_elevation"
-        app:layout_anchor="@id/routeDetailsAppBar"
-        app:layout_anchorGravity="bottom|right|end" />
+        android:textSize="20sp"
+        android:gravity="center"
+        android:textColor="@color/black"
+        android:paddingStart="60dp"
+        android:paddingEnd="60dp"
+        app:layout_anchor="@id/routeDescriptionText"
+        app:layout_anchorGravity="bottom"
+        android:text="Text data is empty. Press edit button to start filling the data"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

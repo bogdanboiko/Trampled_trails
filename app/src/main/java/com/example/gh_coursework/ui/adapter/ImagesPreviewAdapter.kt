@@ -1,4 +1,4 @@
-package com.example.gh_coursework.ui.point_details.adapter
+package com.example.gh_coursework.ui.adapter
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -9,15 +9,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.gh_coursework.databinding.ItemImagePointBinding
-import com.example.gh_coursework.ui.point_details.model.PointImageModel
+import com.bumptech.glide.load.MultiTransformation
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.gh_coursework.databinding.ItemImagesPreviewBinding
+import com.example.gh_coursework.ui.model.ImageModel
 
-class ImageAdapter(private val onItemCLick: View.OnClickListener) :
-    ListAdapter<PointImageModel, ImageAdapter.ImageViewHolder>(Diff) {
+class ImagesPreviewAdapter(private val onItemCLick: View.OnClickListener) :
+    ListAdapter<ImageModel, ImagesPreviewAdapter.ImageViewHolder>(Diff) {
 
-    inner class ImageViewHolder(private val binding: ItemImagePointBinding) :
+    inner class ImageViewHolder(private val binding: ItemImagesPreviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(imageModel: PointImageModel) {
+        fun bind(imageModel: ImageModel) {
             itemView.setOnClickListener(onItemCLick)
 
             val imageUri = Uri.parse(imageModel.image)
@@ -27,6 +30,7 @@ class ImageAdapter(private val onItemCLick: View.OnClickListener) :
                     itemView.context?.let { it1 ->
                         Glide.with(it1)
                             .load(image)
+                            .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
                             .into(binding.pointImage)
                     }
                 }
@@ -36,7 +40,7 @@ class ImageAdapter(private val onItemCLick: View.OnClickListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         return ImageViewHolder(
-            ItemImagePointBinding.inflate(
+            ItemImagesPreviewBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
@@ -48,19 +52,26 @@ class ImageAdapter(private val onItemCLick: View.OnClickListener) :
         holder.bind(currentList[position])
     }
 
-    object Diff : DiffUtil.ItemCallback<PointImageModel>() {
+    object Diff : DiffUtil.ItemCallback<ImageModel>() {
         override fun areItemsTheSame(
-            oldItem: PointImageModel,
-            newItem: PointImageModel
+            oldItem: ImageModel,
+            newItem: ImageModel
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: PointImageModel,
-            newItem: PointImageModel
+            oldItem: ImageModel,
+            newItem: ImageModel
         ): Boolean {
-            return oldItem.pointId == newItem.pointId && oldItem.image == newItem.image
+            return when (oldItem) {
+                is ImageModel.PointImageModel ->
+                    oldItem.pointId == (newItem as ImageModel.PointImageModel).pointId
+                            && oldItem.image == newItem.image
+                is ImageModel.RouteImageModel ->
+                    oldItem.routeId == (newItem as ImageModel.RouteImageModel).routeId
+                            && oldItem.image == newItem.image
+            }
         }
     }
 }

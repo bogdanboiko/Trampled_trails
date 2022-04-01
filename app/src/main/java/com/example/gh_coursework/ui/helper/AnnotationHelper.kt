@@ -4,6 +4,9 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
+import com.mapbox.geojson.Point
+import com.mapbox.maps.extension.style.layers.properties.generated.IconAnchor
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationOptions
 
 fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap? {
     if (sourceDrawable == null) {
@@ -23,4 +26,19 @@ fun convertDrawableToBitmap(sourceDrawable: Drawable?): Bitmap? {
         drawable.draw(canvas)
         bitmap
     }
+}
+
+fun createAnnotationPoint(bitmap: Bitmap, point: Point): PointAnnotationOptions {
+    return PointAnnotationOptions()
+        .withPoint(point)
+        .withIconImage(bitmap)
+        .withIconAnchor(IconAnchor.BOTTOM)
+}
+
+fun createFlagAnnotationPoint(bitmap: Bitmap, point: Point): PointAnnotationOptions {
+    return PointAnnotationOptions()
+        .withPoint(point)
+        .withIconImage(bitmap)
+        .withIconAnchor(IconAnchor.BOTTOM_LEFT)
+        .withIconOffset(listOf(-9.6, 3.8))
 }

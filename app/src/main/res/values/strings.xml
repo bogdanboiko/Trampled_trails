@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Gh_Coursework</string>
-    <string name="mapbox_access_token">pk.eyJ1IjoiYm9nZ2RhbiIsImEiOiJja3oxNnZtbGowZGl4Mm90MnRldXp0cW11In0.nGRpno1yA12A7uYaU4oXOQ</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoiZ2hjb3Vyc2V3b3JrIiwiYSI6ImNsMWYzMmlyZTAwYnMzZW8wYmxnbmxuaGMifQ.rjWVPxd3LzssJi3d4PjqJQ</string>
     <string name="public_menu_item">Public</string>
     <string name="private_menu_item">Private</string>
     <string name="txtCancelButtonExit">exit</string>

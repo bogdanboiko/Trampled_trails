@@ -1,22 +1,19 @@
 package com.example.gh_coursework.ui.private_route.mapper
 
 import com.example.gh_coursework.domain.entity.RouteDomain
-import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
-import com.example.gh_coursework.ui.private_route.model.PrivateRoutePointModel
+import com.example.gh_coursework.ui.private_route.model.RouteModel
+import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageDomainToModel
+import com.example.gh_coursework.ui.route_details.mapper.mapRouteTagDomainToModel
 
-fun mapRouteDomainToModel(routeDomain: RouteDomain): PrivateRouteModel {
-    val pointCoordinatesModelList = mutableListOf<PrivateRoutePointModel>()
-
-    routeDomain.coordinatesList.forEach {
-        pointCoordinatesModelList.add(mapPointDomainToModel(it))
+fun mapRouteDomainToModel(routeDomain: RouteDomain): RouteModel {
+    with(routeDomain) {
+        return RouteModel(
+            routeId,
+            name,
+            description,
+            rating,
+            tagsList.map(::mapRouteTagDomainToModel),
+            imageList.map(::mapRouteImageDomainToModel)
+        )
     }
-
-    return PrivateRouteModel(
-        routeDomain.routeId,
-        routeDomain.name,
-        routeDomain.description,
-        routeDomain.rating,
-        pointCoordinatesModelList,
-        null
-    )
 }

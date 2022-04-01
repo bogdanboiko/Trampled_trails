@@ -10,9 +10,9 @@ data class RouteEntity(
     @ColumnInfo(name = "routeId")
     var routeId: Long?,
     @ColumnInfo(name = "routeName")
-    val name: String,
+    val name: String?,
     @ColumnInfo(name = "description")
-    val description: String,
+    val description: String?,
     @ColumnInfo(name = "rating")
-    val rating: Double
+    val rating: Double?
 )
