@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
-import com.example.gh_coursework.ui.decorator.ImageDecorator
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
@@ -954,7 +953,6 @@ class PrivateRoutesFragment :
             imageRecycler.apply {
                 adapter = pointImageAdapter
                 layoutManager = pointImageLayoutManager
-                addItemDecoration(ImageDecorator(30))
             }
 
             pointImageAdapter.submitList(details.imageList)
@@ -1019,7 +1017,6 @@ class PrivateRoutesFragment :
             imageRecycler.apply {
                 adapter = routeImageAdapter
                 layoutManager = routeImageLayoutManager
-                addItemDecoration(ImageDecorator(30))
             }
 
             imageList.addAll(route.imageList)
