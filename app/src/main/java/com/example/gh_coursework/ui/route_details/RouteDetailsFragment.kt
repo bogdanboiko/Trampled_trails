@@ -112,7 +112,7 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                     if (it.route.name?.isEmpty() == true && it.route.description?.isEmpty() == true) {
                         emptyDataPlaceholder.visibility = View.VISIBLE
                     } else {
-                        emptyDataPlaceholder.visibility = View.INVISIBLE
+                        emptyDataPlaceholder.visibility = View.GONE
                     }
 
                     val routeImages = mutableListOf<ImageModel>()
@@ -171,7 +171,7 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
         with(binding) {
             routeDetailsEditButton.setOnClickListener {
                 it.visibility = View.GONE
-                emptyDataPlaceholder.visibility = View.INVISIBLE
+                emptyDataPlaceholder.visibility = View.GONE
                 confirmEditButton.visibility = View.VISIBLE
                 routeCaptionText.isEnabled = true
                 routeDescriptionText.isEnabled = true

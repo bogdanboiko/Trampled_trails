@@ -1,4 +1,4 @@
-package com.example.gh_coursework.ui.point_details.adapter
+package com.example.gh_coursework.ui.adapter
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -12,35 +12,35 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.gh_coursework.databinding.ItemImagePointBinding
+import com.example.gh_coursework.databinding.ItemImagesPreviewBinding
 import com.example.gh_coursework.ui.model.ImageModel
 
-class ImageAdapter(private val onItemCLick: View.OnClickListener) :
-    ListAdapter<ImageModel, ImageAdapter.ImageViewHolder>(Diff) {
+class ImagesPreviewAdapter(private val onItemCLick: View.OnClickListener) :
+    ListAdapter<ImageModel, ImagesPreviewAdapter.ImageViewHolder>(Diff) {
 
-    inner class ImageViewHolder(private val binding: ItemImagePointBinding) :
+    inner class ImageViewHolder(private val binding: ItemImagesPreviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
-                itemView.setOnClickListener(onItemCLick)
+            itemView.setOnClickListener(onItemCLick)
 
-                val imageUri = Uri.parse(imageModel.image)
-                itemView.context?.contentResolver?.openInputStream(imageUri).use {
-                    val image = Drawable.createFromStream(it, imageUri.toString())
-                    if (image != null) {
-                        itemView.context?.let { it1 ->
-                            Glide.with(it1)
-                                .load(image)
-                                .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
-                                .into(binding.pointImage)
-                        }
+            val imageUri = Uri.parse(imageModel.image)
+            itemView.context?.contentResolver?.openInputStream(imageUri).use {
+                val image = Drawable.createFromStream(it, imageUri.toString())
+                if (image != null) {
+                    itemView.context?.let { it1 ->
+                        Glide.with(it1)
+                            .load(image)
+                            .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
+                            .into(binding.pointImage)
                     }
                 }
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         return ImageViewHolder(
-            ItemImagePointBinding.inflate(
+            ItemImagesPreviewBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

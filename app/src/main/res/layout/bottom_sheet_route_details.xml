@@ -52,16 +52,6 @@
         app:layout_constraintEnd_toStartOf="@id/routeDetailsEditButton"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/routeRating"
-        android:layout_width="0dp"
-        android:layout_height="21dp"
-        android:layout_gravity="end"
-        android:padding="20dp"
-        android:background="@color/transparent"
-        app:layout_constraintEnd_toStartOf="@+id/routeDetailsDeleteButton"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScroll"
         android:layout_width="match_parent"
