@@ -9,6 +9,12 @@
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/imageRecycler"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/pointDetailsEditButton"
+        app:layout_constraintBottom_toTopOf="@id/nestedScroll"/>
 
     <ImageButton
         android:id="@+id/pointDetailsEditButton"
@@ -49,7 +55,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pointDetailsEditButton">
+        app:layout_constraintTop_toBottomOf="@id/imageRecycler">
 
         <LinearLayout
             android:layout_width="match_parent"

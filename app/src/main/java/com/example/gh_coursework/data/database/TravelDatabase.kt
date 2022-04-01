@@ -8,13 +8,14 @@ import com.example.gh_coursework.data.database.entity.*
 @Database(
     entities = [PointCoordinatesEntity::class,
         PointDetailsEntity::class,
-        RouteEntity::class,
-        RoutePointEntity::class,
         PointTagEntity::class,
         PointsTagsEntity::class,
         PointImageEntity::class,
+        RouteEntity::class,
+        RoutePointEntity::class,
         RouteTagEntity::class,
-        RouteTagsEntity::class], version = 13
+        RouteTagsEntity::class,
+        RouteImageEntity::class], version = 15
 )
 abstract class TravelDatabase : RoomDatabase() {
     abstract fun getPointPreviewDao(): PointPreviewDao

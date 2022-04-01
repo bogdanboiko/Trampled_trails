@@ -1,16 +1,12 @@
 package com.example.gh_coursework.di
 
-import com.example.gh_coursework.domain.usecase.image.DeletePointImageUseCase
-import com.example.gh_coursework.domain.usecase.image.DeletePointImageUseCaseImpl
-import com.example.gh_coursework.domain.usecase.image.GetPointImagesUseCase
-import com.example.gh_coursework.domain.usecase.image.GetPointImagesUseCaseImpl
+import com.example.gh_coursework.domain.usecase.image.*
 import com.example.gh_coursework.domain.usecase.point_details.*
 import com.example.gh_coursework.domain.usecase.point_preview.*
 import com.example.gh_coursework.domain.usecase.point_tag.*
-import com.example.gh_coursework.domain.usecase.route_details.GetRouteDetailsUseCase
-import com.example.gh_coursework.domain.usecase.route_details.GetRouteDetailsUseCaseImpl
-import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
-import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCaseImpl
+import com.example.gh_coursework.domain.usecase.route_details.*
+import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
+import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCaseImpl
 import com.example.gh_coursework.domain.usecase.route_preview.*
 import com.example.gh_coursework.domain.usecase.route_tag.*
 import org.koin.dsl.module
@@ -95,6 +91,14 @@ val pointUseCasesModule = module {
         GetRouteDetailsUseCaseImpl(get())
     }
 
+    single<GetRoutePointsListUseCase> {
+        GetRoutePointsListUseCaseImpl(get())
+    }
+
+    single<GetRoutePointsImagesUseCase> {
+        GetRoutePointsImagesUseCaseImpl(get())
+    }
+
     single<UpdateRouteDetailsUseCase> {
         UpdateRouteDetailsUseCaseImpl(get())
     }
@@ -110,5 +114,18 @@ val pointUseCasesModule = module {
 
     single<DeleteTagsFromRouteUseCase> {
         DeleteTagsFromRouteUseCaseImpl(get())
+    }
+
+    //RouteImages
+    single<AddRouteImageListUseCase> {
+        AddRouteImageListUseCaseImpl(get())
+    }
+
+    single<DeleteRouteImageUseCase> {
+        DeleteRouteImageUseCaseImpl(get())
+    }
+
+    single<GetRouteImagesUseCase> {
+        GetRouteImagesUseCaseImpl(get())
     }
 }

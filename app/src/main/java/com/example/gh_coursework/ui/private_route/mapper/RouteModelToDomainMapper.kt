@@ -1,17 +1,17 @@
 package com.example.gh_coursework.ui.private_route.mapper
 
-import com.example.gh_coursework.domain.entity.PointPreviewDomain
 import com.example.gh_coursework.domain.entity.RouteDomain
-import com.example.gh_coursework.ui.private_point.mapper.mapPointModelToDomain
-import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
-import com.mapbox.geojson.Point
+import com.example.gh_coursework.ui.private_route.model.RouteModel
 
-fun mapRouteModelToDomainMapper(route: PrivateRouteModel): RouteDomain {
-    val pointCoordinatesDomainList = mutableListOf<PointPreviewDomain>()
-
-    route.coordinatesList.forEach {
-        pointCoordinatesDomainList.add(mapPointModelToDomain(it))
+fun mapRouteModelToDomainMapper(route: RouteModel): RouteDomain {
+    with(route) {
+        return RouteDomain(
+            routeId,
+            name,
+            description,
+            rating,
+            emptyList(),
+            emptyList()
+        )
     }
-
-    return RouteDomain(route.routeId, route.name, route.description, 0.0, pointCoordinatesDomainList)
 }

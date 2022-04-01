@@ -1,6 +1,9 @@
 package com.example.gh_coursework.ui.private_route.adapter
 
+import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -9,14 +12,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.ItemRouteBinding
-import com.example.gh_coursework.ui.private_route.model.PrivateRouteModel
+import com.example.gh_coursework.ui.private_route.model.RouteModel
 
 interface RoutesListAdapterCallback {
-    fun onRouteItemClick(route: PrivateRouteModel)
+    fun onRouteItemClick(route: RouteModel)
 }
 
 class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
-    ListAdapter<PrivateRouteModel, RoutesListAdapter.RouteViewHolder>(Diff) {
+    ListAdapter<RouteModel, RoutesListAdapter.RouteViewHolder>(Diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
         val binding = ItemRouteBinding.inflate(
@@ -37,40 +40,55 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
     inner class RouteViewHolder(private val binding: ItemRouteBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: PrivateRouteModel) {
+        fun bind(item: RouteModel) {
             with(binding) {
-                txtName.text = item.name
-                txtDescription.text = item.description
-                txtRating.text = item.rating.toString()
+                if (item.name?.isEmpty() == true && item.description?.isEmpty() == true && item.rating == null) {
+                    txtName.visibility = View.INVISIBLE
+                    txtDescription.visibility = View.INVISIBLE
 
-                Glide.with(itemView)
-                    .load(item.imgResources)
-                    .placeholder(imgMapImage.drawable)
-                    .error(R.drawable.ic_launcher_background)
-                    .transform(RoundedCorners(10))
-                    .into(imgMapImage)
-            }
+                    emptyDataPlaceholder.visibility = View.VISIBLE
 
-            binding.root.setOnClickListener {
-                callback.onRouteItemClick(item)
+                } else {
+                    txtName.text = item.name
+                    txtDescription.text = item.description
+                    emptyDataPlaceholder.visibility = View.INVISIBLE
+                }
+
+                if (item.imageList.isEmpty()) {
+                    Glide.with(itemView)
+                        .load(R.drawable.ic_image_placeholder)
+                        .placeholder(imgMapImage.drawable)
+                        .transform(RoundedCorners(10))
+                        .into(imgMapImage)
+                } else if (item.imageList.isNotEmpty()) {
+                    Glide.with(itemView)
+                        .load(Drawable.createFromPath(Uri.parse(item.imageList[0].image).path))
+                        .placeholder(imgMapImage.drawable)
+                        .error(R.drawable.ic_image_placeholder)
+                        .transform(RoundedCorners(10))
+                        .into(imgMapImage)
+                }
+
+                root.setOnClickListener {
+                    callback.onRouteItemClick(item)
+                }
             }
         }
     }
 
-    object Diff : DiffUtil.ItemCallback<PrivateRouteModel>() {
+    object Diff : DiffUtil.ItemCallback<RouteModel>() {
         override fun areItemsTheSame(
-            oldItem: PrivateRouteModel,
-            newItem: PrivateRouteModel
+            oldItem: RouteModel,
+            newItem: RouteModel
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: PrivateRouteModel,
-            newItem: PrivateRouteModel
+            oldItem: RouteModel,
+            newItem: RouteModel
         ): Boolean {
-            return oldItem.routeId == newItem.routeId
-                    && oldItem.coordinatesList == newItem.coordinatesList
+            return oldItem.routeId == newItem.routeId && oldItem.description == newItem.description
         }
     }
 }

@@ -1,12 +1,13 @@
-package com.example.gh_coursework.data.database.mapper
+package com.example.gh_coursework.data.database.mapper.point_details
 
+import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
 import com.example.gh_coursework.data.database.response.PointDetailsResponse
 import com.example.gh_coursework.domain.entity.PointDetailsDomain
 
 fun mapPointDetailsEntityToDomain(details: PointDetailsResponse?): PointDetailsDomain? {
-    return if (details != null) {
-        with(details.pointDetails) {
+    if (details != null) {
+        return with(details.pointDetails) {
             PointDetailsDomain(
                 pointId,
                 details.tagList.map(::mapPointTagEntityToDomain),
@@ -15,7 +16,7 @@ fun mapPointDetailsEntityToDomain(details: PointDetailsResponse?): PointDetailsD
                 description
             )
         }
-    } else {
-        null
     }
+
+    return null
 }
