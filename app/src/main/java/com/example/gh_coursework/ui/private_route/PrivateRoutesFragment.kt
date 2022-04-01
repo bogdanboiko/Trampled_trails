@@ -935,15 +935,15 @@ class PrivateRoutesFragment :
 
     private fun preparePointDetailsDialog(
         pointAnnotation: PointAnnotation,
-        details: RoutePointModel
+        point: RoutePointModel
     ) {
         binding.bottomSheetDialogPointDetails.apply {
-            if (pointCaptionText.text.isEmpty() && pointDescriptionText.text.isEmpty() && tagListTextView.text.isEmpty()) {
+            if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                pointCaptionText.text = details.caption
-                pointDescriptionText.text = details.description
-                tagListTextView.text = details.tagList.joinToString(",", "Tags: ")
+                pointCaptionText.text = point.caption
+                pointDescriptionText.text = point.description
+                tagListTextView.text = point.tagList.joinToString(",", "Tags: ")
                 { pointTagModel -> pointTagModel.name }
                 emptyDataPlaceholder.visibility = View.GONE
             }
@@ -951,7 +951,7 @@ class PrivateRoutesFragment :
             pointImagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivatePointImageDetails(
-                        details.pointId!!,
+                        point.pointId!!,
                         pointImageLayoutManager.findFirstVisibleItemPosition()
                     )
                 )
@@ -962,7 +962,7 @@ class PrivateRoutesFragment :
                 layoutManager = pointImageLayoutManager
             }
 
-            pointImagesPreviewAdapter.submitList(details.imageList)
+            pointImagesPreviewAdapter.submitList(point.imageList)
 
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(
@@ -999,7 +999,7 @@ class PrivateRoutesFragment :
         val imageList = mutableListOf<ImageModel>()
 
         binding.bottomSheetDialogRouteDetails.apply {
-            if (routeCaptionText.text.isEmpty() && routeDescriptionText.text.isEmpty()) {
+            if (route.name?.isEmpty() == true && route.description?.isEmpty() == true) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
                 routeCaptionText.text = route.name
