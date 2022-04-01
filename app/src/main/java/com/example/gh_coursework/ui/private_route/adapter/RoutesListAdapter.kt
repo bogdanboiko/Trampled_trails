@@ -45,14 +45,12 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
                 if (item.name?.isEmpty() == true && item.description?.isEmpty() == true && item.rating == null) {
                     txtName.visibility = View.INVISIBLE
                     txtDescription.visibility = View.INVISIBLE
-                    txtRating.visibility = View.INVISIBLE
 
                     emptyDataPlaceholder.visibility = View.VISIBLE
 
                 } else {
                     txtName.text = item.name
                     txtDescription.text = item.description
-                    txtRating.text = item.rating.toString()
                     emptyDataPlaceholder.visibility = View.INVISIBLE
                 }
 
