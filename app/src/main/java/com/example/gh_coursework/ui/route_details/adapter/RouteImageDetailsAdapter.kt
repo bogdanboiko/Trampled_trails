@@ -8,12 +8,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.gh_coursework.databinding.ItemImagePointBinding
+import com.example.gh_coursework.databinding.ItemImageDetailsBinding
 import com.example.gh_coursework.ui.model.ImageModel
 
 class RouteImageDetailsAdapter : ListAdapter<ImageModel, RouteImageDetailsAdapter.ImageViewHolder>(Diff) {
 
-    inner class ImageViewHolder(private val binding: ItemImagePointBinding) :
+    inner class ImageViewHolder(private val binding: ItemImageDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
             val imageUri = Uri.parse(imageModel.image)
@@ -32,7 +32,7 @@ class RouteImageDetailsAdapter : ListAdapter<ImageModel, RouteImageDetailsAdapte
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         return ImageViewHolder(
-            ItemImagePointBinding.inflate(
+            ItemImageDetailsBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false
