@@ -18,12 +18,12 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
+import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.model.ImageModel
-import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -938,16 +938,23 @@ class PrivateRoutesFragment :
         details: RoutePointModel
     ) {
         binding.bottomSheetDialogPointDetails.apply {
-            pointCaptionText.text = details.caption
-            pointDescriptionText.text = details.description
-            tagListTextView.text = details.tagList.joinToString(",", "Tags: ")
-            { pointTagModel -> pointTagModel.name }
+            if (pointCaptionText.text.isEmpty() && pointDescriptionText.text.isEmpty() && tagListTextView.text.isEmpty()) {
+                emptyDataPlaceholder.visibility = View.VISIBLE
+            } else {
+                pointCaptionText.text = details.caption
+                pointDescriptionText.text = details.description
+                tagListTextView.text = details.tagList.joinToString(",", "Tags: ")
+                { pointTagModel -> pointTagModel.name }
+                emptyDataPlaceholder.visibility = View.GONE
+            }
 
             pointImagesPreviewAdapter = ImagesPreviewAdapter {
-                findNavController().navigate(PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivatePointImageDetails(
-                    details.pointId!!,
-                    pointImageLayoutManager.findFirstVisibleItemPosition()
-                ))
+                findNavController().navigate(
+                    PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivatePointImageDetails(
+                        details.pointId!!,
+                        pointImageLayoutManager.findFirstVisibleItemPosition()
+                    )
+                )
             }
 
             imageRecycler.apply {
@@ -992,9 +999,13 @@ class PrivateRoutesFragment :
         val imageList = mutableListOf<ImageModel>()
 
         binding.bottomSheetDialogRouteDetails.apply {
-            routeCaptionText.text = route.name
-            routeDescriptionText.text = route.description
-            routeRating.text = route.rating.toString()
+            if (routeCaptionText.text.isEmpty() && routeDescriptionText.text.isEmpty()) {
+                emptyDataPlaceholder.visibility = View.VISIBLE
+            } else {
+                routeCaptionText.text = route.name
+                routeDescriptionText.text = route.description
+                emptyDataPlaceholder.visibility = View.GONE
+            }
 
             routeDetailsEditButton.setOnClickListener {
                 route.routeId?.let {
