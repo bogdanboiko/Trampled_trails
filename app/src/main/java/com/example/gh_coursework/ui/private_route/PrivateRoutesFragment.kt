@@ -3,6 +3,7 @@ package com.example.gh_coursework.ui.private_route
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -69,6 +70,8 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -78,6 +81,7 @@ class PrivateRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
+    private lateinit var routePointsJob: Job
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
 
@@ -106,8 +110,6 @@ class PrivateRoutesFragment :
     private var routeState = MutableLiveData<Boolean>()
     private val navigationLocationProvider = NavigationLocationProvider()
 
-    @OptIn(MapboxExperimental::class)
-    private lateinit var viewAnnotationManager: ViewAnnotationManager
     private lateinit var pointAnnotationManager: PointAnnotationManager
 
     private val regularOnMapClickListener = OnMapClickListener { point ->
@@ -231,6 +233,7 @@ class PrivateRoutesFragment :
 
         configMap()
         configMapStateSwitcher()
+        switchMapMod()
         configMapSwitcherButton()
         configCancelButton()
         configRecyclers()
@@ -256,7 +259,6 @@ class PrivateRoutesFragment :
     @OptIn(MapboxExperimental::class)
     private fun configMap() {
         mapboxMap = binding.mapView.getMapboxMap().also {
-            viewAnnotationManager = binding.mapView.viewAnnotationManager
             it.loadStyleUri(Style.MAPBOX_STREETS)
         }
 
@@ -266,7 +268,6 @@ class PrivateRoutesFragment :
         }
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
-        pointAnnotationManager.addClickListener(onPointClickEvent)
     }
 
     private fun configMapStateSwitcher() {
@@ -275,7 +276,6 @@ class PrivateRoutesFragment :
                 executeClickAtPoint()
             } else {
                 mapState.value = MapState.CREATOR
-                switchMapMod()
             }
         }
     }
@@ -302,7 +302,7 @@ class PrivateRoutesFragment :
 
     private fun configCancelButton() {
         routeState.observe(viewLifecycleOwner) {
-            if (routeState.value == true) {
+            if (it) {
                 binding.cancelButton.text = getString(R.string.txtCancelButtonSave)
                 binding.cancelButton.icon =
                     view?.context?.let { it1 ->
@@ -314,11 +314,11 @@ class PrivateRoutesFragment :
 
                 binding.cancelButton.setOnClickListener {
                     createRoute()
-                    routeState.value = false
                     mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
+                    routeState.value = false
                 }
-            } else if (routeState.value == false) {
+            } else {
                 binding.cancelButton.text = getString(R.string.txtCancelButtonExit)
                 binding.cancelButton.icon =
                     view?.context?.let { it1 ->
@@ -330,7 +330,6 @@ class PrivateRoutesFragment :
 
                 binding.cancelButton.setOnClickListener {
                     resetCurrentRoute()
-                    fetchRoutes()
                     mapState.value = MapState.PRESENTATION
                     binding.cancelButton.visibility = View.INVISIBLE
                 }
@@ -632,13 +631,14 @@ class PrivateRoutesFragment :
     }
 
     private fun swapOnMapClickListener(isChecked: Boolean) {
+        mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
+        mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
+
         if (isChecked) {
-            mapboxMap.removeOnMapClickListener(namedOnMapClickListener)
             mapboxMap.addOnMapClickListener(regularOnMapClickListener)
 
             binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
         } else if (!isChecked) {
-            mapboxMap.removeOnMapClickListener(regularOnMapClickListener)
             mapboxMap.addOnMapClickListener(namedOnMapClickListener)
 
             binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
@@ -781,7 +781,7 @@ class PrivateRoutesFragment :
     }
 
     private fun createRoute() {
-        if (creatingRouteCoordinatesList.size > 1) {
+        if (creatingRouteCoordinatesList.size >= 1) {
             val route = RouteModel(
                 null,
                 "",
@@ -803,9 +803,14 @@ class PrivateRoutesFragment :
 
     private fun rebuildRoute(route: RouteModel) {
         focusedRoute = route
-        viewLifecycleOwner.lifecycleScope.launch {
+
+        if (this::routePointsJob.isInitialized) {
+            routePointsJob.cancel()
+        }
+
+        routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
             route.routeId?.let { routeId ->
-                viewModel.getRoutePointsList(routeId).collect { pointsList ->
+                viewModel.getRoutePointsList(routeId).distinctUntilChanged().collect { pointsList ->
                     if (pointsList.isNotEmpty()) {
                         currentRoutePointsList =
                             pointsList.map { it.copy() } as MutableList<RoutePointModel>
@@ -844,11 +849,11 @@ class PrivateRoutesFragment :
             }
 
             creatingRouteCoordinatesList.size == 2 -> {
-                if (!creatingRouteCoordinatesList.last().isRoutePoint && pointAnnotationManager.annotations.size == 2) {
+                if (!creatingRouteCoordinatesList.last().isRoutePoint) {
                     pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
                 }
 
-                creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList[creatingRouteCoordinatesList.lastIndex])
+                creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList.last())
                 routeState.value = false
                 setEmptyRoute()
             }
@@ -938,14 +943,15 @@ class PrivateRoutesFragment :
         point: RoutePointModel
     ) {
         binding.bottomSheetDialogPointDetails.apply {
-            if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
-                emptyDataPlaceholder.visibility = View.VISIBLE
+            pointCaptionText.text = point.caption
+            pointDescriptionText.text = point.description
+            if (point.tagList.isNotEmpty()) {
+                tagListTextView.text = point.tagList.joinToString(
+                    ",",
+                    "Tags: "
+                ) { pointTagModel -> pointTagModel.name }
             } else {
-                pointCaptionText.text = point.caption
-                pointDescriptionText.text = point.description
-                tagListTextView.text = point.tagList.joinToString(",", "Tags: ")
-                { pointTagModel -> pointTagModel.name }
-                emptyDataPlaceholder.visibility = View.GONE
+                tagListTextView.text = ""
             }
 
             pointImagesPreviewAdapter = ImagesPreviewAdapter {

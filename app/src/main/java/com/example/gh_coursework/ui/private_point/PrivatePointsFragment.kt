@@ -264,6 +264,8 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                     ",",
                     "Tags: "
                 ) { pointTagModel -> pointTagModel.name }
+            } else {
+                tagListTextView.text = ""
             }
 
             imagesPreviewAdapter = ImagesPreviewAdapter {
