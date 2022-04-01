@@ -20,8 +20,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
+import com.example.gh_coursework.ui.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
-import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -36,7 +36,7 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
-    private val imageAdapter = ImageAdapter {
+    private val imageAdapter = ImagesInDetailsAdapter {
         findNavController().navigate(
             PointDetailsFragmentDirections.actionPointDetailsFragmentToPrivateImageDetails(
                 arguments.pointId,

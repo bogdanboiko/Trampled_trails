@@ -16,10 +16,10 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
+import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -30,17 +30,19 @@ import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
 import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
-import com.mapbox.maps.plugin.annotation.generated.*
+import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
+import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
+import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
-import com.mapbox.maps.viewannotation.ViewAnnotationManager
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
-    private lateinit var imageAdapter: ImageAdapter
+    private lateinit var imagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var layoutManager: LinearLayoutManager
     private val viewModel: PointViewModel by viewModel()
     private var pointCoordinates = emptyList<PrivatePointModel>()
@@ -264,7 +266,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                 ) { pointTagModel -> pointTagModel.name }
             }
 
-            imageAdapter = ImageAdapter {
+            imagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPrivateImageDetails(
                         details.pointId,
@@ -274,11 +276,11 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             }
 
             imageRecycler.apply {
-                adapter = imageAdapter
+                adapter = imagesPreviewAdapter
                 layoutManager = this@PrivatePointsFragment.layoutManager
             }
 
-            imageAdapter.submitList(details.imageList)
+            imagesPreviewAdapter.submitList(details.imageList)
 
             if (details.caption.isEmpty() && details.description.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE

@@ -21,9 +21,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentRouteDetailsBinding
+import com.example.gh_coursework.ui.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.model.ImageModel
 import com.example.gh_coursework.ui.model.ImageModel.RouteImageModel
-import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
 import com.example.gh_coursework.ui.route_details.model.RouteCompleteModel
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
 import kotlinx.coroutines.flow.combine
@@ -40,7 +40,7 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
     private lateinit var layoutManager: LinearLayoutManager
     private val arguments by navArgs<RouteDetailsFragmentArgs>()
     private val viewModel: RouteDetailsViewModel by viewModel { parametersOf(arguments.routeId) }
-    private val imageAdapter = ImageAdapter {
+    private val imageAdapter = ImagesInDetailsAdapter {
         findNavController().navigate(
             RouteDetailsFragmentDirections.actionRouteDetailsFragmentToPrivateRouteImageDetails(
                 arguments.routeId,
@@ -98,18 +98,6 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
             layoutManager = this@RouteDetailsFragment.layoutManager
         }
     }
-
-//    private fun fetchRoutePointsImages() {
-//        viewLifecycleOwner.lifecycleScope.launch {
-//            viewModel.images.collect { imagesList ->
-//                if (imagesList.isNotEmpty()) {
-//                    imagesList.forEach { image ->
-//                        pointsImages.addAll(image.imagesList)
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private fun configData() {
         with(binding) {

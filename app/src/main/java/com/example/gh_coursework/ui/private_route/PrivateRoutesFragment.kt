@@ -23,7 +23,7 @@ import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.model.ImageModel
-import com.example.gh_coursework.ui.point_details.adapter.ImageAdapter
+import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -78,8 +78,8 @@ class PrivateRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
-    private lateinit var routeImageAdapter: ImageAdapter
-    private lateinit var pointImageAdapter: ImageAdapter
+    private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
+    private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
 
     private lateinit var pointImageLayoutManager: LinearLayoutManager
     private lateinit var routeImageLayoutManager: LinearLayoutManager
@@ -943,7 +943,7 @@ class PrivateRoutesFragment :
             tagListTextView.text = details.tagList.joinToString(",", "Tags: ")
             { pointTagModel -> pointTagModel.name }
 
-            pointImageAdapter = ImageAdapter {
+            pointImagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivatePointImageDetails(
                     details.pointId!!,
                     pointImageLayoutManager.findFirstVisibleItemPosition()
@@ -951,11 +951,11 @@ class PrivateRoutesFragment :
             }
 
             imageRecycler.apply {
-                adapter = pointImageAdapter
+                adapter = pointImagesPreviewAdapter
                 layoutManager = pointImageLayoutManager
             }
 
-            pointImageAdapter.submitList(details.imageList)
+            pointImagesPreviewAdapter.submitList(details.imageList)
 
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(
@@ -1005,7 +1005,7 @@ class PrivateRoutesFragment :
                 }
             }
 
-            routeImageAdapter = ImageAdapter {
+            routeImagesPreviewAdapter = ImagesPreviewAdapter() {
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateRouteImageDetails(
                         route.routeId!!,
@@ -1015,7 +1015,7 @@ class PrivateRoutesFragment :
             }
 
             imageRecycler.apply {
-                adapter = routeImageAdapter
+                adapter = routeImagesPreviewAdapter
                 layoutManager = routeImageLayoutManager
             }
 
@@ -1024,7 +1024,7 @@ class PrivateRoutesFragment :
                 imageList.addAll(it.imageList)
             }
 
-            routeImageAdapter.submitList(imageList)
+            routeImagesPreviewAdapter.submitList(imageList)
 
             routeDetailsDeleteButton.setOnClickListener {
                 deleteRoute(route)
