@@ -246,6 +246,23 @@ class PrivateRoutesFragment :
         mapboxNavigation.startTripSession(withForegroundService = false)
     }
 
+    override fun onStart() {
+        super.onStart()
+        mapboxNavigation.registerRoutesObserver(routesObserver)
+        mapboxNavigation.registerLocationObserver(locationObserver)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mapboxNavigation.unregisterRoutesObserver(routesObserver)
+        mapboxNavigation.unregisterLocationObserver(locationObserver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mapboxNavigation.onDestroy()
+    }
+
     private fun configImageRecyclers() {
         PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogPointDetails.imageRecycler)
         PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogRouteDetails.imageRecycler)
@@ -289,6 +306,79 @@ class PrivateRoutesFragment :
         )
         binding.mapView.dispatchTouchEvent(clickEvent.first)
         binding.mapView.dispatchTouchEvent(clickEvent.second)
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun switchMapMod() {
+        mapState.observe(viewLifecycleOwner) {
+            with(binding) {
+                if (it == MapState.CREATOR) {
+                    setEmptyRoute()
+                    pointAnnotationManager.deleteAll()
+                    pointAnnotationManager.removeClickListener(onAnnotatedPointClickEvent)
+
+                    centralPointer.visibility = View.VISIBLE
+                    pointTypeSwitchButton.visibility = View.VISIBLE
+                    saveRouteButton.visibility = View.VISIBLE
+
+                    getRoutePointsList.visibility = View.INVISIBLE
+                    getRoutesList.visibility = View.INVISIBLE
+
+                    routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    routePointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+                    switchOnMapClickListener(pointTypeSwitchButton.isChecked)
+
+                    pointTypeSwitchButton.addSwitchObserver { _, isChecked ->
+                        switchOnMapClickListener(isChecked)
+                    }
+
+                    createButton.setImageDrawable(
+                        context?.getDrawable(
+                            R.drawable.ic_confirm
+                        )
+                    )
+
+                } else if (it == MapState.PRESENTATION) {
+                    getRoutePointsList.visibility = View.VISIBLE
+                    getRoutesList.visibility = View.VISIBLE
+
+                    centralPointer.visibility = View.INVISIBLE
+                    undoPointCreatingButton.visibility = View.INVISIBLE
+                    resetRouteButton.visibility = View.INVISIBLE
+                    pointTypeSwitchButton.visibility = View.INVISIBLE
+                    saveRouteButton.visibility = View.INVISIBLE
+
+                    mapboxMap.removeOnMapClickListener(onClickAddDefaultRoutePoint)
+                    mapboxMap.removeOnMapClickListener(onClickAddAnnotatedRoutePoint)
+
+                    pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
+
+                    createButton.setImageDrawable(
+                        context?.getDrawable(
+                            R.drawable.ic_add
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun switchOnMapClickListener(isChecked: Boolean) {
+        mapboxMap.removeOnMapClickListener(onClickAddAnnotatedRoutePoint)
+        mapboxMap.removeOnMapClickListener(onClickAddDefaultRoutePoint)
+
+        if (isChecked) {
+            mapboxMap.addOnMapClickListener(onClickAddDefaultRoutePoint)
+
+            binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
+        } else if (!isChecked) {
+            mapboxMap.addOnMapClickListener(onClickAddAnnotatedRoutePoint)
+
+            binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
+        }
     }
 
     private fun onNavigateToPrivatePointButtonClickListener() {
@@ -337,6 +427,22 @@ class PrivateRoutesFragment :
         }
     }
 
+    private fun saveRoute() {
+        if (creatingRouteCoordinatesList.size > 1) {
+            val route = RouteModel(
+                null,
+                "",
+                "",
+                null,
+                emptyList(),
+                emptyList()
+            )
+
+            viewModel.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
+            creatingRouteCoordinatesList.clear()
+        }
+    }
+
     private fun configUndoPointCreationButton() {
         if (mapState.value == MapState.CREATOR && creatingRouteCoordinatesList.size > 0) {
             binding.undoPointCreatingButton.apply {
@@ -360,6 +466,54 @@ class PrivateRoutesFragment :
                     resetCurrentRoute()
                     hide()
                 }
+            }
+        }
+    }
+
+    private fun resetCurrentRoute() {
+        setEmptyRoute()
+        pointAnnotationManager.deleteAll()
+        creatingRouteCoordinatesList.clear()
+        isRouteSaveable.value = false
+
+        binding.undoPointCreatingButton.visibility = View.GONE
+        binding.resetRouteButton.visibility = View.GONE
+    }
+
+    private fun undoPointCreating() {
+        when {
+            creatingRouteCoordinatesList.size > 2 -> {
+                if (!creatingRouteCoordinatesList.last().isRoutePoint) {
+                    pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
+                }
+
+                creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList[creatingRouteCoordinatesList.lastIndex])
+                buildRoute()
+            }
+
+            creatingRouteCoordinatesList.size == 2 -> {
+                if (!creatingRouteCoordinatesList.last().isRoutePoint) {
+                    pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
+                }
+
+                binding.resetRouteButton.visibility = View.GONE
+                creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList.last())
+                isRouteSaveable.value = false
+                setEmptyRoute()
+            }
+
+            creatingRouteCoordinatesList.size == 1 -> {
+                resetCurrentRoute()
+            }
+        }
+    }
+
+    private fun setEmptyRoute() {
+        val routeLines = emptyList<DirectionsRoute>().map { RouteLine(it, null) }
+
+        routeLineApi.setRoutes(routeLines) { value ->
+            mapboxMap.getStyle()?.apply {
+                routeLineView.renderRouteDrawData(this, value)
             }
         }
     }
@@ -522,6 +676,69 @@ class PrivateRoutesFragment :
         }
     }
 
+    override fun onRouteItemClick(route: RouteModel) {
+        rebuildRoute(route)
+        focusedRoute = route
+        routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    private fun rebuildRoute(route: RouteModel) {
+        focusedRoute = route
+
+        if (this::routePointsJob.isInitialized) {
+            routePointsJob.cancel()
+        }
+
+        routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
+            route.routeId?.let { routeId ->
+                viewModel.getRoutePointsList(routeId)
+                    .distinctUntilChanged()
+                    .collect { pointsList ->
+                        if (pointsList.isNotEmpty()) {
+                            currentRoutePointsList =
+                                pointsList.map { it.copy() } as MutableList<RoutePointModel>
+
+                            buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
+                            fetchAnnotatedRoutePoints()
+                            eraseCameraToPoint(
+                                currentRoutePointsList[0].x,
+                                currentRoutePointsList[0].y
+                            )
+                        }
+                    }
+            }
+        }
+    }
+
+    private fun buildRouteFromList(coordinatesList: List<Point>) {
+        mapboxNavigation.requestRoutes(
+            RouteOptions.builder()
+                .applyDefaultNavigationOptions()
+                .profile(PROFILE_WALKING)
+                .coordinatesList(coordinatesList)
+                .build(),
+            object : RouterCallback {
+                override fun onRoutesReady(
+                    routes: List<DirectionsRoute>,
+                    routerOrigin: RouterOrigin
+                ) {
+                    setRoute(routes)
+                }
+
+                override fun onFailure(
+                    reasons: List<RouterFailure>,
+                    routeOptions: RouteOptions
+                ) {
+                    // no impl
+                }
+
+                override fun onCanceled(routeOptions: RouteOptions, routerOrigin: RouterOrigin) {
+                    // no impl
+                }
+            }
+        )
+    }
+
     private fun fetchAnnotatedRoutePoints() {
         val annotatedPoints = mutableListOf<RoutePointModel>()
         val imageList = mutableListOf<ImageModel>()
@@ -582,114 +799,63 @@ class PrivateRoutesFragment :
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapboxNavigation.registerRoutesObserver(routesObserver)
-        mapboxNavigation.registerLocationObserver(locationObserver)
+    private fun addAnnotationToMap(point: RoutePointModel) {
+        activity?.applicationContext?.let {
+            convertDrawableToBitmap(
+                AppCompatResources.getDrawable(
+                    it,
+                    R.drawable.ic_pin_point
+                )
+            )?.let { image ->
+                pointAnnotationManager.create(
+                    createAnnotationPoint(
+                        image,
+                        Point.fromLngLat(point.x, point.y)
+                    ).withData(JsonPrimitive(point.pointId))
+                )
+            }
+        }
     }
 
-    override fun onStop() {
-        super.onStop()
-        mapboxNavigation.unregisterRoutesObserver(routesObserver)
-        mapboxNavigation.unregisterLocationObserver(locationObserver)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapboxNavigation.onDestroy()
-    }
-
-    @SuppressLint("UseCompatLoadingForDrawables")
-    private fun switchMapMod() {
-        mapState.observe(viewLifecycleOwner) {
-            with(binding) {
-                if (it == MapState.CREATOR) {
-                    setEmptyRoute()
-                    pointAnnotationManager.deleteAll()
-                    pointAnnotationManager.removeClickListener(onAnnotatedPointClickEvent)
-
-                    centralPointer.visibility = View.VISIBLE
-                    pointTypeSwitchButton.visibility = View.VISIBLE
-                    saveRouteButton.visibility = View.VISIBLE
-
-                    getRoutePointsList.visibility = View.INVISIBLE
-                    getRoutesList.visibility = View.INVISIBLE
-
-                    routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    routePointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-                    switchOnMapClickListener(pointTypeSwitchButton.isChecked)
-
-                    pointTypeSwitchButton.addSwitchObserver { _, isChecked ->
-                        switchOnMapClickListener(isChecked)
-                    }
-
-                    createButton.setImageDrawable(
-                        context?.getDrawable(
-                            R.drawable.ic_confirm
-                        )
+    private fun addFlagAnnotationToMap(point: Point, resourceId: Int) {
+        activity?.applicationContext?.let {
+            convertDrawableToBitmap(AppCompatResources.getDrawable(it, resourceId))?.let { image ->
+                pointAnnotationManager.create(
+                    createFlagAnnotationPoint(
+                        image,
+                        point
                     )
-
-                } else if (it == MapState.PRESENTATION) {
-                    getRoutePointsList.visibility = View.VISIBLE
-                    getRoutesList.visibility = View.VISIBLE
-
-                    centralPointer.visibility = View.INVISIBLE
-                    undoPointCreatingButton.visibility = View.INVISIBLE
-                    resetRouteButton.visibility = View.INVISIBLE
-                    pointTypeSwitchButton.visibility = View.INVISIBLE
-                    saveRouteButton.visibility = View.INVISIBLE
-
-                    mapboxMap.removeOnMapClickListener(onClickAddDefaultRoutePoint)
-                    mapboxMap.removeOnMapClickListener(onClickAddAnnotatedRoutePoint)
-
-                    pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
-
-                    createButton.setImageDrawable(
-                        context?.getDrawable(
-                            R.drawable.ic_add
-                        )
-                    )
-                }
+                )
             }
         }
     }
 
-    private fun switchOnMapClickListener(isChecked: Boolean) {
-        mapboxMap.removeOnMapClickListener(onClickAddAnnotatedRoutePoint)
-        mapboxMap.removeOnMapClickListener(onClickAddDefaultRoutePoint)
+    private fun addWaypoint(point: RoutePointModel) {
+        creatingRouteCoordinatesList.add(point)
 
-        if (isChecked) {
-            mapboxMap.addOnMapClickListener(onClickAddDefaultRoutePoint)
-
-            binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
-        } else if (!isChecked) {
-            mapboxMap.addOnMapClickListener(onClickAddAnnotatedRoutePoint)
-
-            binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
-        }
-    }
-
-    private fun setRoute(routes: List<DirectionsRoute>) {
-        val routeLines = routes.map { RouteLine(it, null) }
-
-        routeLineApi.setRoutes(routeLines) { value ->
-            mapboxMap.getStyle()?.apply {
-                routeLineView.renderRouteDrawData(this, value)
+        if (creatingRouteCoordinatesList.size == 1) {
+            if (binding.pointTypeSwitchButton.isChecked) {
+                addFlagAnnotationToMap(
+                    Point.fromLngLat(
+                        creatingRouteCoordinatesList[0].x,
+                        creatingRouteCoordinatesList[0].y
+                    ),
+                    R.drawable.ic_start_flag
+                )
+            } else {
+                addFlagAnnotationToMap(
+                    Point.fromLngLat(
+                        creatingRouteCoordinatesList[0].x,
+                        creatingRouteCoordinatesList[0].y + 0.00005
+                    ),
+                    R.drawable.ic_start_flag
+                )
             }
+        } else if (creatingRouteCoordinatesList.size == 2) {
+            isRouteSaveable.value = true
         }
-    }
 
-    private fun setEmptyRoute() {
-        val routeLines = emptyList<DirectionsRoute>().map { RouteLine(it, null) }
-
-        routeLineApi.setRoutes(routeLines) { value ->
-            mapboxMap.getStyle()?.apply {
-                routeLineView.renderRouteDrawData(this, value)
-            }
-        }
+        buildRoute()
     }
 
     private fun buildRoute() {
@@ -721,175 +887,12 @@ class PrivateRoutesFragment :
         )
     }
 
-    private fun buildRouteFromList(coordinatesList: List<Point>) {
-        mapboxNavigation.requestRoutes(
-            RouteOptions.builder()
-                .applyDefaultNavigationOptions()
-                .profile(PROFILE_WALKING)
-                .coordinatesList(coordinatesList)
-                .build(),
-            object : RouterCallback {
-                override fun onRoutesReady(
-                    routes: List<DirectionsRoute>,
-                    routerOrigin: RouterOrigin
-                ) {
-                    setRoute(routes)
-                }
+    private fun setRoute(routes: List<DirectionsRoute>) {
+        val routeLines = routes.map { RouteLine(it, null) }
 
-                override fun onFailure(
-                    reasons: List<RouterFailure>,
-                    routeOptions: RouteOptions
-                ) {
-                    // no impl
-                }
-
-                override fun onCanceled(routeOptions: RouteOptions, routerOrigin: RouterOrigin) {
-                    // no impl
-                }
-            }
-        )
-    }
-
-    private fun addWaypoint(point: RoutePointModel) {
-        configUndoPointCreationButton()
-        configResetRouteButton()
-        creatingRouteCoordinatesList.add(point)
-
-        if (creatingRouteCoordinatesList.size == 1) {
-            if (binding.pointTypeSwitchButton.isChecked) {
-                addFlagAnnotationToMap(
-                    Point.fromLngLat(
-                        creatingRouteCoordinatesList[0].x,
-                        creatingRouteCoordinatesList[0].y
-                    ),
-                    R.drawable.ic_start_flag
-                )
-            } else {
-                addFlagAnnotationToMap(
-                    Point.fromLngLat(
-                        creatingRouteCoordinatesList[0].x,
-                        creatingRouteCoordinatesList[0].y + 0.00005
-                    ),
-                    R.drawable.ic_start_flag
-                )
-            }
-        } else if (creatingRouteCoordinatesList.size == 2) {
-            isRouteSaveable.value = true
-        }
-
-        buildRoute()
-    }
-
-    private fun saveRoute() {
-        if (creatingRouteCoordinatesList.size > 1) {
-            val route = RouteModel(
-                null,
-                "",
-                "",
-                null,
-                emptyList(),
-                emptyList()
-            )
-
-            viewModel.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
-            creatingRouteCoordinatesList.clear()
-        }
-    }
-
-    private fun deleteRoute(route: RouteModel) {
-        resetCurrentRoute()
-        viewModel.deleteRoute(route)
-    }
-
-    private fun rebuildRoute(route: RouteModel) {
-        focusedRoute = route
-
-        if (this::routePointsJob.isInitialized) {
-            routePointsJob.cancel()
-        }
-
-        routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
-            route.routeId?.let { routeId ->
-                viewModel.getRoutePointsList(routeId)
-                    .distinctUntilChanged()
-                    .collect { pointsList ->
-                    if (pointsList.isNotEmpty()) {
-                        currentRoutePointsList =
-                            pointsList.map { it.copy() } as MutableList<RoutePointModel>
-
-                        buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
-                        fetchAnnotatedRoutePoints()
-                        eraseCameraToPoint(
-                            currentRoutePointsList[0].x,
-                            currentRoutePointsList[0].y
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private fun resetCurrentRoute() {
-        setEmptyRoute()
-        pointAnnotationManager.deleteAll()
-        creatingRouteCoordinatesList.clear()
-        isRouteSaveable.value = false
-
-        binding.undoPointCreatingButton.visibility = View.GONE
-        binding.resetRouteButton.visibility = View.GONE
-    }
-
-    private fun undoPointCreating() {
-        when {
-            creatingRouteCoordinatesList.size > 2 -> {
-                if (!creatingRouteCoordinatesList.last().isRoutePoint) {
-                    pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
-                }
-
-                creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList[creatingRouteCoordinatesList.lastIndex])
-                buildRoute()
-            }
-
-            creatingRouteCoordinatesList.size == 2 -> {
-                if (!creatingRouteCoordinatesList.last().isRoutePoint) {
-                    pointAnnotationManager.delete(pointAnnotationManager.annotations.last())
-                }
-
-                creatingRouteCoordinatesList.remove(creatingRouteCoordinatesList.last())
-                isRouteSaveable.value = false
-                setEmptyRoute()
-            }
-
-            creatingRouteCoordinatesList.size == 1 -> {
-                resetCurrentRoute()
-            }
-        }
-    }
-
-    override fun onRouteItemClick(route: RouteModel) {
-        rebuildRoute(route)
-        focusedRoute = route
-        routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
-
-    override fun onPointItemClick(pointId: Long) {
-        val pointPreview = currentRoutePointsList.find {
-            it.pointId == pointId
-        }
-
-        pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
-        routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
-
-    private fun addFlagAnnotationToMap(point: Point, resourceId: Int) {
-        activity?.applicationContext?.let {
-            convertDrawableToBitmap(AppCompatResources.getDrawable(it, resourceId))?.let { image ->
-                pointAnnotationManager.create(
-                    createFlagAnnotationPoint(
-                        image,
-                        point
-                    )
-                )
+        routeLineApi.setRoutes(routeLines) { value ->
+            mapboxMap.getStyle()?.apply {
+                routeLineView.renderRouteDrawData(this, value)
             }
         }
     }
@@ -912,22 +915,13 @@ class PrivateRoutesFragment :
         }
     }
 
-    private fun addAnnotationToMap(point: RoutePointModel) {
-        activity?.applicationContext?.let {
-            convertDrawableToBitmap(
-                AppCompatResources.getDrawable(
-                    it,
-                    R.drawable.ic_pin_point
-                )
-            )?.let { image ->
-                pointAnnotationManager.create(
-                    createAnnotationPoint(
-                        image,
-                        Point.fromLngLat(point.x, point.y)
-                    ).withData(JsonPrimitive(point.pointId))
-                )
-            }
+    override fun onPointItemClick(pointId: Long) {
+        val pointPreview = currentRoutePointsList.find {
+            it.pointId == pointId
         }
+
+        pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
+        routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
     private fun loadAnnotatedPointData(annotation: PointAnnotation) {
@@ -1024,7 +1018,7 @@ class PrivateRoutesFragment :
                 }
             }
 
-            routeImagesPreviewAdapter = ImagesPreviewAdapter() {
+            routeImagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateRouteImageDetails(
                         route.routeId!!,
@@ -1051,6 +1045,11 @@ class PrivateRoutesFragment :
                 routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
+    }
+
+    private fun deleteRoute(route: RouteModel) {
+        resetCurrentRoute()
+        viewModel.deleteRoute(route)
     }
 
     private fun eraseCameraToPoint(x: Double, y: Double) {
