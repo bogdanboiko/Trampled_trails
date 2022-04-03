@@ -4,5 +4,6 @@
     <string name="public_menu_item">Public</string>
     <string name="private_menu_item">Private</string>
     <string name="txtCancelButtonExit">exit</string>
-    <string name="txtCancelButtonSave">save</string>
+    <string name="txtSaveButtonDisable">disable</string>
+    <string name="txtSaveButtonSave">save</string>
 </resources>
