@@ -125,7 +125,7 @@
         app:checked="true"
         app:enabled="true"
         app:forceAspectRatio="false"
-        app:layout_constraintBottom_toTopOf="@+id/undoPointCreatingButton"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:switchBkgCheckedColor="@color/purple_200"
@@ -137,7 +137,7 @@
         app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/cancelButton"
+        android:id="@+id/saveRouteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
@@ -145,7 +145,7 @@
         android:layout_marginEnd="15dp"
         android:elevation="2dp"
         android:paddingStart="20dp"
-        android:text="@string/txtCancelButtonExit"
+        android:text="@string/txtSaveButtonDisable"
         android:visibility="invisible"
         app:icon="@drawable/ic_close"
         app:iconGravity="start"
@@ -181,7 +181,7 @@
         </com.google.android.material.bottomappbar.BottomAppBar>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab"
+            android:id="@+id/createButton"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:contentDescription="@string/app_name"

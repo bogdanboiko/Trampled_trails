@@ -176,6 +176,10 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                     )
                 )
             }
+
+            backImageButton.setOnClickListener {
+                findNavController().popBackStack()
+            }
         }
     }
 

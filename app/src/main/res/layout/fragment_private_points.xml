@@ -34,7 +34,7 @@
         android:layout_marginTop="25dp"
         android:layout_marginEnd="15dp"
         android:paddingStart="20dp"
-        android:text="@string/txtCancelButtonExit"
+        android:text="@string/txtSaveButtonDisable"
         android:visibility="invisible"
         app:iconGravity="start"
         app:icon="@drawable/ic_close"
