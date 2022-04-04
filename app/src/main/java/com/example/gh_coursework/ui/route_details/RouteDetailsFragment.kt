@@ -179,7 +179,7 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                 routeDescriptionText.hint = "Put in point description..."
             }
 
-            pointImageAddButton.setOnClickListener {
+            routeImageAddButton.setOnClickListener {
                 val transitionToGallery = Intent()
                 transitionToGallery.type = "image/*"
                 transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
@@ -190,6 +190,10 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                         "Select pictures"
                     )
                 )
+            }
+
+            backImageButton.setOnClickListener {
+                findNavController().popBackStack()
             }
         }
     }

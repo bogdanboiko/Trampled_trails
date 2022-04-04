@@ -74,13 +74,22 @@
                     android:src="@drawable/ic_tag" />
 
                 <ImageButton
-                    android:id="@+id/pointImageAddButton"
+                    android:id="@+id/routeImageAddButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:src="@drawable/ic_image"
                     android:background="@color/transparent"
                     android:padding="20dp" />
+
+                <ImageButton
+                    android:id="@+id/backImageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:src="@drawable/ic_back"
+                    android:background="@color/transparent"
+                    />
 
             </Toolbar>
         </com.google.android.material.appbar.CollapsingToolbarLayout>

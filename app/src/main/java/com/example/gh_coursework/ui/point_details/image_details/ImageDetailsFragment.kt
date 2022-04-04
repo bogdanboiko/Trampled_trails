@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -51,6 +52,10 @@ class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
                 imageFile.delete()
             }
             viewModel.deletePointImage(imageData)
+        }
+
+        binding.backImageButton.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 
