@@ -25,6 +25,17 @@
         android:background="@drawable/ic_points"
         android:elevation="-2dp"/>
 
+    <ImageButton
+        android:id="@+id/homepageButton"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginEnd="15dp"
+        android:layout_marginTop="35dp"
+        android:background="@drawable/ic_home"
+        android:elevation="-2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/cancelButton"
         android:layout_width="wrap_content"
