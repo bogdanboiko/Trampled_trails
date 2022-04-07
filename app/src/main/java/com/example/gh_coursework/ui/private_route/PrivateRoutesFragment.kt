@@ -235,6 +235,7 @@ class PrivateRoutesFragment :
         configMapStateSwitcher()
         switchMapMod()
         onNavigateToPrivatePointButtonClickListener()
+        onNavigateToHomepageButtonClickListener()
         configSaveRouteButton()
         setUpBottomSheetsRecyclers()
         configImageRecyclers()
@@ -254,6 +255,7 @@ class PrivateRoutesFragment :
 
     override fun onStop() {
         super.onStop()
+        locationObserver.firstLocationUpdateReceived = false
         mapboxNavigation.unregisterRoutesObserver(routesObserver)
         mapboxNavigation.unregisterLocationObserver(locationObserver)
     }
@@ -389,6 +391,16 @@ class PrivateRoutesFragment :
             )
         }
     }
+
+    private fun onNavigateToHomepageButtonClickListener() {
+        binding.homepageButton.setOnClickListener {
+            findNavController().navigate(
+                PrivateRoutesFragmentDirections
+                    .actionPrivateRoutesFragmentToHomepageFragment()
+            )
+        }
+    }
+
 
     private fun configSaveRouteButton() {
         isRouteSaveable.observe(viewLifecycleOwner) {

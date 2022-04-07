@@ -23,6 +23,10 @@
             android:id="@+id/action_privatePointsFragment_to_privateImageDetails"
             app:destination="@id/privateImageDetails"
             app:popUpTo="@id/privatePointsFragment"/>
+        <action
+            android:id="@+id/action_privatePointsFragment_to_homepageFragment"
+            app:destination="@id/homepageFragment"
+            app:popUpTo="@id/privatePointsFragment"/>
     </fragment>
     <fragment
         android:id="@+id/pointDetailsFragment"
@@ -86,6 +90,10 @@
             android:id="@+id/action_privateRoutesFragment_to_privatePointImageDetails"
             app:destination="@id/privateImageDetails"
             app:popUpTo="@id/privateRoutesFragment"/>
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_homepageFragment"
+            app:destination="@id/homepageFragment"
+            app:popUpTo="@id/privateRoutesFragment"/>
     </fragment>
 
     <fragment
@@ -125,5 +133,13 @@
             app:argType="long" />
         <argument android:name="clickedItemCount"
             app:argType="integer" />
+    </fragment>
+
+    <!--Home-->
+    <fragment
+        android:id="@+id/homepageFragment"
+        android:name="com.example.gh_coursework.ui.home.HomepageFragment"
+        android:label="fragment_homepage"
+        tools:layout="@layout/fragment_homepage">
     </fragment>
 </navigation>

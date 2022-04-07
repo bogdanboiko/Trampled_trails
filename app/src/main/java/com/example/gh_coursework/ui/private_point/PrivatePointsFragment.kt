@@ -109,6 +109,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         configMapModSwitcher()
         configCancelButton()
         configBottomSheetDialog()
+        onNavigateToHomepageButtonClickListener()
         fetchPoints()
 
         val callback: OnBackPressedCallback =
@@ -187,6 +188,15 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             mapboxMap.removeOnMapClickListener(onMapClickListener)
             pointAnnotationManager.addClickListener(onPointClickEvent)
             mapState = MapState.PRESENTATION
+        }
+    }
+
+    private fun onNavigateToHomepageButtonClickListener() {
+        binding.homepageButton.setOnClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections
+                    .actionPrivatePointsFragmentToHomepageFragment()
+            )
         }
     }
 
