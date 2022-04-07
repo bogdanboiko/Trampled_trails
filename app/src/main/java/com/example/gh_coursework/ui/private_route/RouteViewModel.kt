@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.image.AddRouteImageListUseCase
 import com.example.gh_coursework.domain.usecase.image.GetRouteImagesUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
+import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.DeleteRouteUseCase
@@ -28,7 +29,8 @@ class RouteViewModel(
     private val addRouteImageListUseCase: AddRouteImageListUseCase,
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
     private val deletePointUseCase: DeletePointUseCase,
-    private val deleteRouteUseCase: DeleteRouteUseCase
+    private val deleteRouteUseCase: DeleteRouteUseCase,
+    private val publishRouteUseCase: PublishRouteUseCase
 ) : ViewModel() {
 
     val routes = getRoutesListUseCase.invoke()
@@ -65,5 +67,9 @@ class RouteViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             deleteRouteUseCase.invoke(mapRouteModelToDomainMapper(route))
         }
+    }
+
+    fun publishRoute(route: RouteModel, routePoints: List<RoutePointModel>) {
+        publishRouteUseCase.invoke(mapRouteModelToDomainMapper(route), routePoints.map(::mapRoutePointModelToDomainMapper))
     }
 }

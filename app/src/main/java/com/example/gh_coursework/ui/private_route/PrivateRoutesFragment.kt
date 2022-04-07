@@ -3,6 +3,7 @@ package com.example.gh_coursework.ui.private_route
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -998,6 +999,10 @@ class PrivateRoutesFragment :
     private fun prepareRouteDetailsDialog(
         route: RouteModel
     ) {
+
+        Log.e("e", route.toString())
+        Log.e("e", currentRoutePointsList.toString())
+
         val imageList = mutableListOf<ImageModel>()
 
         binding.bottomSheetDialogRouteDetails.apply {
@@ -1016,6 +1021,10 @@ class PrivateRoutesFragment :
                             .actionPrivateRoutesFragmentToRouteDetailsFragment(it)
                     )
                 }
+            }
+
+            routePublishButton.setOnClickListener {
+                viewModel.publishRoute(route, currentRoutePointsList)
             }
 
             routeImagesPreviewAdapter = ImagesPreviewAdapter {
