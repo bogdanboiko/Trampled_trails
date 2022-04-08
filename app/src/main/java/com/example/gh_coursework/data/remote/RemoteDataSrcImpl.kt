@@ -1,8 +1,6 @@
 package com.example.gh_coursework.data.remote
 
 import android.net.Uri
-import android.util.Log
-import androidx.core.net.toFile
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.data.remote.mapper.mapRouteDomainToPublicRouteEntity
 import com.example.gh_coursework.data.remote.mapper.mapRoutePointDomainToPublicRoutePointEntity
@@ -23,20 +21,30 @@ class RemoteDataSrcImpl : TravelDatasource.Remote {
 
         route.imageList.forEach { imageUrl ->
             val generatedImageId = UUID.randomUUID().toString()
-            ref.child("route_images/$generatedImageId")
-                .putFile(Uri.parse(imageUrl.image)).addOnSuccessListener {
-                    imageUrls.add(generatedImageId)
-                }
+            val routeImageReference = ref.child("route_images/$generatedImageId")
+            imageUrls.add(routeImageReference.path)
+            routeImageReference.putFile(Uri.parse(imageUrl.image))
         }
 
         db.collection("routes")
             .add(mapRouteDomainToPublicRouteEntity(route, imageUrls))
             .addOnSuccessListener { routeDocument ->
                 routePoints.forEach { routePoint ->
+
+                    val pointImageUrls = mutableListOf<String>()
+
+                    routePoint.imageList.forEach { imageUrl ->
+                        val generatedImageId = UUID.randomUUID().toString()
+
+                        val routeImageReference = ref.child("point_images/$generatedImageId")
+                        pointImageUrls.add(routeImageReference.path)
+                        routeImageReference.putFile(Uri.parse(imageUrl.image))
+                    }
+
                     db.collection("routes")
                         .document(routeDocument.id)
                         .collection("points")
-                        .add(mapRoutePointDomainToPublicRoutePointEntity(routePoint))
+                        .add(mapRoutePointDomainToPublicRoutePointEntity(routePoint, pointImageUrls))
                 }
             }
     }
