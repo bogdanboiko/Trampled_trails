@@ -12,6 +12,7 @@ import com.google.firebase.ktx.Firebase
 class RemoteDataSrcImpl : TravelDatasource.Remote {
     private val db = Firebase.firestore
     override fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>) {
+        Log.e("e", route.imageList.toString())
         db.collection("routes")
             .add(mapRouteDomainToPublicRouteEntity(route))
             .addOnSuccessListener {
