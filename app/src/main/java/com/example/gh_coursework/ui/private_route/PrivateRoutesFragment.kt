@@ -48,6 +48,7 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
@@ -285,6 +286,8 @@ class PrivateRoutesFragment :
             setLocationProvider(navigationLocationProvider)
             enabled = true
         }
+
+        binding.mapView.compass.enabled = false
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
     }
