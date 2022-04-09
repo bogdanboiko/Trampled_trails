@@ -94,6 +94,7 @@ class PrivateRoutesFragment :
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private lateinit var focusedRoute: RouteModel
+    private lateinit var lastSeenCoordinate: Point
     private lateinit var routePointsJob: Job
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -252,11 +253,14 @@ class PrivateRoutesFragment :
         super.onStart()
         mapboxNavigation.registerRoutesObserver(routesObserver)
         mapboxNavigation.registerLocationObserver(locationObserver)
+
+        if (this::lastSeenCoordinate.isInitialized) {
+            eraseCameraToPoint(lastSeenCoordinate.longitude(), lastSeenCoordinate.latitude())
+        }
     }
 
     override fun onStop() {
         super.onStop()
-        locationObserver.firstLocationUpdateReceived = false
         mapboxNavigation.unregisterRoutesObserver(routesObserver)
         mapboxNavigation.unregisterLocationObserver(locationObserver)
     }
@@ -397,6 +401,8 @@ class PrivateRoutesFragment :
 
     private fun onNavigateToHomepageButtonClickListener() {
         binding.homepageButton.setOnClickListener {
+            lastSeenCoordinate = binding.mapView.getMapboxMap().cameraState.center
+
             findNavController().navigate(
                 PrivateRoutesFragmentDirections
                     .actionPrivateRoutesFragmentToHomepageFragment()
