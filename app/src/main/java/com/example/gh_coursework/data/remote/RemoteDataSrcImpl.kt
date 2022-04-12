@@ -21,7 +21,7 @@ class RemoteDataSrcImpl : TravelDatasource.Remote {
 
     override fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>) {
         db.collection("routes")
-            .add(hashMapOf("imageList" to "routeImageUrls") as Map<String, Any>)
+            .add(mapRouteDomainToPublicRouteEntity(route))
             .addOnSuccessListener { routeDocument ->
                 Log.e("e", "eeee")
                 val routeImageUrls = mutableListOf<String>()
