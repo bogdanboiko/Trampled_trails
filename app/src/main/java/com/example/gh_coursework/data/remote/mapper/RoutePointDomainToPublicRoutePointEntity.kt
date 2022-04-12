@@ -4,13 +4,12 @@ import com.example.gh_coursework.data.remote.entity.PublicRoutePointEntity
 import com.example.gh_coursework.domain.entity.RoutePointDomain
 
 fun mapRoutePointDomainToPublicRoutePointEntity(
-    routePoint: RoutePointDomain,
-    pointImageUrls: MutableList<String>
+    routePoint: RoutePointDomain
 ): PublicRoutePointEntity {
     return PublicRoutePointEntity(
         routePoint.caption,
         routePoint.description,
-        pointImageUrls,
+        emptyList(),
         routePoint.x,
         routePoint.y
     )
