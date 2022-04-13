@@ -19,10 +19,10 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
-
 class HomepageFragment : Fragment() {
 
     private lateinit var binding: FragmentHomepageBinding
+    private val homepageAdapter = HomepageAdapter()
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
 
     override fun onCreateView(
@@ -37,11 +37,8 @@ class HomepageFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        setUpRecycler()
         configHomepage(firebaseUser != null)
-
-        binding.signInButton.setOnClickListener {
-            signIn()
-        }
     }
 
     private fun signIn() {
@@ -80,8 +77,9 @@ class HomepageFragment : Fragment() {
     private fun configHomepage(isUserLoggedIn: Boolean) {
         with(binding) {
             if (isUserLoggedIn) {
-                txtUsername.text = "Hello, ${firebaseUser!!.displayName}!"
                 editIconButton.visibility = View.VISIBLE
+                txtUsername.text = "Hello, ${firebaseUser!!.displayName}!"
+                homepageRecycler.visibility = View.VISIBLE
                 signInButton.visibility = View.GONE
 
                 Glide.with(requireActivity())
@@ -91,16 +89,27 @@ class HomepageFragment : Fragment() {
                     .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                     .into(imgUserIcon)
             } else {
-                txtUsername.text = ""
-                signInButton.visibility = View.VISIBLE
                 editIconButton.visibility = View.GONE
+                txtUsername.visibility = View.GONE
+                homepageRecycler.visibility = View.GONE
+                signInButton.visibility = View.VISIBLE
 
                 Glide.with(requireActivity())
                     .load(R.drawable.ic_user)
                     .placeholder(imgUserIcon.drawable)
                     .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                     .into(imgUserIcon)
+
+                binding.signInButton.setOnClickListener {
+                    signIn()
+                }
             }
+        }
+    }
+
+    private fun setUpRecycler() {
+        binding.homepageRecycler.apply {
+            adapter = homepageAdapter
         }
     }
 }
