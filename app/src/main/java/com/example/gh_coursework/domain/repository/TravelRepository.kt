@@ -39,4 +39,7 @@ interface TravelRepository {
     fun getRoutePointsImagesList(routeId: Long): Flow<List<RoutePointsImagesDomain>>
 
     fun getRouteTags(): Flow<List<RouteTagDomain>>
+
+    //Public
+    fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>)
 }

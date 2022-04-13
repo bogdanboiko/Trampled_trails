@@ -631,7 +631,6 @@ class PrivateRoutesFragment :
             loadAnnotatedPointData(annotation)
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             loadAnnotatedPointData(annotation)
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
@@ -1016,6 +1015,10 @@ class PrivateRoutesFragment :
                             .actionPrivateRoutesFragmentToRouteDetailsFragment(it)
                     )
                 }
+            }
+
+            routePublishButton.setOnClickListener {
+                viewModel.publishRoute(route, currentRoutePointsList)
             }
 
             routeImagesPreviewAdapter = ImagesPreviewAdapter {

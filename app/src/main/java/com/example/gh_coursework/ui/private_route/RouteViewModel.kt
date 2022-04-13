@@ -1,19 +1,20 @@
 package com.example.gh_coursework.ui.private_route
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.image.AddRouteImageListUseCase
-import com.example.gh_coursework.domain.usecase.image.GetRouteImagesUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
+import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.DeleteRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
 import com.example.gh_coursework.ui.model.ImageModel.RouteImageModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
-import com.example.gh_coursework.ui.private_route.mapper.mapRouteModelToDomainMapper
+import com.example.gh_coursework.ui.private_route.mapper.mapRouteModelToDomain
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDomainToModel
-import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointModelToDomainMapper
+import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointModelToDomain
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageModelToDomain
@@ -28,7 +29,8 @@ class RouteViewModel(
     private val addRouteImageListUseCase: AddRouteImageListUseCase,
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
     private val deletePointUseCase: DeletePointUseCase,
-    private val deleteRouteUseCase: DeleteRouteUseCase
+    private val deleteRouteUseCase: DeleteRouteUseCase,
+    private val publishRouteUseCase: PublishRouteUseCase
 ) : ViewModel() {
 
     val routes = getRoutesListUseCase.invoke()
@@ -37,8 +39,8 @@ class RouteViewModel(
     fun addRoute(route: RouteModel, pointsList: List<RoutePointModel>) {
         viewModelScope.launch(Dispatchers.IO) {
             addRouteUseCase.invoke(
-                mapRouteModelToDomainMapper(route),
-                pointsList.map(::mapRoutePointModelToDomainMapper)
+                mapRouteModelToDomain(route),
+                pointsList.map(::mapRoutePointModelToDomain)
             )
         }
     }
@@ -63,7 +65,13 @@ class RouteViewModel(
 
     fun deleteRoute(route: RouteModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteRouteUseCase.invoke(mapRouteModelToDomainMapper(route))
+            deleteRouteUseCase.invoke(mapRouteModelToDomain(route))
         }
+    }
+
+    fun publishRoute(route: RouteModel, routePoints: List<RoutePointModel>) {
+        Log.e("e", routePoints.map(::mapRoutePointModelToDomain).toString())
+        Log.e("e", mapRouteModelToDomain(route).toString())
+        publishRouteUseCase.invoke(mapRouteModelToDomain(route), routePoints.map(::mapRoutePointModelToDomain))
     }
 }

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "380237413037",
+    "project_id": "gh-coursework-f4257",
+    "storage_bucket": "gh-coursework-f4257.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380237413037:android:da12645e71180e78112424",
+        "android_client_info": {
+          "package_name": "com.example.gh_coursework"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "380237413037-hrvkulti0n677dkq55fngteav9hvgq44.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gh_coursework",
+            "certificate_hash": "b0c588ad7a69a9e73b9c19dd332caa7139fec4c5"
+          }
+        },
+        {
+          "client_id": "380237413037-0fvf3i1me25bj808bvoqdjd45nskk5im.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCchrNMIwPzDsPDMjlMIDzA_4-N_vrfyY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "380237413037-0fvf3i1me25bj808bvoqdjd45nskk5im.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
