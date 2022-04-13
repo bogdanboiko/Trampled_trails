@@ -1,14 +1,12 @@
 package com.example.gh_coursework.data.remote
 
 import android.net.Uri
-import android.util.Log
 import androidx.core.net.toFile
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.data.remote.mapper.mapRouteDomainToPublicRouteEntity
 import com.example.gh_coursework.data.remote.mapper.mapRoutePointDomainToPublicRoutePointEntity
 import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.domain.entity.RoutePointDomain
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -23,7 +21,6 @@ class RemoteDataSrcImpl : TravelDatasource.Remote {
         db.collection("routes")
             .add(mapRouteDomainToPublicRouteEntity(route))
             .addOnSuccessListener { routeDocument ->
-                Log.e("e", "eeee")
                 val routeImageUrls = mutableListOf<String>()
 
                 route.imageList.forEach { imageUrl ->
