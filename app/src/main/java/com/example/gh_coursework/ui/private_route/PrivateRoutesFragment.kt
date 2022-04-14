@@ -24,6 +24,7 @@ import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.model.ImageModel
+import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -234,6 +235,7 @@ class PrivateRoutesFragment :
         configMap()
         configMapStateSwitcher()
         switchMapMod()
+        configBottomNavBar()
         onNavigateToPrivatePointButtonClickListener()
         configSaveRouteButton()
         setUpBottomSheetsRecyclers()
@@ -244,6 +246,17 @@ class PrivateRoutesFragment :
         fetchRoutes()
 
         mapboxNavigation.startTripSession(withForegroundService = false)
+    }
+
+    private fun configBottomNavBar() {
+        binding.bottomNavigationView.menu.getItem(2).isChecked = true
+        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
+            findNavController().navigate(
+                PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment()
+            )
+
+            return@setOnMenuItemClickListener true
+        }
     }
 
     override fun onStart() {
