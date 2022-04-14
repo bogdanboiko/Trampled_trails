@@ -1,25 +1,21 @@
 package com.example.gh_coursework.ui.public_route
 
 import androidx.lifecycle.ViewModel
-import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
-import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
-import com.example.gh_coursework.ui.public_route.mapper.mapRouteDomainToModel
-import com.example.gh_coursework.ui.public_route.mapper.mapRoutePointDomainToModel
-import com.example.gh_coursework.ui.public_route.model.RoutePointModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.cachedIn
+import com.example.gh_coursework.data.remote.FirestorePagingSource
+import com.google.firebase.firestore.FirebaseFirestore
+
 
 class PublicRouteViewModel(
-    getRoutesListUseCase: GetRoutesListUseCase,
-    private val getRoutePointsListUseCase: GetRoutePointsListUseCase
+    private val db: FirebaseFirestore
 ) : ViewModel() {
 
-    val routes = getRoutesListUseCase.invoke()
-        .map { route -> route.map(::mapRouteDomainToModel) }
-
-    fun getRoutePointsList(routeId: Long): Flow<List<RoutePointModel>> {
-        return getRoutePointsListUseCase.invoke(routeId).map {
-            it.map(::mapRoutePointDomainToModel)
-        }
-    }
+    val routeList = Pager(
+            PagingConfig(pageSize = 10)
+        ) {
+            FirestorePagingSource(db.collection("routes").limit(10))
+        }.flow.cachedIn(viewModelScope)
 }

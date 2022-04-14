@@ -9,27 +9,27 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
+import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
-import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
+import com.example.gh_coursework.data.remote.mapper.mapPublicRouteResponseToDomain
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
-import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.model.ImageModel
 import com.example.gh_coursework.ui.public_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.public_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.public_route.adapter.RoutesListAdapter
 import com.example.gh_coursework.ui.public_route.adapter.RoutesListAdapterCallback
 import com.example.gh_coursework.ui.public_route.mapper.mapPrivateRoutePointModelToPoint
-import com.example.gh_coursework.ui.public_route.model.RouteModel
+import com.example.gh_coursework.ui.public_route.mapper.mapPublicRouteDomainToModel
+import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
@@ -48,9 +48,6 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
-import com.mapbox.maps.plugin.gestures.OnMapClickListener
-import com.mapbox.maps.plugin.gestures.addOnMapClickListener
-import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
 import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
@@ -75,7 +72,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PublicRoutesFragment :
-    Fragment(R.layout.fragment_private_route),
+    Fragment(R.layout.fragment_public_route),
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
@@ -91,7 +88,7 @@ class PublicRoutesFragment :
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
-    private lateinit var focusedRoute: RouteModel
+    private lateinit var focusedPublicRoute: PublicRouteModel
     private lateinit var routePointsJob: Job
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -322,7 +319,7 @@ class PublicRoutesFragment :
     }
 
     private fun getRouteDetailsDialog() {
-        prepareRouteDetailsDialog(focusedRoute)
+        prepareRouteDetailsDialog(focusedPublicRoute)
 
         routesDialogBehavior.peekHeight = 0
         routePointsDialogBehavior.peekHeight = 0
@@ -382,57 +379,46 @@ class PublicRoutesFragment :
 
     private fun fetchRoutes() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModelPublic.routes
+            viewModelPublic.routeList
                 .collect { route ->
-                    if (route.isNotEmpty()) {
-                        rebuildRoute(route.last())
-                        routesListAdapter.submitList(route)
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                            View.GONE
-                    } else if (route.isEmpty()) {
-                        routesListAdapter.submitList(route)
-                        pointsListAdapter.submitList(emptyList())
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                            View.VISIBLE
-                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
-                            View.VISIBLE
-                    }
+                    routesListAdapter.submitData(route.map { mapPublicRouteResponseToDomain(it) }
+                        .map { mapPublicRouteDomainToModel(it) })
                 }
         }
     }
 
-    override fun onRouteItemClick(route: RouteModel) {
-        rebuildRoute(route)
-        focusedRoute = route
+    override fun onRouteItemClick(publicRoute: PublicRouteModel) {
+        rebuildRoute(publicRoute)
+        focusedPublicRoute = publicRoute
         routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
-    private fun rebuildRoute(route: RouteModel) {
-        focusedRoute = route
+    private fun rebuildRoute(publicRoute: PublicRouteModel) {
+        focusedPublicRoute = publicRoute
 
         if (this::routePointsJob.isInitialized) {
             routePointsJob.cancel()
         }
 
-        routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
-            route.routeId?.let { routeId ->
-                viewModelPublic.getRoutePointsList(routeId)
-                    .distinctUntilChanged()
-                    .collect { pointsList ->
-                        if (pointsList.isNotEmpty()) {
-                            currentRoutePointsList =
-                                pointsList.map { it.copy() } as MutableList<RoutePointModel>
-
-                            buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
-                            fetchAnnotatedRoutePoints()
-                            eraseCameraToPoint(
-                                currentRoutePointsList[0].x,
-                                currentRoutePointsList[0].y
-                            )
-                        }
-                    }
-            }
-        }
+//        routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
+//            publicRoute.routeId?.let { routeId ->
+//                viewModelPublic.getRoutePointsList(routeId)
+//                    .distinctUntilChanged()
+//                    .collect { pointsList ->
+//                        if (pointsList.isNotEmpty()) {
+//                            currentRoutePointsList =
+//                                pointsList.map { it.copy() } as MutableList<RoutePointModel>
+//
+//                            buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
+//                            fetchAnnotatedRoutePoints()
+//                            eraseCameraToPoint(
+//                                currentRoutePointsList[0].x,
+//                                currentRoutePointsList[0].y
+//                            )
+//                        }
+//                    }
+//            }
+//        }
     }
 
     private fun buildRouteFromList(coordinatesList: List<Point>) {
@@ -601,10 +587,10 @@ class PublicRoutesFragment :
             }
 
             pointImagesPreviewAdapter = ImagesPreviewAdapter {
-               // findNavController().navigate(
-                    // TODO ("Navigation")
-               //     )
-               // )
+                // findNavController().navigate(
+                // TODO ("Navigation")
+                //     )
+                // )
             }
 
             imageRecycler.apply {
@@ -624,21 +610,21 @@ class PublicRoutesFragment :
     }
 
     private fun prepareRouteDetailsDialog(
-        route: RouteModel
+        publicRoute: PublicRouteModel
     ) {
         val imageList = mutableListOf<ImageModel>()
 
         binding.bottomSheetDialogRouteDetails.apply {
-            if (route.name?.isEmpty() == true && route.description?.isEmpty() == true) {
+            if (publicRoute.name?.isEmpty() == true && publicRoute.description?.isEmpty() == true) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                routeCaptionText.text = route.name
-                routeDescriptionText.text = route.description
+                routeCaptionText.text = publicRoute.name
+                routeDescriptionText.text = publicRoute.description
                 emptyDataPlaceholder.visibility = View.GONE
             }
 
             routeDetailsEditButton.setOnClickListener {
-                route.routeId?.let {
+                publicRoute.routeId?.let {
                     // findNavController().navigate(
                     // TODO ("Navigation")
                     //     )
@@ -658,7 +644,7 @@ class PublicRoutesFragment :
                 layoutManager = routeImageLayoutManager
             }
 
-            imageList.addAll(route.imageList)
+            //imageList.addAll(publicRoute.imageList)
             currentRoutePointsList.forEach {
                 imageList.addAll(it.imageList)
             }
