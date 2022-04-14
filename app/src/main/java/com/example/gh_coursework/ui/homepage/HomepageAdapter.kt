@@ -6,9 +6,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.ItemHomepageBinding
 
+interface HomepageCallback {
+    fun onSettingsClick()
+    fun onEditClick()
+    fun onLogOutClick()
+}
+
 data class Data(val viewType: Int, val image: Int, val text: String)
 
-class HomepageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class HomepageAdapter(private val callback: HomepageCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val VIEW_TYPE_SETTINGS = 1
@@ -76,6 +82,10 @@ class HomepageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         fun bind(item: Data) {
             binding.imgItemHomepage.setImageResource(item.image)
             binding.txtItemHomepage.text = item.text
+
+            binding.root.setOnClickListener {
+                callback.onSettingsClick()
+            }
         }
     }
 
@@ -85,6 +95,10 @@ class HomepageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         fun bind(item: Data) {
             binding.imgItemHomepage.setImageResource(item.image)
             binding.txtItemHomepage.text = item.text
+
+            binding.root.setOnClickListener {
+                callback.onEditClick()
+            }
         }
     }
 
@@ -94,6 +108,10 @@ class HomepageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
         fun bind(item: Data) {
             binding.imgItemHomepage.setImageResource(item.image)
             binding.txtItemHomepage.text = item.text
+
+            binding.root.setOnClickListener {
+                callback.onLogOutClick()
+            }
         }
     }
 }
