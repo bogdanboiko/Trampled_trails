@@ -5,5 +5,6 @@ data class PublicRoutePointEntity(
     val description: String,
     val imageList: List<String>,
     val x: Double,
-    val y: Double
+    val y: Double,
+    val isRoutePoint: Boolean
 )
