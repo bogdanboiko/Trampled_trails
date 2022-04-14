@@ -20,10 +20,7 @@ import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.model.ImageModel
-import com.example.gh_coursework.ui.public_route.adapter.RoutePointsListAdapter
-import com.example.gh_coursework.ui.public_route.adapter.RoutePointsListCallback
-import com.example.gh_coursework.ui.public_route.adapter.RoutesListAdapter
-import com.example.gh_coursework.ui.public_route.adapter.RoutesListAdapterCallback
+import com.example.gh_coursework.ui.public_route.adapter.*
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -70,8 +67,8 @@ class PublicRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
-    private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
-    private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
+    private lateinit var routeImagesPreviewAdapter: PublicImageAdapter
+    private lateinit var pointImagesPreviewAdapter: PublicImageAdapter
 
     private lateinit var pointImageLayoutManager: LinearLayoutManager
     private lateinit var routeImageLayoutManager: LinearLayoutManager
@@ -393,25 +390,22 @@ class PublicRoutesFragment :
             routePointsJob.cancel()
         }
 
-//        routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
-//            publicRoute.routeId?.let { routeId ->
-//                viewModelPublic.getRoutePointsList(routeId)
-//                    .distinctUntilChanged()
-//                    .collect { pointsList ->
-//                        if (pointsList.isNotEmpty()) {
-//                            currentRoutePointsList =
-//                                pointsList.map { it.copy() } as MutableList<RoutePointModel>
-//
-//                            buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
-//                            fetchAnnotatedRoutePoints()
-//                            eraseCameraToPoint(
-//                                currentRoutePointsList[0].x,
-//                                currentRoutePointsList[0].y
-//                            )
-//                        }
-//                    }
-//            }
-//        }
+        routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModelPublic.fetchRoutePoints(publicRoute.routeId)
+                .collect { pointsList ->
+                    if (pointsList.isNotEmpty()) {
+                        currentRoutePointsList =
+                            pointsList.map { it.copy() } as MutableList<RoutePointModel>
+
+                        buildRouteFromList(currentRoutePointsList.map { Point.fromLngLat(it.x, it.y) })
+                        fetchAnnotatedRoutePoints()
+                        eraseCameraToPoint(
+                            currentRoutePointsList[0].x,
+                            currentRoutePointsList[0].y
+                        )
+                    }
+                }
+        }
     }
 
     private fun buildRouteFromList(coordinatesList: List<Point>) {
@@ -445,7 +439,7 @@ class PublicRoutesFragment :
 
     private fun fetchAnnotatedRoutePoints() {
         val annotatedPoints = mutableListOf<RoutePointModel>()
-        val imageList = mutableListOf<ImageModel>()
+        val imageList = mutableListOf<String>()
 
         pointAnnotationManager.deleteAll()
         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
@@ -544,7 +538,7 @@ class PublicRoutesFragment :
         }
     }
 
-    override fun onPointItemClick(pointId: Long) {
+    override fun onPointItemClick(pointId: String) {
         val pointPreview = currentRoutePointsList.find {
             it.pointId == pointId
         }
@@ -554,7 +548,7 @@ class PublicRoutesFragment :
     }
 
     private fun loadAnnotatedPointData(annotation: PointAnnotation) {
-        annotation.getData()?.asLong?.let { pointId ->
+        annotation.getData()?.asString?.let { pointId ->
             val point = currentRoutePointsList.find { it.pointId == pointId }
 
             if (point != null) {
@@ -570,16 +564,8 @@ class PublicRoutesFragment :
         binding.bottomSheetDialogPointDetails.apply {
             pointCaptionText.text = point.caption
             pointDescriptionText.text = point.description
-            if (point.tagList.isNotEmpty()) {
-                tagListTextView.text = point.tagList.joinToString(
-                    ",",
-                    "Tags: "
-                ) { pointTagModel -> pointTagModel.name }
-            } else {
-                tagListTextView.text = ""
-            }
 
-            pointImagesPreviewAdapter = ImagesPreviewAdapter {
+            pointImagesPreviewAdapter = PublicImageAdapter {
                 // findNavController().navigate(
                 // TODO ("Navigation")
                 //     )
@@ -605,7 +591,7 @@ class PublicRoutesFragment :
     private fun prepareRouteDetailsDialog(
         publicRoute: PublicRouteModel
     ) {
-        val imageList = mutableListOf<ImageModel>()
+        val imageList = mutableListOf<String>()
 
         binding.bottomSheetDialogRouteDetails.apply {
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty()) {
@@ -625,7 +611,7 @@ class PublicRoutesFragment :
                 }
             }
 
-            routeImagesPreviewAdapter = ImagesPreviewAdapter {
+            routeImagesPreviewAdapter = PublicImageAdapter {
                 // findNavController().navigate(
                 // TODO ("Navigation")
                 //     )
@@ -637,7 +623,7 @@ class PublicRoutesFragment :
                 layoutManager = routeImageLayoutManager
             }
 
-            //imageList.addAll(publicRoute.imageList)
+            imageList.addAll(publicRoute.imageList)
             currentRoutePointsList.forEach {
                 imageList.addAll(it.imageList)
             }

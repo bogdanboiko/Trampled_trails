@@ -17,9 +17,12 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class RemoteDataSrcImpl(
@@ -96,16 +99,16 @@ class RemoteDataSrcImpl(
             data.add(
                 PublicRoutePointResponseEntity(
                     it.id,
-                    it.getString("name")!!,
+                    it.getString("caption")!!,
                     it.getString("description")!!,
                     (it.get("imageList") ?: emptyList<String>()) as List<String>,
                     it.getDouble("x")!!,
                     it.getDouble("y")!!,
-                    it.getBoolean("isRoutePoint")!!
+                    it.getBoolean("routePoint")!!
                 )
             )
         }
 
         this.emit(data.map(::mapPublicRoutePointResponseEntityToDomain))
-    }
+    }.flowOn(Dispatchers.IO)
 }

@@ -16,7 +16,7 @@ import com.example.gh_coursework.databinding.ItemPublicPointBinding
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 
 interface RoutePointsListCallback {
-    fun onPointItemClick(pointId: Long)
+    fun onPointItemClick(pointId: String)
 }
 
 class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
@@ -101,7 +101,6 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
                     && oldItem.caption == newItem.caption
                     && oldItem.description == newItem.description
                     && oldItem.imageList == newItem.imageList
-                    && oldItem.tagList == newItem.tagList
         }
     }
 }
