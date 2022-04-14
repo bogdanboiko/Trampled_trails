@@ -8,6 +8,7 @@ fun mapRouteDomainToPublicRouteEntity(route: RouteDomain, imageList: List<String
     return PublicRouteEntity(
         route.name,
         route.description,
+        0.0,
         route.tagsList.map { it.name },
         imageList
     )

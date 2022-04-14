@@ -9,14 +9,11 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.paging.map
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
-import com.example.gh_coursework.data.remote.mapper.mapPublicRouteResponseToDomain
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
@@ -27,7 +24,6 @@ import com.example.gh_coursework.ui.public_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.public_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.public_route.adapter.RoutesListAdapter
 import com.example.gh_coursework.ui.public_route.adapter.RoutesListAdapterCallback
-import com.example.gh_coursework.ui.public_route.mapper.mapPrivateRoutePointModelToPoint
 import com.example.gh_coursework.ui.public_route.mapper.mapPublicRouteDomainToModel
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
@@ -66,7 +62,6 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -381,8 +376,7 @@ class PublicRoutesFragment :
         viewLifecycleOwner.lifecycleScope.launch {
             viewModelPublic.routeList
                 .collect { route ->
-                    routesListAdapter.submitData(route.map { mapPublicRouteResponseToDomain(it) }
-                        .map { mapPublicRouteDomainToModel(it) })
+                    routesListAdapter.submitData(route)
                 }
         }
     }
