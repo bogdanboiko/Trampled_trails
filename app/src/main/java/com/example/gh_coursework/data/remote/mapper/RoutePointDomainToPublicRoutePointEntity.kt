@@ -5,7 +5,8 @@ import com.example.gh_coursework.domain.entity.RoutePointDomain
 
 fun mapRoutePointDomainToPublicRoutePointEntity(
     routePoint: RoutePointDomain,
-    imageList: List<String>
+    imageList: List<String>,
+    position: Int
 ): PublicRoutePointEntity {
     return PublicRoutePointEntity(
         routePoint.caption,
@@ -13,6 +14,7 @@ fun mapRoutePointDomainToPublicRoutePointEntity(
         imageList,
         routePoint.x,
         routePoint.y,
-        routePoint.isRoutePoint
+        routePoint.isRoutePoint,
+        position
     )
 }

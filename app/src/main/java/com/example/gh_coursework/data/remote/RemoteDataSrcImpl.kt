@@ -36,7 +36,7 @@ class RemoteDataSrcImpl(
         val routeImagesAddTasks = mutableListOf<StorageTask<UploadTask.TaskSnapshot>>()
         val routeImagesGetUriTasks = mutableListOf<Task<Uri>>()
 
-        routePoints.forEach { point ->
+        routePoints.forEachIndexed { index, point ->
             val routePointImageAddTasks = mutableListOf<StorageTask<UploadTask.TaskSnapshot>>()
             val routePointImageGetUriTasks = mutableListOf<Task<Uri>>()
             val routePointDocRef =
@@ -60,7 +60,8 @@ class RemoteDataSrcImpl(
                     routePointDocRef.set(
                         mapRoutePointDomainToPublicRoutePointEntity(
                             point,
-                            it.map { imageUrl -> imageUrl.toString() })
+                            it.map { imageUrl -> imageUrl.toString() },
+                            index)
                     )
                 }
             }
@@ -104,10 +105,13 @@ class RemoteDataSrcImpl(
                     (it.get("imageList") ?: emptyList<String>()) as List<String>,
                     it.getDouble("x")!!,
                     it.getDouble("y")!!,
-                    it.getBoolean("routePoint")!!
+                    it.getBoolean("routePoint")!!,
+                    it.getLong("position")!!
                 )
             )
         }
+
+        data.sortBy { it.position }
 
         this.emit(data.map(::mapPublicRoutePointResponseEntityToDomain))
     }.flowOn(Dispatchers.IO)
