@@ -24,7 +24,6 @@ import com.example.gh_coursework.ui.public_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.public_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.public_route.adapter.RoutesListAdapter
 import com.example.gh_coursework.ui.public_route.adapter.RoutesListAdapterCallback
-import com.example.gh_coursework.ui.public_route.mapper.mapPublicRouteDomainToModel
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -609,7 +608,7 @@ class PublicRoutesFragment :
         val imageList = mutableListOf<ImageModel>()
 
         binding.bottomSheetDialogRouteDetails.apply {
-            if (publicRoute.name?.isEmpty() == true && publicRoute.description?.isEmpty() == true) {
+            if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
                 routeCaptionText.text = publicRoute.name
@@ -618,7 +617,7 @@ class PublicRoutesFragment :
             }
 
             routeDetailsEditButton.setOnClickListener {
-                publicRoute.routeId?.let {
+                publicRoute.routeId.let {
                     // findNavController().navigate(
                     // TODO ("Navigation")
                     //     )
