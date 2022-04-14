@@ -20,6 +20,7 @@ import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
+import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.public_route.adapter.*
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
@@ -174,7 +175,7 @@ class PublicRoutesFragment :
         super.onViewCreated(view, savedInstanceState)
 
         configMap()
-        onNavigateToPublicPointButtonClickListener()
+        configBottomNavBar()
         setUpBottomSheetsRecyclers()
         configImageRecyclers()
         configBottomSheetDialogs()
@@ -202,6 +203,14 @@ class PublicRoutesFragment :
         mapboxNavigation.onDestroy()
     }
 
+    private fun configBottomNavBar() {
+        binding.bottomNavigationView.menu.getItem(0).isChecked = true
+        binding.bottomNavigationView.menu.getItem(2).setOnMenuItemClickListener {
+            findNavController().popBackStack()
+            return@setOnMenuItemClickListener true
+        }
+    }
+
     private fun configImageRecyclers() {
         PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogPointDetails.imageRecycler)
         PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogRouteDetails.imageRecycler)
@@ -225,14 +234,6 @@ class PublicRoutesFragment :
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
-    }
-
-    private fun onNavigateToPublicPointButtonClickListener() {
-        binding.mapRoutePointModSwitcher.setOnClickListener {
-//            findNavController().navigate(
-// TODO("Navigation")
-//            )
-        }
     }
 
     private fun setUpBottomSheetsRecyclers() {
