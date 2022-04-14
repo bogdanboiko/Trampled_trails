@@ -951,15 +951,16 @@ class PrivateRoutesFragment :
         point: RoutePointModel
     ) {
         binding.bottomSheetDialogPointDetails.apply {
-            pointCaptionText.text = point.caption
-            pointDescriptionText.text = point.description
-            if (point.tagList.isNotEmpty()) {
+            if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
+                emptyDataPlaceholder.visibility = View.VISIBLE
+            } else {
+                pointCaptionText.text = point.caption
+                pointDescriptionText.text = point.description
                 tagListTextView.text = point.tagList.joinToString(
                     ",",
                     "Tags: "
                 ) { pointTagModel -> pointTagModel.name }
-            } else {
-                tagListTextView.text = ""
+                emptyDataPlaceholder.visibility = View.GONE
             }
 
             pointImagesPreviewAdapter = ImagesPreviewAdapter {

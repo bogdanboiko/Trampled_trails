@@ -15,11 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
-import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
-import com.example.gh_coursework.ui.model.ImageModel
 import com.example.gh_coursework.ui.public_route.adapter.*
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
@@ -174,7 +172,7 @@ class PublicRoutesFragment :
         super.onViewCreated(view, savedInstanceState)
 
         configMap()
-        onNavigateToPrivatePointButtonClickListener()
+        onNavigateToPublicPointButtonClickListener()
         setUpBottomSheetsRecyclers()
         configImageRecyclers()
         configBottomSheetDialogs()
@@ -224,9 +222,10 @@ class PublicRoutesFragment :
         }
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
     }
 
-    private fun onNavigateToPrivatePointButtonClickListener() {
+    private fun onNavigateToPublicPointButtonClickListener() {
         binding.mapRoutePointModSwitcher.setOnClickListener {
 //            findNavController().navigate(
 // TODO("Navigation")
@@ -247,7 +246,8 @@ class PublicRoutesFragment :
     private fun configBottomSheetDialogs() {
         getRoutesDialog()
         getRoutePointsDialog()
-
+        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
+        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.text = resources.getText(R.string.public_route_point_placeholder)
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
         routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
@@ -562,8 +562,13 @@ class PublicRoutesFragment :
         point: RoutePointModel
     ) {
         binding.bottomSheetDialogPointDetails.apply {
-            pointCaptionText.text = point.caption
-            pointDescriptionText.text = point.description
+            if (point.caption.isEmpty() && point.description.isEmpty()) {
+                emptyDataPlaceholder.visibility = View.VISIBLE
+            } else {
+                pointCaptionText.text = point.caption
+                pointDescriptionText.text = point.description
+                emptyDataPlaceholder.visibility = View.GONE
+            }
 
             pointImagesPreviewAdapter = PublicImageAdapter {
                 // findNavController().navigate(
@@ -594,7 +599,7 @@ class PublicRoutesFragment :
         val imageList = mutableListOf<String>()
 
         binding.bottomSheetDialogRouteDetails.apply {
-            if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty()) {
+            if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
                 routeCaptionText.text = publicRoute.name

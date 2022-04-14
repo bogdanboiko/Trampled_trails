@@ -5,4 +5,5 @@
     <string name="private_menu_item">Private</string>
     <string name="txtSaveButtonDisable">disable</string>
     <string name="txtSaveButtonSave">save</string>
+    <string name="public_route_point_placeholder">This route doesn\'t contain annotated points</string>
 </resources>
