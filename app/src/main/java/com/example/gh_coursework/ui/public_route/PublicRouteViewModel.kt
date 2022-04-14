@@ -7,15 +7,16 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.example.gh_coursework.data.remote.FirestorePagingSource
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 
 
 class PublicRouteViewModel(
-    private val db: FirebaseFirestore
+    private val query: Query
 ) : ViewModel() {
 
     val routeList = Pager(
             PagingConfig(pageSize = 10)
         ) {
-            FirestorePagingSource(db.collection("routes").limit(10))
+            FirestorePagingSource(query)
         }.flow.cachedIn(viewModelScope)
 }
