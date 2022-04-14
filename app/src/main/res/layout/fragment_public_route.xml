@@ -122,11 +122,11 @@
 
             <include
                 android:id="@+id/bottomSheetDialogPointDetails"
-                layout="@layout/bottom_sheet_point_details" />
+                layout="@layout/bottom_sheet_public_point_details" />
 
             <include
                 android:id="@+id/bottomSheetDialogRouteDetails"
-                layout="@layout/bottom_sheet_route_details"/>
+                layout="@layout/bottom_sheet_public_route_details"/>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

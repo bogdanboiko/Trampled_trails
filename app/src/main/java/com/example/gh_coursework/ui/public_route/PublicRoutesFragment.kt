@@ -11,10 +11,12 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
+import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
@@ -70,7 +72,7 @@ class PublicRoutesFragment :
 
     private lateinit var pointImageLayoutManager: LinearLayoutManager
     private lateinit var routeImageLayoutManager: LinearLayoutManager
-    private lateinit var binding: FragmentPrivateRouteBinding
+    private lateinit var binding: FragmentPublicRouteBinding
 
     private val viewModelPublic: PublicRouteViewModel by viewModel()
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
@@ -163,7 +165,7 @@ class PublicRoutesFragment :
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPrivateRouteBinding.inflate(inflater, container, false)
+        binding = FragmentPublicRouteBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -247,7 +249,8 @@ class PublicRoutesFragment :
         getRoutesDialog()
         getRoutePointsDialog()
         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
-        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.text = resources.getText(R.string.public_route_point_placeholder)
+        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.text =
+            resources.getText(R.string.public_route_point_placeholder)
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
         routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
@@ -397,7 +400,12 @@ class PublicRoutesFragment :
                         currentRoutePointsList =
                             pointsList.map { it.copy() } as MutableList<RoutePointModel>
 
-                        buildRouteFromList(currentRoutePointsList.map { Point.fromLngLat(it.x, it.y) })
+                        buildRouteFromList(currentRoutePointsList.map {
+                            Point.fromLngLat(
+                                it.x,
+                                it.y
+                            )
+                        })
                         fetchAnnotatedRoutePoints()
                         eraseCameraToPoint(
                             currentRoutePointsList[0].x,
@@ -571,10 +579,12 @@ class PublicRoutesFragment :
             }
 
             pointImagesPreviewAdapter = PublicImageAdapter {
-                // findNavController().navigate(
-                // TODO ("Navigation")
-                //     )
-                // )
+                findNavController().navigate(
+                    PublicRoutesFragmentDirections.actionPublicRouteFragmentToPublicImageFragment(
+                        point.imageList.toTypedArray(),
+                        pointImageLayoutManager.findFirstVisibleItemPosition()
+                    )
+                )
             }
 
             imageRecycler.apply {
@@ -583,21 +593,12 @@ class PublicRoutesFragment :
             }
 
             pointImagesPreviewAdapter.submitList(point.imageList)
-
-            pointDetailsEditButton.setOnClickListener {
-                // findNavController().navigate(
-                // TODO ("Navigation")
-                //     )
-                // )
-            }
         }
     }
 
     private fun prepareRouteDetailsDialog(
         publicRoute: PublicRouteModel
     ) {
-        val imageList = mutableListOf<String>()
-
         binding.bottomSheetDialogRouteDetails.apply {
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
@@ -607,20 +608,13 @@ class PublicRoutesFragment :
                 emptyDataPlaceholder.visibility = View.GONE
             }
 
-            routeDetailsEditButton.setOnClickListener {
-                publicRoute.routeId.let {
-                    // findNavController().navigate(
-                    // TODO ("Navigation")
-                    //     )
-                    // )
-                }
-            }
-
             routeImagesPreviewAdapter = PublicImageAdapter {
-                // findNavController().navigate(
-                // TODO ("Navigation")
-                //     )
-                // )
+                findNavController().navigate(
+                    PublicRoutesFragmentDirections.actionPublicRouteFragmentToPublicImageFragment(
+                        publicRoute.imageList.toTypedArray(),
+                        pointImageLayoutManager.findFirstVisibleItemPosition()
+                    )
+                )
             }
 
             imageRecycler.apply {
@@ -628,12 +622,7 @@ class PublicRoutesFragment :
                 layoutManager = routeImageLayoutManager
             }
 
-            imageList.addAll(publicRoute.imageList)
-            currentRoutePointsList.forEach {
-                imageList.addAll(it.imageList)
-            }
-
-            routeImagesPreviewAdapter.submitList(imageList)
+            routeImagesPreviewAdapter.submitList(publicRoute.imageList)
         }
     }
 

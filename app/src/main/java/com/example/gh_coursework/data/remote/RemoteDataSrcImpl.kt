@@ -1,6 +1,7 @@
 package com.example.gh_coursework.data.remote
 
 import android.net.Uri
+import android.util.Log
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.data.remote.entity.PublicRoutePointEntity
 import com.example.gh_coursework.data.remote.entity.PublicRoutePointResponseEntity

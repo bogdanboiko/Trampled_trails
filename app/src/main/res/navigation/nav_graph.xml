@@ -139,6 +139,23 @@
         android:id="@+id/publicRouteFragment"
         android:name="com.example.gh_coursework.ui.public_route.PublicRoutesFragment"
         android:label="public_routes_fragment"
-        tools:layout="@layout/fragment_image_details">
+        tools:layout="@layout/fragment_public_route">
+        <action
+            android:id="@+id/action_publicRouteFragment_to_publicImageFragment"
+            app:destination="@id/publicImageFragment"
+            app:popUpTo="@id/publicRouteFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/publicImageFragment"
+        android:name="com.example.gh_coursework.ui.public_route.image_details.PublicRouteDetailsImageFragment"
+        android:label="public_image_fragment"
+        tools:layout="@layout/fragment_public_image_details">
+
+        <argument
+            android:name="imageList"
+            app:argType="string[]" />
+        <argument android:name="clickedItemCount"
+            app:argType="integer" />
     </fragment>
 </navigation>
