@@ -70,8 +70,6 @@ class RouteViewModel(
     }
 
     fun publishRoute(route: RouteModel, routePoints: List<RoutePointModel>) {
-        Log.e("e", routePoints.map(::mapRoutePointModelToDomain).toString())
-        Log.e("e", mapRouteModelToDomain(route).toString())
         publishRouteUseCase.invoke(mapRouteModelToDomain(route), routePoints.map(::mapRoutePointModelToDomain))
     }
 }

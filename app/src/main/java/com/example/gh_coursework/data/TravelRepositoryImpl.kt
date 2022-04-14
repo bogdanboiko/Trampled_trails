@@ -5,6 +5,7 @@ import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.data.remote.RemoteDataSrcImpl
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
+import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(
     private val localDataSrcIml: TravelDatasource.Local,
@@ -107,5 +108,9 @@ class TravelRepositoryImpl(
 
     override fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>) {
         remoteDataSrcImpl.publishRoute(route, routePoints)
+    }
+
+    override fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>> {
+        return remoteDataSrcImpl.fetchRoutePoints(routeId)
     }
 }

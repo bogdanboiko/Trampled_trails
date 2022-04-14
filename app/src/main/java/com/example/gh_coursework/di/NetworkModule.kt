@@ -1,30 +1,21 @@
 package com.example.gh_coursework.di
 
-import com.example.gh_coursework.BuildConfig
-import com.squareup.moshi.Moshi
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.FirebaseStorage
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 
 val networkModule = module {
     single {
-        Moshi.Builder()
-            .add(KotlinJsonAdapterFactory())
-            .build()
+        Firebase.firestore
     }
 
     single {
-        MoshiConverterFactory.create(get())
+        FirebaseStorage.getInstance()
     }
-}
 
-val retrofitModule = module {
     single {
-        Retrofit.Builder().baseUrl(BuildConfig.BASE_URL)
-            .addConverterFactory(get<MoshiConverterFactory>()).client(get()).build()
+        get<FirebaseFirestore>().collection("routes").limit(10)
     }
-}
-
-val apiModule = module {
 }

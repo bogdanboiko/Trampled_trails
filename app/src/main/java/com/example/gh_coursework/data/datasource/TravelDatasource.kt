@@ -45,5 +45,6 @@ interface TravelDatasource {
 
     interface Remote {
         fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>)
+        fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
     }
 }

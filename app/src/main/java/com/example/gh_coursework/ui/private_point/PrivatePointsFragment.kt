@@ -105,6 +105,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configMap()
+        configBottomNavBar()
         configMapSwitcherButton()
         configMapModSwitcher()
         configCancelButton()
@@ -118,6 +119,17 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                 }
             }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
+    }
+
+    private fun configBottomNavBar() {
+        binding.bottomNavigationView.menu.getItem(2).isChecked = true
+        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment()
+            )
+
+            return@setOnMenuItemClickListener true
+        }
     }
 
     private fun configMap() {

@@ -9,7 +9,7 @@ import org.koin.dsl.module
 
 val datasourceModule = module {
     single<TravelDatasource.Remote> {
-        RemoteDataSrcImpl()
+        RemoteDataSrcImpl(get(), get())
     }
 
     single<TravelDatasource.Local> {
