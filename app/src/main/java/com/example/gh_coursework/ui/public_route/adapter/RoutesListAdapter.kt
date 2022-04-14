@@ -38,11 +38,14 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: PublicRouteModel) {
-            Log.e("e", item.toString())
             with(binding) {
-                txtName.text = item.name
-                txtDescription.text = item.description
-                emptyDataPlaceholder.visibility = View.INVISIBLE
+                if (item.name.isEmpty() && item.description.isEmpty()) {
+                    emptyDataPlaceholder.visibility = View.VISIBLE
+                } else {
+                    txtName.text = item.name
+                    txtDescription.text = item.description
+                    emptyDataPlaceholder.visibility = View.INVISIBLE
+                }
 
                 if (item.imageList.isEmpty()) {
                     Glide.with(itemView)
@@ -50,7 +53,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
                         .placeholder(imgMapImage.drawable)
                         .transform(RoundedCorners(10))
                         .into(imgMapImage)
-                } else if (item.imageList.isNotEmpty()) {
+                } else {
                     Glide.with(itemView)
                         .load(item.imageList.last())
                         .placeholder(imgMapImage.drawable)

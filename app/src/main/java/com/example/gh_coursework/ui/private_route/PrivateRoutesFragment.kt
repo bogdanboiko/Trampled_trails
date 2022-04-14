@@ -243,7 +243,11 @@ class PrivateRoutesFragment :
         configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
-        fetchRoutes()
+        if (this::focusedRoute.isInitialized) {
+            rebuildRoute(focusedRoute)
+        } else {
+            fetchRoutes()
+        }
 
         mapboxNavigation.startTripSession(withForegroundService = false)
     }
