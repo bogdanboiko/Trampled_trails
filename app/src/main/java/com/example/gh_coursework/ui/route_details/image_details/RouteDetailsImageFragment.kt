@@ -1,7 +1,6 @@
 package com.example.gh_coursework.ui.route_details.image_details
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentImageDetailsBinding
 import com.example.gh_coursework.ui.model.ImageModel
-import com.example.gh_coursework.ui.route_details.adapter.RouteImageDetailsAdapter
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

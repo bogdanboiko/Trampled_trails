@@ -20,7 +20,7 @@
         android:text="Routes list is empty. Press add button to create your first route!"
         android:textColor="@color/map_background"
         android:textSize="20sp"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/routesRecyclerView"
