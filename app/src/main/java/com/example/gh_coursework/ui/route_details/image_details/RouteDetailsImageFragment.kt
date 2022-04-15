@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -49,6 +50,10 @@ class RouteDetailsImageFragment : Fragment(R.layout.fragment_image_details) {
             } else if (image is ImageModel.RouteImageModel) {
                 viewModel.deleteRouteImage(image)
             }
+        }
+
+        binding.backImageButton.setOnClickListener {
+            findNavController().popBackStack()
         }
     }
 

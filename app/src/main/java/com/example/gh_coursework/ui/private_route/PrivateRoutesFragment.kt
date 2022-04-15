@@ -49,6 +49,7 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
@@ -94,6 +95,7 @@ class PrivateRoutesFragment :
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private lateinit var focusedRoute: RouteModel
+    private lateinit var lastSeenCoordinate: Point
     private lateinit var routePointsJob: Job
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -237,6 +239,7 @@ class PrivateRoutesFragment :
         switchMapMod()
         configBottomNavBar()
         onNavigateToPrivatePointButtonClickListener()
+        onNavigateToHomepageButtonClickListener()
         configSaveRouteButton()
         setUpBottomSheetsRecyclers()
         configImageRecyclers()
@@ -267,6 +270,10 @@ class PrivateRoutesFragment :
         super.onStart()
         mapboxNavigation.registerRoutesObserver(routesObserver)
         mapboxNavigation.registerLocationObserver(locationObserver)
+
+        if (this::lastSeenCoordinate.isInitialized) {
+            eraseCameraToPoint(lastSeenCoordinate.longitude(), lastSeenCoordinate.latitude())
+        }
     }
 
     override fun onStop() {
@@ -300,6 +307,8 @@ class PrivateRoutesFragment :
             setLocationProvider(navigationLocationProvider)
             enabled = true
         }
+
+        binding.mapView.compass.enabled = false
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
     }
@@ -406,6 +415,18 @@ class PrivateRoutesFragment :
             )
         }
     }
+
+    private fun onNavigateToHomepageButtonClickListener() {
+        binding.homepageButton.setOnClickListener {
+            lastSeenCoordinate = binding.mapView.getMapboxMap().cameraState.center
+
+            findNavController().navigate(
+                PrivateRoutesFragmentDirections
+                    .actionPrivateRoutesFragmentToHomepageFragment()
+            )
+        }
+    }
+
 
     private fun configSaveRouteButton() {
         isRouteSaveable.observe(viewLifecycleOwner) {

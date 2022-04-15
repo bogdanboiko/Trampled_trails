@@ -24,6 +24,10 @@
             app:destination="@id/privateImageDetails"
             app:popUpTo="@id/privatePointsFragment"/>
         <action
+            android:id="@+id/action_privatePointsFragment_to_homepageFragment"
+            app:destination="@id/homepageFragment"
+            app:popUpTo="@id/privatePointsFragment"/>
+      <action
             android:id="@+id/action_privatePointsFragment_to_publicRoutesFragment"
             app:destination="@id/publicRouteFragment"
             app:popUpTo="@id/privatePointsFragment"/>
@@ -91,6 +95,10 @@
             app:destination="@id/privateImageDetails"
             app:popUpTo="@id/privateRoutesFragment"/>
         <action
+            android:id="@+id/action_privateRoutesFragment_to_homepageFragment"
+            app:destination="@id/homepageFragment"
+            app:popUpTo="@id/privateRoutesFragment"/>
+        <action
             android:id="@+id/action_privateRoutesFragment_to_publicRoutesFragment"
             app:destination="@id/publicRouteFragment"
             app:popUpTo="@id/privateRoutesFragment"/>
@@ -135,6 +143,15 @@
             app:argType="integer" />
     </fragment>
 
+    <!--Home-->
+    <fragment
+        android:id="@+id/homepageFragment"
+        android:name="com.example.gh_coursework.ui.homepage.HomepageFragment"
+        android:label="fragment_homepage"
+        tools:layout="@layout/fragment_homepage">
+    </fragment>
+  
+    <!--Public-->
     <fragment
         android:id="@+id/publicRouteFragment"
         android:name="com.example.gh_coursework.ui.public_route.PublicRoutesFragment"
