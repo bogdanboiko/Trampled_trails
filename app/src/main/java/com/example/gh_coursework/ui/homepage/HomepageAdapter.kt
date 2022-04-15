@@ -79,13 +79,10 @@ class HomepageAdapter(private val callback: HomepageCallback) : RecyclerView.Ada
     private inner class ThemeViewHolder(private val binding: ItemHomepageSwitchBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Data) {
-            with(binding) {
-                imgItemHomepage.setImageResource(item.image)
-                txtItemHomepage.text = item.text
-
-            binding.root.setOnClickListener {
-                callback.onSettingsClick()
+            fun bind(item: Data) {
+                with(binding) {
+                    imgItemHomepage.setImageResource(item.image)
+                    txtItemHomepage.text = item.text
             }
         }
     }
