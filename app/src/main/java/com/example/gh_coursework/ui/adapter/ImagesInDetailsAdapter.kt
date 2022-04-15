@@ -13,15 +13,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
-import com.example.gh_coursework.databinding.ItemImageDetailsBinding
-import com.example.gh_coursework.databinding.ItemImagesDetailsBinding
+import com.example.gh_coursework.databinding.ItemImagesTopbarDetailsBinding
 import com.example.gh_coursework.ui.model.ImageModel
-import java.io.File
 
 class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
     ListAdapter<ImageModel, ImagesInDetailsAdapter.ImageViewHolder>(Diff) {
 
-    inner class ImageViewHolder(private val binding: ItemImageDetailsBinding) :
+    inner class ImageViewHolder(private val binding: ItemImagesTopbarDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
             itemView.setOnClickListener(onItemCLick)
@@ -45,7 +43,7 @@ class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
         return ImageViewHolder(
-            ItemImageDetailsBinding.inflate(
+            ItemImagesTopbarDetailsBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

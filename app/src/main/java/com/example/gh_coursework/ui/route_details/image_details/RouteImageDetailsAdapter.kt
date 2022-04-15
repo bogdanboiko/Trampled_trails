@@ -1,4 +1,4 @@
-package com.example.gh_coursework.ui.point_details.adapter
+package com.example.gh_coursework.ui.route_details.image_details
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -9,14 +9,15 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gh_coursework.databinding.ItemImageDetailsBinding
-import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
+import com.example.gh_coursework.ui.model.ImageModel
 
-class ImageDetailsAdapter :
-    ListAdapter<PointImageModel, ImageDetailsAdapter.ImageViewHolder>(Diff) {
+class RouteImageDetailsAdapter : ListAdapter<ImageModel, RouteImageDetailsAdapter.ImageViewHolder>(
+    Diff
+) {
 
     inner class ImageViewHolder(private val binding: ItemImageDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(imageModel: PointImageModel) {
+        fun bind(imageModel: ImageModel) {
             val imageUri = Uri.parse(imageModel.image)
             itemView.context?.contentResolver?.openInputStream(imageUri).use {
                 val image = Drawable.createFromStream(it, imageUri.toString())
@@ -45,19 +46,26 @@ class ImageDetailsAdapter :
         holder.bind(currentList[position])
     }
 
-    object Diff : DiffUtil.ItemCallback<PointImageModel>() {
+    object Diff : DiffUtil.ItemCallback<ImageModel>() {
         override fun areItemsTheSame(
-            oldItem: PointImageModel,
-            newItem: PointImageModel
+            oldItem: ImageModel,
+            newItem: ImageModel
         ): Boolean {
             return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: PointImageModel,
-            newItem: PointImageModel
+            oldItem: ImageModel,
+            newItem: ImageModel
         ): Boolean {
-            return oldItem.pointId == newItem.pointId && oldItem.image == newItem.image
+            return when (oldItem) {
+                is ImageModel.PointImageModel ->
+                    oldItem.pointId == (newItem as ImageModel.PointImageModel).pointId
+                            && oldItem.image == newItem.image
+                is ImageModel.RouteImageModel ->
+                    oldItem.routeId == (newItem as ImageModel.RouteImageModel).routeId
+                            && oldItem.image == newItem.image
+            }
         }
     }
 }
