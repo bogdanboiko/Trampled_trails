@@ -4,6 +4,10 @@ import com.example.gh_coursework.domain.usecase.image.*
 import com.example.gh_coursework.domain.usecase.point_details.*
 import com.example.gh_coursework.domain.usecase.point_preview.*
 import com.example.gh_coursework.domain.usecase.point_tag.*
+import com.example.gh_coursework.domain.usecase.public.FetchRoutePointsUseCase
+import com.example.gh_coursework.domain.usecase.public.FetchRoutePointsUseCaseImpl
+import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
+import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCaseImpl
 import com.example.gh_coursework.domain.usecase.route_details.*
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCaseImpl
@@ -127,5 +131,14 @@ val pointUseCasesModule = module {
 
     single<GetRouteImagesUseCase> {
         GetRouteImagesUseCaseImpl(get())
+    }
+
+    //Public
+    single<PublishRouteUseCase> {
+        PublishRouteUseCaseImpl(get())
+    }
+
+    single<FetchRoutePointsUseCase> {
+        FetchRoutePointsUseCaseImpl(get())
     }
 }

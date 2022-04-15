@@ -1,37 +1,30 @@
-package com.example.gh_coursework.ui.point_details.image_details
+package com.example.gh_coursework.ui.public_route.image_details
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.R
-import com.example.gh_coursework.databinding.FragmentImageDetailsBinding
-import kotlinx.coroutines.launch
-import org.koin.androidx.viewmodel.ext.android.viewModel
-import org.koin.core.parameter.parametersOf
-import java.io.File
-import java.net.URI
+import com.example.gh_coursework.databinding.FragmentPublicImageDetailsBinding
 
-class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
+class PublicRouteDetailsImageFragment : Fragment(R.layout.fragment_public_image_details) {
     private lateinit var layoutManager: LinearLayoutManager
-    private lateinit var binding: FragmentImageDetailsBinding
-    private val arguments by navArgs<ImageDetailsFragmentArgs>()
-    private val viewModel: ImageDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
-    private val imageAdapter = ImageDetailsAdapter()
+    private lateinit var binding: FragmentPublicImageDetailsBinding
+    private val arguments by navArgs<PublicRouteDetailsImageFragmentArgs>()
+    private val imageAdapter = PublicImageAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentImageDetailsBinding.inflate(inflater, container, false)
+        binding = FragmentPublicImageDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -42,23 +35,13 @@ class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
     }
 
     private fun configToolbar() {
-        binding.deleteImageButton.setOnClickListener {
-            val imageData = imageAdapter.currentList[layoutManager.findFirstVisibleItemPosition()]
-            val imageFile = File(URI.create(imageData.image))
-
-            if (imageFile.exists()) {
-                imageFile.delete()
-            }
-            viewModel.deletePointImage(imageData)
-        }
-
         binding.backImageButton.setOnClickListener {
             findNavController().popBackStack()
         }
     }
 
     private fun configRecycler() {
-        PagerSnapHelper().attachToRecyclerView(binding.pointImageRecycler)
+        PagerSnapHelper().attachToRecyclerView(binding.imageRecycler)
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         imageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(
@@ -68,15 +51,13 @@ class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
                 layoutManager.scrollToPosition(arguments.clickedItemCount)
             }
         })
-        binding.pointImageRecycler.apply {
+
+
+        binding.imageRecycler.apply {
             adapter = imageAdapter
-            layoutManager = this@ImageDetailsFragment.layoutManager
+            layoutManager = this@PublicRouteDetailsImageFragment.layoutManager
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.pointImages.collect {
-                imageAdapter.submitList(it)
-            }
-        }
+        imageAdapter.submitList(arguments.imageList.asList())
     }
 }

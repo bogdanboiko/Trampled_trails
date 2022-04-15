@@ -5,7 +5,7 @@ import com.example.gh_coursework.ui.point_details.mapper.mapPointImageModelToDom
 import com.example.gh_coursework.ui.point_details.mapper.mapPointTagModelToDomain
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
 
-fun mapRoutePointModelToDomainMapper(point: RoutePointModel): RoutePointDomain {
+fun mapRoutePointModelToDomain(point: RoutePointModel): RoutePointDomain {
     with(point) {
         return RoutePointDomain(
             pointId,

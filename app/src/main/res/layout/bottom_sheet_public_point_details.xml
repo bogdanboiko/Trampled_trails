@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/routeBottomSheetDialog"
+    android:id="@+id/pointBottomSheetDialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
@@ -9,34 +9,22 @@
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/imageRecycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/routeDetailsEditButton"
+        app:layout_constraintTop_toBottomOf="@id/pointDetailsAddToFavouriteButton"
         app:layout_constraintBottom_toTopOf="@id/nestedScroll"/>
 
     <ImageButton
-        android:id="@+id/routeDetailsEditButton"
+        android:id="@+id/pointDetailsAddToFavouriteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/transparent"
         android:backgroundTint="@color/black"
         android:padding="20dp"
-        android:src="@drawable/ic_edit"
+        android:src="@drawable/ic_favourite"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageButton
-        android:id="@+id/routePublishButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/transparent"
-        android:backgroundTint="@color/black"
-        android:padding="20dp"
-        android:src="@drawable/ic_upload"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -44,24 +32,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:paddingTop="60dp"
         android:paddingStart="60dp"
         android:paddingEnd="60dp"
-        android:text="Text data is empty. Press edit button to start filling the data"
+        android:text="Text data is empty"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="@id/nestedScroll" />
-
-    <ImageButton
-        android:id="@+id/routeDetailsDeleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:background="@color/transparent"
-        android:padding="20dp"
-        android:src="@drawable/ic_delete"
-        app:layout_constraintEnd_toStartOf="@id/routeDetailsEditButton"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScroll"
@@ -76,7 +52,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/routeCaptionText"
+                android:id="@+id/pointCaptionText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
@@ -93,17 +69,17 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                app:layout_anchor="@id/routeCaptionText"
                 android:background="@color/transparent"
                 android:enabled="false"
                 android:lineSpacingExtra="2dp"
                 android:paddingBottom="10dp"
                 android:textColor="@color/black"
                 android:textColorHint="@color/black"
-                android:textSize="16sp" />
+                android:textSize="16sp"
+                app:layout_anchor="@id/pointCaptionText" />
 
             <TextView
-                android:id="@+id/routeDescriptionText"
+                android:id="@+id/pointDescriptionText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
