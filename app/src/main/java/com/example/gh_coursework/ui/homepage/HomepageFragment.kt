@@ -11,13 +11,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentHomepageBinding
-import com.example.gh_coursework.ui.model.ImageModel
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -70,6 +70,9 @@ class HomepageFragment : Fragment(), HomepageCallback {
     private fun setUpRecycler() {
         binding.homepageRecycler.apply {
             adapter = homepageAdapter
+            layoutManager = object : LinearLayoutManager(context) {
+                override fun canScrollVertically(): Boolean = false
+            }
         }
     }
 
@@ -153,10 +156,6 @@ class HomepageFragment : Fragment(), HomepageCallback {
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }
-    }
-
-    override fun onSettingsClick() {
-        TODO("Not yet implemented")
     }
 
     override fun onEditClick() {
