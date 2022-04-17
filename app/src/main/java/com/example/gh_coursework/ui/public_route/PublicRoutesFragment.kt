@@ -181,11 +181,12 @@ class PublicRoutesFragment :
         configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
+
         if (this::focusedPublicRoute.isInitialized) {
             rebuildRoute(focusedPublicRoute)
-        } else {
-            fetchRoutes()
         }
+
+        fetchRoutes()
 
         mapboxNavigation.startTripSession(withForegroundService = false)
     }

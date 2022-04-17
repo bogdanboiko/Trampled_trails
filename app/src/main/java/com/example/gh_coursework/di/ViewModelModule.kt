@@ -19,7 +19,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        RouteViewModel(get(), get(), get(), get(), get(), get(), get())
+        RouteViewModel(get(), get(), get(), get(), get(), get())
     }
 
     viewModel { parameters ->

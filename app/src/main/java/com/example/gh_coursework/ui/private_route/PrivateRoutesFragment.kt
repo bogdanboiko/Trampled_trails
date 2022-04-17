@@ -3,6 +3,7 @@ package com.example.gh_coursework.ui.private_route
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
+import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
@@ -30,8 +33,10 @@ import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallbac
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapterCallback
 import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointModelToPoint
+import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
+import com.example.gh_coursework.ui.route_details.RouteDetailsFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
@@ -71,6 +76,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -81,6 +87,7 @@ class PrivateRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
+    private var previousRouteId: Long? = null
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
 
@@ -246,11 +253,12 @@ class PrivateRoutesFragment :
         configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
+
         if (this::focusedRoute.isInitialized) {
-            rebuildRoute(focusedRoute)
-        } else {
-            fetchRoutes()
+            previousRouteId = focusedRoute.routeId
         }
+
+        fetchRoutes()
 
         mapboxNavigation.startTripSession(withForegroundService = false)
     }
@@ -694,14 +702,20 @@ class PrivateRoutesFragment :
     private fun fetchRoutes() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.routes
-                .collect { route ->
-                    if (route.isNotEmpty()) {
-                        rebuildRoute(route.last())
-                        routesListAdapter.submitList(route)
+                .collect { routes ->
+                    routesListAdapter.submitList(routes)
+
+                    if (routes.isNotEmpty()) {
+                        if (previousRouteId != null) {
+                            routes.find { it.routeId == previousRouteId }?.let { rebuildRoute(it) }
+                                ?: rebuildRoute(routes.last())
+                            previousRouteId = null
+                        } else {
+                            rebuildRoute(routes.last())
+                        }
                         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
                             View.GONE
-                    } else if (route.isEmpty()) {
-                        routesListAdapter.submitList(route)
+                    } else if (routes.isEmpty()) {
                         pointsListAdapter.submitList(emptyList())
 
                         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
