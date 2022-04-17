@@ -8,7 +8,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.gh_coursework.databinding.RouteDialogTagBinding
+import com.example.gh_coursework.databinding.DialogRouteTagBinding
 import com.example.gh_coursework.ui.route_details.RouteDetailsFragmentArgs
 import com.example.gh_coursework.ui.route_details.adapter.RouteTagAdapter
 import com.example.gh_coursework.ui.route_details.model.RouteTagsModel
@@ -18,7 +18,7 @@ import org.koin.core.parameter.parametersOf
 
 class RouteTagDialogFragment : DialogFragment() {
 
-    private lateinit var binding: RouteDialogTagBinding
+    private lateinit var binding: DialogRouteTagBinding
     private val viewModel: RouteTagDialogViewModel by viewModel { parametersOf(arguments.routeId) }
     private val tagAdapter = RouteTagAdapter()
 
@@ -29,7 +29,7 @@ class RouteTagDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = RouteDialogTagBinding.inflate(inflater, container, false)
+        binding = DialogRouteTagBinding.inflate(inflater, container, false)
         return binding.root
     }
 
