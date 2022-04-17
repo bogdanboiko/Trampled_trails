@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
+import com.example.gh_coursework.data.database.entity.RouteTagEntity
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
@@ -36,7 +37,9 @@ import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointMod
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
+import com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment
 import com.example.gh_coursework.ui.route_details.RouteDetailsFragment
+import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
@@ -78,6 +81,8 @@ import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -87,6 +92,8 @@ class PrivateRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
+    private var filteredTags = emptyList<RouteTagModel>()
+    private lateinit var routesJob: Job
     private var previousRouteId: Long? = null
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
@@ -259,6 +266,14 @@ class PrivateRoutesFragment :
         }
 
         fetchRoutes()
+
+        setFragmentResultListener(RouteFilterByTagDialogFragment.REQUEST_KEY) { key, bundle ->
+            val tagArray = bundle.getParcelableArray("tags")
+            if (tagArray != null) {
+                filteredTags = tagArray.toList() as List<RouteTagModel>
+                fetchRoutes()
+            }
+        }
 
         mapboxNavigation.startTripSession(withForegroundService = false)
     }
@@ -617,6 +632,14 @@ class PrivateRoutesFragment :
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
+
+        binding.bottomSheetDialogRoutes.routeFilterByTagButton.setOnClickListener {
+            findNavController().navigate(
+                PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToRouteFilterByTagsDialogFragment(
+                    filteredTags.toTypedArray()
+                )
+            )
+        }
     }
 
     private fun getRoutePointsDialog() {
@@ -700,30 +723,49 @@ class PrivateRoutesFragment :
     }
 
     private fun fetchRoutes() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.routes
-                .collect { routes ->
-                    routesListAdapter.submitList(routes)
+        if (this::routesJob.isInitialized) {
+            routesJob.cancel()
+        }
 
-                    if (routes.isNotEmpty()) {
-                        if (previousRouteId != null) {
-                            routes.find { it.routeId == previousRouteId }?.let { rebuildRoute(it) }
-                                ?: rebuildRoute(routes.last())
-                            previousRouteId = null
-                        } else {
-                            rebuildRoute(routes.last())
+        routesJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.routes.collect { routes ->
+                var filteredRoutes = mutableListOf<RouteModel>()
+
+                if (filteredTags.isNotEmpty()) {
+                    routes.forEach { route ->
+                        filteredTags.forEach tags@{
+                            if (route.tagsList.contains(it)) {
+                                filteredRoutes.add(route)
+                                return@tags
+                            }
                         }
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                            View.GONE
-                    } else if (routes.isEmpty()) {
-                        pointsListAdapter.submitList(emptyList())
-
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                            View.VISIBLE
-                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
-                            View.VISIBLE
                     }
+                } else {
+                    filteredRoutes = routes.toMutableList()
                 }
+
+                routesListAdapter.submitList(filteredRoutes)
+
+                if (filteredRoutes.isNotEmpty()) {
+                    if (previousRouteId != null) {
+                        filteredRoutes.find { it.routeId == previousRouteId }
+                            ?.let { rebuildRoute(it) }
+                            ?: rebuildRoute(routes.last())
+                        previousRouteId = null
+                    } else {
+                        rebuildRoute(filteredRoutes.last())
+                    }
+                    binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                        View.GONE
+                } else if (filteredRoutes.isEmpty()) {
+                    pointsListAdapter.submitList(emptyList())
+
+                    binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                        View.VISIBLE
+                    binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
+                        View.VISIBLE
+                }
+            }
         }
     }
 
