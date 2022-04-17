@@ -64,6 +64,7 @@ class RouteFilterByTagDialogFragment : DialogFragment() {
             tagAdapter.setFilteredTags(arguments.checkedTags.toMutableList())
 
             clearTagsDialogButton.setOnClickListener {
+                tagAdapter.setFilteredTags(mutableListOf())
                 dismiss()
             }
 
