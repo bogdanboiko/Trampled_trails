@@ -10,6 +10,14 @@
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    <ImageButton
+        android:id="@+id/routeFilterByTagButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:src="@drawable/ic_tag"
+        android:background="@color/transparent"
+        android:padding="20dp" />
 
     <TextView
         android:id="@+id/emptyDataPlaceholder"
