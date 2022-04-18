@@ -137,8 +137,11 @@
             app:layout_anchorGravity="bottom"
             android:elevation="-1dp">
             <include
-                android:id="@+id/bottomSheetDialogLayout"
+                android:id="@+id/pointDetailsBottomSheetDialogLayout"
                 layout="@layout/bottom_sheet_point_details" />
+            <include
+                android:id="@+id/bottomSheetDialogPoints"
+                layout="@layout/bottom_sheet_points"/>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
