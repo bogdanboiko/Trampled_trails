@@ -13,11 +13,11 @@ abstract class PointDetailsDao {
     @Update
     abstract suspend fun updatePointDetails(details: PointDetailsEntity)
 
-    @Query("SELECT * FROM point_details WHERE pointId = :pointId")
-    abstract fun getPointDetails(pointId: Long): Flow<PointDetailsResponse?>
+    @Query("SELECT * FROM point_coordinates WHERE pointId = :pointId")
+    abstract fun getPointDetails(pointId: Long): Flow<PointDetailsResponse>
 
-    @Query("SELECT * FROM point_details")
-    abstract fun getAllPointsDetails(): Flow<PointDetailsResponse?>
+    @Query("SELECT * FROM point_coordinates WHERE isRoutePoint = 0")
+    abstract fun getAllPointsDetails(): Flow<List<PointDetailsResponse>>
 
     @Transaction
     open suspend fun updateOrInsertPointDetails(details: PointDetailsEntity) {

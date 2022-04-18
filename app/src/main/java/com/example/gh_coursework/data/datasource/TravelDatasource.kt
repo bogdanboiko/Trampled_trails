@@ -8,6 +8,7 @@ interface TravelDatasource {
     interface Local {
         suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain)
         suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain): Long
+        fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>>
         suspend fun deletePoint(pointId: Long)
 
         suspend fun addPointTag(tag: PointTagDomain)

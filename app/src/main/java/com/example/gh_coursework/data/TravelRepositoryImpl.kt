@@ -24,6 +24,8 @@ class TravelRepositoryImpl(
         localDataSrcIml.addOrUpdatePointOfInterestDetails(poi)
     }
 
+    override fun getAllPointsDetails() = localDataSrcIml.getAllPointsDetails()
+
     override suspend fun addPointImages(images: List<PointImageDomain>) {
         localDataSrcIml.addPointImages(images)
     }

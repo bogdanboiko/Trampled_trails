@@ -9,6 +9,7 @@ import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntity
 import com.example.gh_coursework.data.database.mapper.mapPointImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToDomain
+import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToPointCompleteDetailsDomain
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
@@ -51,6 +52,10 @@ class LocalDataSrcIml(
         return pointId
     }
 
+    override fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>> {
+        return pointDetailsDao.getAllPointsDetails().map { it.map(::mapPointDetailsEntityToPointCompleteDetailsDomain) }
+    }
+
     override fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>> {
         return pointDao.getPointPreview()
             .map { pointPreview -> pointPreview.map(::mapPointEntityToDomain) }
@@ -73,7 +78,7 @@ class LocalDataSrcIml(
         imageDao.deletePointImage(mapPointImageDomainToEntity(image))
     }
 
-    override fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?> {
+    override fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain> {
         return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
     }
 
