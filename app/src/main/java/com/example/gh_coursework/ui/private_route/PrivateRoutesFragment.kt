@@ -3,7 +3,6 @@ package com.example.gh_coursework.ui.private_route
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,26 +18,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
-import com.example.gh_coursework.data.database.entity.RouteTagEntity
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
-import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.model.ImageModel
-import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapterCallback
 import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointModelToPoint
-import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
+import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
 import com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment
-import com.example.gh_coursework.ui.route_details.RouteDetailsFragment
 import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
@@ -79,10 +74,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -271,6 +263,13 @@ class PrivateRoutesFragment :
             val tagArray = bundle.getParcelableArray("tags")
             if (tagArray != null) {
                 filteredTags = tagArray.toList() as List<RouteTagModel>
+                if (tagArray.isEmpty()) {
+
+                    binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
+                        context?.resources?.getString(R.string.private_no_routes_placeholder)
+                }
+
+                resetCurrentRoute()
                 fetchRoutes()
             }
         }
@@ -739,6 +738,11 @@ class PrivateRoutesFragment :
                                 return@tags
                             }
                         }
+                    }
+
+                    if (filteredRoutes.isEmpty()) {
+                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
+                            context?.resources?.getString(R.string.private_no_routes_found_by_tags_placeholder)
                     }
                 } else {
                     filteredRoutes = routes.toMutableList()

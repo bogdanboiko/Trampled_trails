@@ -10,7 +10,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.gh_coursework.databinding.DialogFilterRoutesByTagBinding
+import com.example.gh_coursework.databinding.DialogFilterRoutesByTagsBinding
 import com.example.gh_coursework.ui.private_route.adapter.RouteFilterTagAdapter
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -20,7 +20,7 @@ class RouteFilterByTagDialogFragment : DialogFragment() {
         val REQUEST_KEY = "route_filter_by_tag_dialog_fragment"
     }
 
-    private lateinit var binding: DialogFilterRoutesByTagBinding
+    private lateinit var binding: DialogFilterRoutesByTagsBinding
     private val viewModelFilterBy: RouteFilterByTagDialogViewModel by viewModel()
     private val tagAdapter = RouteFilterTagAdapter()
     private val arguments by navArgs<RouteFilterByTagDialogFragmentArgs>()
@@ -32,7 +32,7 @@ class RouteFilterByTagDialogFragment : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DialogFilterRoutesByTagBinding.inflate(inflater, container, false)
+        binding = DialogFilterRoutesByTagsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -65,6 +65,7 @@ class RouteFilterByTagDialogFragment : DialogFragment() {
 
             clearTagsDialogButton.setOnClickListener {
                 tagAdapter.setFilteredTags(mutableListOf())
+                setFragmentResult(REQUEST_KEY, bundleOf("tags" to tagAdapter.filterByTagList.toTypedArray()))
                 dismiss()
             }
 

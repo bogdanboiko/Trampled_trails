@@ -11,6 +11,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,10 +23,14 @@ import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.private_point.adapter.PointsListAdapter
 import com.example.gh_coursework.ui.private_point.adapter.PointsListCallback
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
+import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
+import com.example.gh_coursework.ui.private_route.model.RouteModel
+import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
@@ -42,12 +47,14 @@ import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), PointsListCallback {
+    private lateinit var pointsJob: Job
     private lateinit var imagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointDetailsImagesLayoutManager: LinearLayoutManager
     private lateinit var pointsLayoutManager: LinearLayoutManager
@@ -56,6 +63,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
     private val pointListAdapter = PointsListAdapter(this)
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
+    private var checkedTagList = emptyList<PointTagModel>()
     private lateinit var pointDetailsSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var pointListBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private var mapState: MapState = MapState.PRESENTATION
@@ -109,6 +117,20 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
         configBottomSheetDialog()
         onNavigateToHomepageButtonClickListener()
         fetchPoints()
+
+        setFragmentResultListener(PointFilterByTagDialogFragment.REQUEST_KEY) { key, bundle ->
+            val tagArray = bundle.getParcelableArray("tags")
+            if (tagArray != null) {
+                checkedTagList = tagArray.toList() as List<PointTagModel>
+
+                if (tagArray.isEmpty()) {
+                    binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
+                        context?.resources?.getString(R.string.private_no_point_placeholder)
+                }
+
+                fetchPoints()
+            }
+        }
 
         val callback: OnBackPressedCallback =
             object : OnBackPressedCallback(true /* enabled by default */) {
@@ -170,6 +192,14 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
             adapter = pointListAdapter
             layoutManager = pointsLayoutManager
         }
+
+        binding.bottomSheetDialogPoints.pointFilterByTagButton.setOnClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPointFilterByTagsDialogFragment(
+                    checkedTagList.toTypedArray()
+                )
+            )
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -230,24 +260,45 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
     }
 
     private fun fetchPoints() {
-        pointCoordinates.forEach {
-            addAnnotationToMap(it)
+        if (this::pointsJob.isInitialized) {
+            pointsJob.cancel()
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.points.collect { data ->
-                data.forEach {
+        pointAnnotationManager.deleteAll()
+        pointsJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.points.collect { points ->
+                var filteredPoints = mutableListOf<PrivatePointDetailsModel>()
+
+                if (checkedTagList.isNotEmpty()) {
+                    points.forEach { point ->
+                        checkedTagList.forEach tags@{
+                            if (point.tagList.contains(it)) {
+                                filteredPoints.add(point)
+                                return@tags
+                            }
+                        }
+                    }
+
+                    if (filteredPoints.isEmpty()) {
+                        binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
+                            context?.resources?.getString(R.string.private_no_point_found_by_tags_placeholder)
+                    }
+                } else {
+                    filteredPoints = points.toMutableList()
+                }
+
+                filteredPoints.forEach {
                     addAnnotationToMap(it)
                 }
 
-                if (data.isNotEmpty()) {
+                if (filteredPoints.isNotEmpty()) {
                     binding.bottomSheetDialogPoints.emptyDataPlaceholder.visibility = View.GONE
                 } else {
                     binding.bottomSheetDialogPoints.emptyDataPlaceholder.visibility = View.VISIBLE
                 }
 
-                pointCoordinates = data
-                pointListAdapter.submitList(data)
+                pointCoordinates = filteredPoints
+                pointListAdapter.submitList(filteredPoints)
             }
         }
     }

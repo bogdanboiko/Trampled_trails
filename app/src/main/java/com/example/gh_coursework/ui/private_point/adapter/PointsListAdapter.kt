@@ -22,17 +22,17 @@ class PointsListAdapter(val callback: PointsListCallback) :
     ListAdapter<PrivatePointDetailsModel, PointsListAdapter.PointViewHolder>(Diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PointViewHolder {
-        val binding = ItemPointBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
+        return PointViewHolder(
+            ItemPointBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
         )
-
-        return PointViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: PointViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(currentList[position])
     }
 
     override fun getItemCount(): Int = currentList.size
@@ -42,15 +42,12 @@ class PointsListAdapter(val callback: PointsListCallback) :
 
         fun bind(item: PrivatePointDetailsModel) {
             with(binding) {
+                txtName.text = item.caption
+                txtDescription.text = item.description
+
                 if (item.caption.isEmpty() && item.description.isEmpty()) {
-                    txtName.visibility = View.INVISIBLE
-                    txtDescription.visibility = View.INVISIBLE
-
                     emptyDataPlaceholder.visibility = View.VISIBLE
-
                 } else {
-                    txtName.text = item.caption
-                    txtDescription.text = item.description
                     emptyDataPlaceholder.visibility = View.GONE
                 }
 
@@ -97,8 +94,8 @@ class PointsListAdapter(val callback: PointsListCallback) :
                     && oldItem.y == newItem.y
                     && oldItem.caption == newItem.caption
                     && oldItem.description == newItem.description
-                    && oldItem.imageList == newItem.imageList
-                    && oldItem.tagList == newItem.tagList
+                    && oldItem.imageList.containsAll(newItem.imageList)
+                    && oldItem.tagList.containsAll(newItem.tagList)
         }
     }
 }

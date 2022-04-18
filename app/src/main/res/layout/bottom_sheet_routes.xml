@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/light_gray"
     android:orientation="vertical"
-    android:paddingBottom="70dp"
+    android:paddingBottom="?attr/actionBarSize"
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -23,9 +23,8 @@
         android:id="@+id/emptyDataPlaceholder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
         android:gravity="center"
-        android:text="Routes list is empty. Press add button to create your first route!"
+        android:text="Points list is empty. Create your first point by pressing + button!"
         android:textColor="@color/map_background"
         android:textSize="20sp"
         android:visibility="gone" />
@@ -34,6 +33,5 @@
         android:id="@+id/routesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 </LinearLayout>
