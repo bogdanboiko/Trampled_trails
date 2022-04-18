@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class LocalDataSrcIml(
-    private val pointDao: PointPreviewDao,
     private val routeDao: RoutePreviewDao,
     private val pointDetailsDao: PointDetailsDao,
     private val tagDao: PointTagDao,
@@ -38,36 +37,20 @@ class LocalDataSrcIml(
 
     //PointPreview
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain): Long {
-        val pointId = pointDao.addPointPreview(mapPointDomainToEntity(poi))
-        addOrUpdatePointOfInterestDetails(
-            PointDetailsDomain(
-                pointId,
-                emptyList(),
-                emptyList(),
-                "",
-                ""
-            )
-        )
-
-        return pointId
+        return pointDetailsDao.insertPointCoordinatesAndCreateDetails(mapPointDomainToEntity(poi))
     }
 
     override fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>> {
         return pointDetailsDao.getAllPointsDetails().map { it.map(::mapPointDetailsEntityToPointCompleteDetailsDomain) }
     }
 
-    override fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>> {
-        return pointDao.getPointPreview()
-            .map { pointPreview -> pointPreview.map(::mapPointEntityToDomain) }
-    }
-
     override suspend fun deletePoint(pointId: Long) {
-        pointDao.deletePoint(pointId)
+        pointDetailsDao.deletePoint(pointId)
     }
 
     //PointDetails
-    override suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain) {
-        pointDetailsDao.updateOrInsertPointDetails(mapPointDetailsDomainToEntity(poi))
+    override suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain) {
+        pointDetailsDao.updatePointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
     override suspend fun addPointImages(images: List<PointImageDomain>) {
@@ -105,7 +88,7 @@ class LocalDataSrcIml(
     }
 
     override fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>> {
-        return getPointOfInterestDetails(pointId).map { it?.tagList ?: emptyList() }
+        return getPointOfInterestDetails(pointId).map { it.tagList }
     }
 
     override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {

@@ -36,10 +36,6 @@ val localDataBaseModule = module {
     }
 
     single {
-        get<TravelDatabase>().getPointPreviewDao()
-    }
-
-    single {
         get<TravelDatabase>().getRoutePreviewDao()
     }
 

@@ -22,10 +22,6 @@ val pointUseCasesModule = module {
         AddPointPreviewWithDetailsUseCaseImpl(get())
     }
 
-    single<GetPointsPreviewUseCase> {
-        GetPointsPreviewUseCaseImpl(get())
-    }
-
     single<DeletePointUseCase> {
         DeletePointUseCaseImpl(get())
     }

@@ -4,7 +4,7 @@ import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
 
 interface TravelRepository {
-    suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain)
+    suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
     suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain)
     suspend fun deletePoint(pointId: Long)
 
@@ -26,7 +26,6 @@ interface TravelRepository {
     suspend fun deleteTagsFromRoute(routeTagsList: List<RouteTagsDomain>)
 
     fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>>
-    fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
     fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?>
     fun getPointTagList(): Flow<List<PointTagDomain>>
 

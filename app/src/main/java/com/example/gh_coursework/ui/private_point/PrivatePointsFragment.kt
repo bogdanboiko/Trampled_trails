@@ -2,6 +2,7 @@ package com.example.gh_coursework.ui.private_point
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +22,8 @@ import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.private_point.adapter.PointsListAdapter
+import com.example.gh_coursework.ui.private_point.adapter.PointsListCallback
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -39,16 +42,18 @@ import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
+class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), PointsListCallback {
     private lateinit var imagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointDetailsImagesLayoutManager: LinearLayoutManager
     private lateinit var pointsLayoutManager: LinearLayoutManager
     private val viewModel: PointViewModel by viewModel()
     private var pointCoordinates = emptyList<PrivatePointDetailsModel>()
+    private val pointListAdapter = PointsListAdapter(this)
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
     private lateinit var pointDetailsSheetBehavior: BottomSheetBehavior<ConstraintLayout>
@@ -81,12 +86,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
 
         pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
 
-        binding.mapView.camera.easeTo(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(annotation.point.longitude(), annotation.point.latitude()))
-                .zoom(12.0)
-                .build()
-        )
+        eraseCameraToPoint(annotation.point.longitude(), annotation.point.latitude())
 
         true
     }
@@ -157,15 +157,19 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         pointDetailsSheetBehavior =
             BottomSheetBehavior.from(binding.pointDetailsBottomSheetDialogLayout.pointBottomSheetDialog)
 
-        pointDetailsSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 2
+        pointDetailsSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
-        pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         pointListBottomSheetBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
-        pointListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 2
+        pointListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         pointListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
+        binding.bottomSheetDialogPoints.pointsRecyclerView.apply {
+            adapter = pointListAdapter
+            layoutManager = pointsLayoutManager
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -232,11 +236,18 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.points.collect { data ->
-                data.minus(pointCoordinates).forEach {
+                data.forEach {
                     addAnnotationToMap(it)
                 }
 
+                if (data.isNotEmpty()) {
+                    binding.bottomSheetDialogPoints.emptyDataPlaceholder.visibility = View.GONE
+                } else {
+                    binding.bottomSheetDialogPoints.emptyDataPlaceholder.visibility = View.VISIBLE
+                }
+
                 pointCoordinates = data
+                pointListAdapter.submitList(data)
             }
         }
     }
@@ -322,5 +333,19 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                 pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
+    }
+
+    override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
+        eraseCameraToPoint(pointDetails.x, pointDetails.y)
+        pointListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    private fun eraseCameraToPoint(x: Double, y: Double) {
+        binding.mapView.camera.easeTo(
+            CameraOptions.Builder()
+                .center(Point.fromLngLat(x, y))
+                .zoom(14.0)
+                .build()
+        )
     }
 }
