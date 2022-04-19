@@ -82,7 +82,7 @@ class HomepageFragment : Fragment(), HomepageCallback {
                 btnEditUserIcon.visibility = View.VISIBLE
                 txtUsername.visibility = View.VISIBLE
                 homepageRecycler.visibility = View.VISIBLE
-                signInButton.visibility = View.GONE
+                btnLoginFacebook.visibility = View.GONE
 
                 txtUsername.text = "Hello, ${firebaseUser?.displayName}!"
                 Glide.with(requireActivity())
@@ -99,7 +99,7 @@ class HomepageFragment : Fragment(), HomepageCallback {
                 btnEditUserIcon.visibility = View.GONE
                 txtUsername.visibility = View.GONE
                 homepageRecycler.visibility = View.GONE
-                signInButton.visibility = View.VISIBLE
+                btnLoginFacebook.visibility = View.VISIBLE
 
                 Glide.with(requireActivity())
                     .load(R.drawable.ic_user)
@@ -107,7 +107,7 @@ class HomepageFragment : Fragment(), HomepageCallback {
                     .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                     .into(imgUserIcon)
 
-                binding.signInButton.setOnClickListener {
+                binding.btnLoginFacebook.setOnClickListener {
                     signIn()
                 }
             }
@@ -128,8 +128,9 @@ class HomepageFragment : Fragment(), HomepageCallback {
 
     private fun signIn() {
         val providers = arrayListOf(
-            AuthUI.IdpConfig.GoogleBuilder().build()
-
+            AuthUI.IdpConfig.FacebookBuilder()
+                .setPermissions(listOf("public_profile"))
+                .build()
         )
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
@@ -150,9 +151,7 @@ class HomepageFragment : Fragment(), HomepageCallback {
         val response = result.idpResponse
         if (result.resultCode == ComponentActivity.RESULT_OK) {
             firebaseUser = FirebaseAuth.getInstance().currentUser
-            firebaseUser?.let {
-                configHomepage()
-            }
+            configHomepage()
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }
