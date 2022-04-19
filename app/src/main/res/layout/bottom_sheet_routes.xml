@@ -19,16 +19,6 @@
         android:background="@color/transparent"
         android:padding="20dp" />
 
-    <TextView
-        android:id="@+id/emptyDataPlaceholder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Points list is empty. Create your first point by pressing + button!"
-        android:textColor="@color/map_background"
-        android:textSize="20sp"
-        android:visibility="gone" />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/routesRecyclerView"
         android:layout_width="match_parent"

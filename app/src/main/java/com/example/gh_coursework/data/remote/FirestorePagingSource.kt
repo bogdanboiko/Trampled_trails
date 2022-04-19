@@ -34,6 +34,13 @@ class FirestorePagingSource(
                     )
                 }
 
+                if (currentPage.isEmpty) {
+                    return@withContext LoadResult.Page(
+                        data = emptyList(),
+                        prevKey = null,
+                        nextKey = null
+                    )
+                }
 
                 val lastVisibleProduct = currentPage.documents[currentPage.size() - 1]
                 val nextPage = if (tagsFilter.isNotEmpty()) {
