@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.gh_coursework.data.database.TravelDatabase
+import com.example.gh_coursework.ui.helper.routeTags
 import org.koin.dsl.module
 
 val localDataBaseModule = module {
@@ -22,13 +23,11 @@ val localDataBaseModule = module {
                         """.trimIndent()
                     )
 
-                    db.execSQL("INSERT OR REPLACE INTO route_tag VALUES " +
-                            "(1, \"Historical\"), " +
-                            "(2, \"Evening walk\"), " +
-                            "(3, \"Romantic date\"), " +
-                            "(4, \"Beer weekend\"), " +
-                            "(5, \"Nature\"), " +
-                            "(6, \"Deserted\")")
+                    routeTags.forEachIndexed { index, s ->
+                        db.execSQL("INSERT OR REPLACE INTO route_tag VALUES " +
+                                "(${index + 1}, \"${s}\")")
+                    }
+
                 }
             })
             .fallbackToDestructiveMigration()
