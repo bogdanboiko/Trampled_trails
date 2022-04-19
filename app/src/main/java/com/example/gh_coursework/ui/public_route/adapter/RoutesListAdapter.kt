@@ -39,11 +39,13 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
 
         fun bind(item: PublicRouteModel) {
             with(binding) {
+                txtName.text = item.name
+                txtDescription.text = item.description
+
                 if (item.name.isEmpty() && item.description.isEmpty()) {
                     emptyDataPlaceholder.visibility = View.VISIBLE
                 } else {
-                    txtName.text = item.name
-                    txtDescription.text = item.description
+
                     emptyDataPlaceholder.visibility = View.INVISIBLE
                 }
 

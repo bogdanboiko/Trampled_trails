@@ -2,7 +2,6 @@ package com.example.gh_coursework.ui.private_point
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,8 +28,6 @@ import com.example.gh_coursework.ui.private_point.adapter.PointsListCallback
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
 import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
-import com.example.gh_coursework.ui.private_route.model.RouteModel
-import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
@@ -48,13 +45,12 @@ import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), PointsListCallback {
-    private lateinit var pointsJob: Job
+    private lateinit var pointsFetchingJob: Job
     private lateinit var imagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointDetailsImagesLayoutManager: LinearLayoutManager
     private lateinit var pointsLayoutManager: LinearLayoutManager
@@ -260,12 +256,12 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
     }
 
     private fun fetchPoints() {
-        if (this::pointsJob.isInitialized) {
-            pointsJob.cancel()
+        if (this::pointsFetchingJob.isInitialized) {
+            pointsFetchingJob.cancel()
         }
 
         pointAnnotationManager.deleteAll()
-        pointsJob = viewLifecycleOwner.lifecycleScope.launch {
+        pointsFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModel.points.collect { points ->
                 var filteredPoints = mutableListOf<PrivatePointDetailsModel>()
 

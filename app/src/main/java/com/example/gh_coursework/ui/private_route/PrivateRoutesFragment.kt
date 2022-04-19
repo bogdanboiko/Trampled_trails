@@ -32,7 +32,6 @@ import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapterCallb
 import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointModelToPoint
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
-import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
 import com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment
 import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -85,7 +84,7 @@ class PrivateRoutesFragment :
     RoutePointsListCallback {
 
     private var filteredTags = emptyList<RouteTagModel>()
-    private lateinit var routesJob: Job
+    private lateinit var routesFetchingJob: Job
     private var previousRouteId: Long? = null
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
@@ -722,11 +721,11 @@ class PrivateRoutesFragment :
     }
 
     private fun fetchRoutes() {
-        if (this::routesJob.isInitialized) {
-            routesJob.cancel()
+        if (this::routesFetchingJob.isInitialized) {
+            routesFetchingJob.cancel()
         }
 
-        routesJob = viewLifecycleOwner.lifecycleScope.launch {
+        routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModel.routes.collect { routes ->
                 var filteredRoutes = mutableListOf<RouteModel>()
 
