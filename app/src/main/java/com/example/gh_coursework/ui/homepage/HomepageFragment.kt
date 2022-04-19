@@ -82,7 +82,7 @@ class HomepageFragment : Fragment(), HomepageCallback {
                 btnEditUserIcon.visibility = View.VISIBLE
                 txtUsername.visibility = View.VISIBLE
                 homepageRecycler.visibility = View.VISIBLE
-                btnLoginFacebook.visibility = View.GONE
+                btnSingIn.visibility = View.GONE
 
                 txtUsername.text = "Hello, ${firebaseUser?.displayName}!"
                 Glide.with(requireActivity())
@@ -99,7 +99,7 @@ class HomepageFragment : Fragment(), HomepageCallback {
                 btnEditUserIcon.visibility = View.GONE
                 txtUsername.visibility = View.GONE
                 homepageRecycler.visibility = View.GONE
-                btnLoginFacebook.visibility = View.VISIBLE
+                btnSingIn.visibility = View.VISIBLE
 
                 Glide.with(requireActivity())
                     .load(R.drawable.ic_user)
@@ -107,7 +107,7 @@ class HomepageFragment : Fragment(), HomepageCallback {
                     .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                     .into(imgUserIcon)
 
-                binding.btnLoginFacebook.setOnClickListener {
+                btnSingIn.setOnClickListener {
                     signIn()
                 }
             }
@@ -130,12 +130,17 @@ class HomepageFragment : Fragment(), HomepageCallback {
         val providers = arrayListOf(
             AuthUI.IdpConfig.FacebookBuilder()
                 .setPermissions(listOf("public_profile"))
+                .build(),
+            AuthUI.IdpConfig.GoogleBuilder()
                 .build()
         )
+
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .setIsSmartLockEnabled(false)
+            .setTheme(R.style.Login)
+            .setLogo(R.drawable.ic_user)
             .build()
 
         signInLauncher.launch(signInIntent)
