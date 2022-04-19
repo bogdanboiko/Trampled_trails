@@ -132,6 +132,9 @@ class HomepageFragment : Fragment(), HomepageCallback {
                 .setPermissions(listOf("public_profile"))
                 .build(),
             AuthUI.IdpConfig.GoogleBuilder()
+                .build(),
+            AuthUI.IdpConfig.PhoneBuilder()
+                .setDefaultCountryIso("ua")
                 .build()
         )
 

@@ -67,6 +67,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx:20.1.2'
     implementation 'com.firebaseui:firebase-ui-auth:8.0.1'
 
+    //Google
+    implementation 'com.google.android.gms:play-services-safetynet:18.0.1'
+
     //Facebook
     implementation 'com.facebook.android:facebook-android-sdk:13.1.0'
 
