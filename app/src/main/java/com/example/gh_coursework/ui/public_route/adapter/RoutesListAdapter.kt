@@ -17,7 +17,7 @@ interface RoutesListAdapterCallback {
     fun onRouteItemClick(publicRoute: PublicRouteModel)
 }
 
-class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
+class RoutesListAdapter(private val callback: RoutesListAdapterCallback) :
     PagingDataAdapter<PublicRouteModel, RoutesListAdapter.RouteViewHolder>(Diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
