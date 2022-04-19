@@ -21,5 +21,7 @@
 
     <style name="Login" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="android:background">@color/map_background</item>
+        <item name="colorPrimary">@color/teal_200</item>
+        <item name="android:colorForeground">@color/light_gray</item>
     </style>
 </resources>
