@@ -8,10 +8,16 @@ import androidx.room.ForeignKey
     tableName = "route_tags", primaryKeys = ["routeId", "tagId"],
     foreignKeys = [
         ForeignKey(
-        entity = RouteTagEntity::class,
-        onDelete = ForeignKey.CASCADE,
-        parentColumns = arrayOf("tagId"),
-        childColumns = arrayOf("tagId")
+            entity = RouteEntity::class,
+            onDelete = ForeignKey.CASCADE,
+            parentColumns = arrayOf("routeId"),
+            childColumns = arrayOf("routeId")
+        ),
+        ForeignKey(
+            entity = RouteTagEntity::class,
+            onDelete = ForeignKey.NO_ACTION,
+            parentColumns = arrayOf("tagId"),
+            childColumns = arrayOf("tagId")
         )
     ]
 )

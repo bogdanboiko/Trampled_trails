@@ -6,6 +6,6 @@ import com.example.gh_coursework.domain.repository.TravelRepository
 class AddPointDetailsUseCaseImpl(private val repository: TravelRepository) :
     AddPointDetailsUseCase {
     override suspend fun invoke(details: PointDetailsDomain) {
-        repository.addOrUpdatePointOfInterestDetails(details)
+        repository.updatePointOfInterestDetails(details)
     }
 }

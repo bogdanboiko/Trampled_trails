@@ -22,10 +22,6 @@ val pointUseCasesModule = module {
         AddPointPreviewWithDetailsUseCaseImpl(get())
     }
 
-    single<GetPointsPreviewUseCase> {
-        GetPointsPreviewUseCaseImpl(get())
-    }
-
     single<DeletePointUseCase> {
         DeletePointUseCaseImpl(get())
     }
@@ -37,6 +33,10 @@ val pointUseCasesModule = module {
 
     single<GetPointDetailsUseCase> {
         GetPointDetailsUseCaseImpl(get())
+    }
+
+    single<GetAllPointsDetails> {
+        GetAllPointsDetailsImpl(get())
     }
 
     //Point images

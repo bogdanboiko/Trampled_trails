@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,8 +22,12 @@ import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsPreviewModel
+import com.example.gh_coursework.ui.point_details.model.PointTagModel
+import com.example.gh_coursework.ui.private_point.adapter.PointsListAdapter
+import com.example.gh_coursework.ui.private_point.adapter.PointsListCallback
+import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
+import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
@@ -38,18 +44,24 @@ import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.gestures.OnMapClickListener
 import com.mapbox.maps.plugin.gestures.addOnMapClickListener
 import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 
-class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
+class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), PointsListCallback {
+    private lateinit var pointsFetchingJob: Job
     private lateinit var imagesPreviewAdapter: ImagesPreviewAdapter
-    private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var pointDetailsImagesLayoutManager: LinearLayoutManager
+    private lateinit var pointsLayoutManager: LinearLayoutManager
     private val viewModel: PointViewModel by viewModel()
-    private var pointCoordinates = emptyList<PrivatePointModel>()
+    private var pointCoordinates = emptyList<PrivatePointDetailsModel>()
+    private val pointListAdapter = PointsListAdapter(this)
     private lateinit var mapboxMap: MapboxMap
     private lateinit var binding: FragmentPrivatePointsBinding
-    private lateinit var sheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private var checkedTagList = emptyList<PointTagModel>()
+    private lateinit var pointDetailsSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var pointListBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
 
@@ -71,27 +83,14 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         viewLifecycleOwner.lifecycleScope.launch {
 
             annotation.getData()?.asLong?.let { pointId ->
-                viewModel.getPointDetailsPreview(pointId).collect { details ->
-                    if (details != null) {
-                        prepareDetailsDialog(annotation, details)
-                    }
-                }
+                pointCoordinates.find { it.pointId == pointId }
+                    ?.let { prepareDetailsDialog(annotation, it) }
             }
         }
-        if (sheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            loadPointData(annotation)
-            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        } else {
-            loadPointData(annotation)
-            sheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        }
 
-        binding.mapView.camera.easeTo(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(annotation.point.longitude(), annotation.point.latitude()))
-                .zoom(12.0)
-                .build()
-        )
+        pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        eraseCameraToPoint(annotation.point.longitude(), annotation.point.latitude())
 
         true
     }
@@ -110,9 +109,24 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         configMapSwitcherButton()
         configMapModSwitcher()
         configCancelButton()
+        configPointsButton()
         configBottomSheetDialog()
         onNavigateToHomepageButtonClickListener()
         fetchPoints()
+
+        setFragmentResultListener(PointFilterByTagDialogFragment.REQUEST_KEY) { key, bundle ->
+            val tagArray = bundle.getParcelableArray("tags")
+            if (tagArray != null) {
+                checkedTagList = tagArray.toList() as List<PointTagModel>
+
+                if (tagArray.isEmpty()) {
+                    binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
+                        context?.resources?.getString(R.string.private_no_point_placeholder)
+                }
+
+                fetchPoints()
+            }
+        }
 
         val callback: OnBackPressedCallback =
             object : OnBackPressedCallback(true /* enabled by default */) {
@@ -155,13 +169,33 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     }
 
     private fun configBottomSheetDialog() {
-        PagerSnapHelper().attachToRecyclerView(binding.bottomSheetDialogLayout.imageRecycler)
-        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        sheetBehavior =
-            BottomSheetBehavior.from(binding.bottomSheetDialogLayout.pointBottomSheetDialog)
+        PagerSnapHelper().attachToRecyclerView(binding.pointDetailsBottomSheetDialogLayout.imageRecycler)
+        pointDetailsImagesLayoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        pointDetailsSheetBehavior =
+            BottomSheetBehavior.from(binding.pointDetailsBottomSheetDialogLayout.pointBottomSheetDialog)
 
-        sheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 2
-        sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        pointDetailsSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+        pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        pointListBottomSheetBehavior =
+            BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
+        pointListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+        pointListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        binding.bottomSheetDialogPoints.pointsRecyclerView.apply {
+            adapter = pointListAdapter
+            layoutManager = pointsLayoutManager
+        }
+
+        binding.bottomSheetDialogPoints.pointFilterByTagButton.setOnClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPointFilterByTagsDialogFragment(
+                    checkedTagList.toTypedArray()
+                )
+            )
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -206,6 +240,12 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         }
     }
 
+    private fun configPointsButton() {
+        binding.getPointsList.setOnClickListener {
+            pointListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        }
+    }
+
     private fun onNavigateToHomepageButtonClickListener() {
         binding.homepageButton.setOnClickListener {
             findNavController().navigate(
@@ -216,21 +256,45 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
     }
 
     private fun fetchPoints() {
-        pointCoordinates.forEach {
-            if (!it.isRoutePoint) {
-                addAnnotationToMap(it)
-            }
+        if (this::pointsFetchingJob.isInitialized) {
+            pointsFetchingJob.cancel()
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.points.collect { data ->
-                data.minus(pointCoordinates).forEach {
-                    if (!it.isRoutePoint) {
-                        addAnnotationToMap(it)
+        pointAnnotationManager.deleteAll()
+        pointsFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.points.collect { points ->
+                var filteredPoints = mutableListOf<PrivatePointDetailsModel>()
+
+                if (checkedTagList.isNotEmpty()) {
+                    points.forEach { point ->
+                        checkedTagList.forEach tags@{
+                            if (point.tagList.contains(it)) {
+                                filteredPoints.add(point)
+                                return@tags
+                            }
+                        }
                     }
+
+                    if (filteredPoints.isEmpty()) {
+                        binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
+                            context?.resources?.getString(R.string.private_no_point_found_by_tags_placeholder)
+                    }
+                } else {
+                    filteredPoints = points.toMutableList()
                 }
 
-                pointCoordinates = data
+                filteredPoints.forEach {
+                    addAnnotationToMap(it)
+                }
+
+                if (filteredPoints.isNotEmpty()) {
+                    binding.bottomSheetDialogPoints.emptyDataPlaceholder.visibility = View.GONE
+                } else {
+                    binding.bottomSheetDialogPoints.emptyDataPlaceholder.visibility = View.VISIBLE
+                }
+
+                pointCoordinates = filteredPoints
+                pointListAdapter.submitList(filteredPoints)
             }
         }
     }
@@ -246,7 +310,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         binding.mapView.dispatchTouchEvent(clickEvent.second)
     }
 
-    private fun addAnnotationToMap(point: PrivatePointModel) {
+    private fun addAnnotationToMap(point: PrivatePointDetailsModel) {
         activity?.applicationContext?.let {
             convertDrawableToBitmap(
                 AppCompatResources.getDrawable(
@@ -264,24 +328,11 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
         }
     }
 
-    private fun loadPointData(annotation: PointAnnotation) {
-        viewLifecycleOwner.lifecycleScope.launch {
-
-            annotation.getData()?.asLong?.let { pointId ->
-                viewModel.getPointDetailsPreview(pointId).collect { details ->
-                    if (details != null) {
-                        prepareDetailsDialog(annotation, details)
-                    }
-                }
-            }
-        }
-    }
-
     private fun prepareDetailsDialog(
         pointAnnotation: PointAnnotation,
-        details: PrivatePointDetailsPreviewModel
+        details: PrivatePointDetailsModel
     ) {
-        binding.bottomSheetDialogLayout.apply {
+        binding.pointDetailsBottomSheetDialogLayout.apply {
             pointCaptionText.text = details.caption
             pointDescriptionText.text = details.description
             if (details.tagList.isNotEmpty()) {
@@ -297,14 +348,14 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPrivateImageDetails(
                         details.pointId,
-                        this@PrivatePointsFragment.layoutManager.findFirstVisibleItemPosition()
+                        this@PrivatePointsFragment.pointDetailsImagesLayoutManager.findFirstVisibleItemPosition()
                     )
                 )
             }
 
             imageRecycler.apply {
                 adapter = imagesPreviewAdapter
-                layoutManager = this@PrivatePointsFragment.layoutManager
+                layoutManager = this@PrivatePointsFragment.pointDetailsImagesLayoutManager
             }
 
             imagesPreviewAdapter.submitList(details.imageList)
@@ -318,20 +369,30 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points) {
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment(pointAnnotation.getData()?.asLong!!)
+                        .actionPrivatePointsFragmentToPointDetailsFragment(details.pointId)
                 )
             }
 
             pointDetailsDeleteButton.setOnClickListener {
-                pointAnnotation.getData()?.asLong?.let { pointId ->
-                    viewModel.deletePoint(
-                        pointId
-                    )
-                }
+                viewModel.deletePoint(details.pointId)
 
                 pointAnnotationManager.delete(pointAnnotation)
-                sheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
+    }
+
+    override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
+        eraseCameraToPoint(pointDetails.x, pointDetails.y)
+        pointListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    private fun eraseCameraToPoint(x: Double, y: Double) {
+        binding.mapView.camera.easeTo(
+            CameraOptions.Builder()
+                .center(Point.fromLngLat(x, y))
+                .zoom(14.0)
+                .build()
+        )
     }
 }

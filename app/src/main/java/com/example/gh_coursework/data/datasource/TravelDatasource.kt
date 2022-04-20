@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface TravelDatasource {
     interface Local {
-        suspend fun addOrUpdatePointOfInterestDetails(poi: PointDetailsDomain)
         suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain): Long
+        fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>>
         suspend fun deletePoint(pointId: Long)
 
         suspend fun addPointTag(tag: PointTagDomain)
@@ -28,7 +28,6 @@ interface TravelDatasource {
         suspend fun deleteTagsFromRoute(routeTagsList: List<RouteTagsDomain>)
 
         fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>>
-        fun getPointOfInterestPreview(): Flow<List<PointPreviewDomain>>
         fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?>
         fun getPointTagList(): Flow<List<PointTagDomain>>
 
@@ -41,6 +40,7 @@ interface TravelDatasource {
         fun getRoutePointsImagesList(routeId: Long): Flow<List<RoutePointsImagesDomain>>
 
         fun getRouteTags(): Flow<List<RouteTagDomain>>
+        suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
     }
 
     interface Remote {

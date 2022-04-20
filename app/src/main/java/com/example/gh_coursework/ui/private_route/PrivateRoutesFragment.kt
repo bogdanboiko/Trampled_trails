@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -24,7 +25,6 @@ import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.model.ImageModel
-import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -32,6 +32,8 @@ import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapterCallb
 import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointModelToPoint
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
+import com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment
+import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
@@ -81,6 +83,9 @@ class PrivateRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
+    private var filteredTags = emptyList<RouteTagModel>()
+    private lateinit var routesFetchingJob: Job
+    private var previousRouteId: Long? = null
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
 
@@ -246,10 +251,26 @@ class PrivateRoutesFragment :
         configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
+
         if (this::focusedRoute.isInitialized) {
-            rebuildRoute(focusedRoute)
-        } else {
-            fetchRoutes()
+            previousRouteId = focusedRoute.routeId
+        }
+
+        fetchRoutes()
+
+        setFragmentResultListener(RouteFilterByTagDialogFragment.REQUEST_KEY) { key, bundle ->
+            val tagArray = bundle.getParcelableArray("tags")
+            if (tagArray != null) {
+                filteredTags = tagArray.toList() as List<RouteTagModel>
+                if (tagArray.isEmpty()) {
+
+                    binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
+                        context?.resources?.getString(R.string.private_no_routes_placeholder)
+                }
+
+                resetCurrentRoute()
+                fetchRoutes()
+            }
         }
 
         mapboxNavigation.startTripSession(withForegroundService = false)
@@ -609,6 +630,14 @@ class PrivateRoutesFragment :
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
+
+        binding.bottomSheetDialogRoutes.routeFilterByTagButton.setOnClickListener {
+            findNavController().navigate(
+                PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToRouteFilterByTagsDialogFragment(
+                    filteredTags.toTypedArray()
+                )
+            )
+        }
     }
 
     private fun getRoutePointsDialog() {
@@ -692,24 +721,54 @@ class PrivateRoutesFragment :
     }
 
     private fun fetchRoutes() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.routes
-                .collect { route ->
-                    if (route.isNotEmpty()) {
-                        rebuildRoute(route.last())
-                        routesListAdapter.submitList(route)
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                            View.GONE
-                    } else if (route.isEmpty()) {
-                        routesListAdapter.submitList(route)
-                        pointsListAdapter.submitList(emptyList())
+        if (this::routesFetchingJob.isInitialized) {
+            routesFetchingJob.cancel()
+        }
 
-                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
-                            View.VISIBLE
-                        binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
-                            View.VISIBLE
+        routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.routes.collect { routes ->
+                var filteredRoutes = mutableListOf<RouteModel>()
+
+                if (filteredTags.isNotEmpty()) {
+                    routes.forEach { route ->
+                        filteredTags.forEach tags@{
+                            if (route.tagsList.contains(it)) {
+                                filteredRoutes.add(route)
+                                return@tags
+                            }
+                        }
                     }
+
+                    if (filteredRoutes.isEmpty()) {
+                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
+                            context?.resources?.getString(R.string.private_no_routes_found_by_tags_placeholder)
+                    }
+                } else {
+                    filteredRoutes = routes.toMutableList()
                 }
+
+                routesListAdapter.submitList(filteredRoutes)
+
+                if (filteredRoutes.isNotEmpty()) {
+                    if (previousRouteId != null) {
+                        filteredRoutes.find { it.routeId == previousRouteId }
+                            ?.let { rebuildRoute(it) }
+                            ?: rebuildRoute(routes.last())
+                        previousRouteId = null
+                    } else {
+                        rebuildRoute(filteredRoutes.last())
+                    }
+                    binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                        View.GONE
+                } else if (filteredRoutes.isEmpty()) {
+                    pointsListAdapter.submitList(emptyList())
+
+                    binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                        View.VISIBLE
+                    binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
+                        View.VISIBLE
+                }
+            }
         }
     }
 
