@@ -31,6 +31,10 @@
             android:id="@+id/action_privatePointsFragment_to_publicRoutesFragment"
             app:destination="@id/publicRouteFragment"
             app:popUpTo="@id/privatePointsFragment"/>
+        <action
+            android:id="@+id/action_privatePointsFragment_to_pointFilterByTagsDialogFragment"
+            app:destination="@id/pointFilterByTagsDialogFragment"
+            app:popUpTo="@id/privatePointsFragment" />
     </fragment>
     <fragment
         android:id="@+id/pointDetailsFragment"
@@ -55,6 +59,15 @@
         <argument
             android:name="pointId"
             app:argType="long" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/pointFilterByTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment"
+        android:label="FilterByTagDialog">
+        <argument
+            android:name="checkedTags"
+            app:argType="com.example.gh_coursework.ui.point_details.model.PointTagModel[]" />
     </dialog>
 
     <fragment
@@ -102,6 +115,10 @@
             android:id="@+id/action_privateRoutesFragment_to_publicRoutesFragment"
             app:destination="@id/publicRouteFragment"
             app:popUpTo="@id/privateRoutesFragment"/>
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_routeFilterByTagsDialogFragment"
+            app:destination="@id/routeFilterByTagsDialogFragment"
+            app:popUpTo="@id/privateRoutesFragment" />
     </fragment>
 
     <fragment
@@ -121,6 +138,15 @@
             app:destination="@id/privateRouteImageDetails"
             app:popUpTo="@id/routeDetailsFragment"/>
     </fragment>
+
+    <dialog
+        android:id="@+id/routeFilterByTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment"
+        android:label="FilterByTagDialog">
+        <argument
+            android:name="checkedTags"
+            app:argType="com.example.gh_coursework.ui.route_details.model.RouteTagModel[]" />
+    </dialog>
 
     <dialog
         android:id="@+id/routeTagsDialogFragment"
@@ -161,6 +187,10 @@
             android:id="@+id/action_publicRouteFragment_to_publicImageFragment"
             app:destination="@id/publicImageFragment"
             app:popUpTo="@id/publicRouteFragment" />
+        <action
+            android:id="@+id/action_publicRouteFragment_to_publicRouteFilterByTagsDialogFragment"
+            app:destination="@id/publicRouteFilterByTagsDialogFragment"
+            app:popUpTo="@id/publicRouteFragment" />
     </fragment>
 
     <fragment
@@ -175,4 +205,13 @@
         <argument android:name="clickedItemCount"
             app:argType="integer" />
     </fragment>
+
+    <dialog
+        android:id="@+id/publicRouteFilterByTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment"
+        android:label="PublicRouteFilterByTagDialog">
+        <argument
+            android:name="checkedTags"
+            app:argType="string[]" />
+    </dialog>
 </navigation>

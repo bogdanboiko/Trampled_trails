@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id "androidx.navigation.safeargs"
     id 'com.google.gms.google-services'
+    id "kotlin-parcelize"
 }
 
 android {
@@ -49,6 +50,7 @@ android {
 }
 
 dependencies {
+    implementation "androidx.fragment:fragment-ktx:1.4.1"
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'

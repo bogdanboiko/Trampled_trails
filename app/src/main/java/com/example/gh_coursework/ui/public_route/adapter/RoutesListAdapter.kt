@@ -17,7 +17,7 @@ interface RoutesListAdapterCallback {
     fun onRouteItemClick(publicRoute: PublicRouteModel)
 }
 
-class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
+class RoutesListAdapter(private val callback: RoutesListAdapterCallback) :
     PagingDataAdapter<PublicRouteModel, RoutesListAdapter.RouteViewHolder>(Diff) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RouteViewHolder {
@@ -39,11 +39,13 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
 
         fun bind(item: PublicRouteModel) {
             with(binding) {
+                txtName.text = item.name
+                txtDescription.text = item.description
+
                 if (item.name.isEmpty() && item.description.isEmpty()) {
                     emptyDataPlaceholder.visibility = View.VISIBLE
                 } else {
-                    txtName.text = item.name
-                    txtDescription.text = item.description
+
                     emptyDataPlaceholder.visibility = View.INVISIBLE
                 }
 

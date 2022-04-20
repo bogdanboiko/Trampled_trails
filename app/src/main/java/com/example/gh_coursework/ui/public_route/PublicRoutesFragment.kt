@@ -10,20 +10,20 @@ import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
-import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
-import com.example.gh_coursework.ui.private_point.PrivatePointsFragmentDirections
 import com.example.gh_coursework.ui.public_route.adapter.*
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
+import com.example.gh_coursework.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
@@ -68,6 +68,8 @@ class PublicRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
+    private lateinit var routesFetchingJob: Job
+    private var tagsFilter = emptyList<String>()
     private lateinit var routeImagesPreviewAdapter: PublicImageAdapter
     private lateinit var pointImagesPreviewAdapter: PublicImageAdapter
 
@@ -181,10 +183,24 @@ class PublicRoutesFragment :
         configBottomSheetDialogs()
         initMapboxNavigation()
         initRouteLine()
+
         if (this::focusedPublicRoute.isInitialized) {
             rebuildRoute(focusedPublicRoute)
-        } else {
-            fetchRoutes()
+        }
+
+        fetchRoutes()
+
+        setFragmentResultListener(PublicRouteFilterByTagFragment.REQUEST_KEY) { key, bundle ->
+            val tagArray = bundle.getStringArray("tags")
+            if (tagArray != null) {
+                tagsFilter = tagArray.toList()
+                if (tagArray.isEmpty()) {
+                    binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
+                        context?.resources?.getString(R.string.private_no_routes_placeholder)
+                }
+
+                fetchRoutes()
+            }
         }
 
         mapboxNavigation.startTripSession(withForegroundService = false)
@@ -295,6 +311,14 @@ class PublicRoutesFragment :
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
+
+        binding.bottomSheetDialogRoutes.routeFilterByTagButton.setOnClickListener {
+            findNavController().navigate(
+                PublicRoutesFragmentDirections.actionPublicRouteFragmentToPublicRouteFilterByTagsDialogFragment(
+                    tagsFilter.toTypedArray()
+                )
+            )
+        }
     }
 
     private fun getRoutePointsDialog() {
@@ -377,9 +401,12 @@ class PublicRoutesFragment :
     }
 
     private fun fetchRoutes() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModelPublic.routeList
-                .collect { route ->
+        if (this::routesFetchingJob.isInitialized) {
+            routesFetchingJob.cancel()
+        }
+
+        routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
+            viewModelPublic.fetchRoutes(tagsFilter).collect { route ->
                     routesListAdapter.submitData(route)
                 }
         }
