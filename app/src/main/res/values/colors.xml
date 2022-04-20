@@ -11,4 +11,8 @@
     <color name="transparent">#00000000</color>
     <color name="light_gray">#2D2D2D</color>
     <color name="map_background">#EBE7E1</color>
+
+    <color name="com_facebook_button_background_color_focused_disabled">#3C5A99</color>
+    <color name="com_facebook_button_background_color_focused">#3C5A99</color>
+    <color name="com_facebook_button_border_color_focused">#3C5A99</color>
 </resources>

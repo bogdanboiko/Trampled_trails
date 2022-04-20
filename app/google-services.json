@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "380237413037-hrvkulti0n677dkq55fngteav9hvgq44.apps.googleusercontent.com",
+          "client_id": "380237413037-2akgosnv3mgifogk95m4t9u2250pkvvp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.gh_coursework",
-            "certificate_hash": "b0c588ad7a69a9e73b9c19dd332caa7139fec4c5"
+            "certificate_hash": "dc838f7568a890f19a571e80d8a433e840caf15e"
           }
         },
         {
