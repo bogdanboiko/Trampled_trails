@@ -5,37 +5,15 @@
     android:layout_height="match_parent"
     android:background="@color/map_background">
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/imgContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/imgUserIcon"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/ic_user"
         android:layout_marginTop="60dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/imgUserIcon"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:src="@drawable/ic_user"
-            android:elevation="-2dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/btnEditUserIcon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_camera"
-            app:elevation="-1dp"
-            app:fabCustomSize="50dp"
-            app:layout_anchor="@id/imgUserIcon"
-            app:layout_anchorGravity="bottom|right|end"
-            app:maxImageSize="20dp" />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/txtUsername"
@@ -48,7 +26,7 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgContainer" />
+        app:layout_constraintTop_toBottomOf="@+id/imgUserIcon" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/homepageRecycler"

@@ -1,14 +1,11 @@
 package com.example.gh_coursework.ui.homepage
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,25 +28,11 @@ class HomepageFragment : Fragment(), HomepageCallback {
     private val homepageAdapter = HomepageAdapter(this as HomepageCallback)
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
 
-    private val imageTakerLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                val updatedUser = UserProfileChangeRequest.Builder()
-                    .setPhotoUri(data?.data)
-                    .build()
-
-                firebaseUser?.updateProfile(updatedUser)
-                Glide.with(requireActivity())
-                    .load(data?.data)
-                    .placeholder(binding.imgUserIcon.drawable)
-                    .error(R.drawable.ic_user)
-                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                    .into(binding.imgUserIcon)
-                } else {
-                    Log.e("Fail: ", "to load image")
-                }
-            }
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract()
+    ) { res ->
+        this.signInResult(res)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -79,51 +62,27 @@ class HomepageFragment : Fragment(), HomepageCallback {
     private fun configHomepage() {
         with(binding) {
             if (firebaseUser != null) {
-                btnEditUserIcon.visibility = View.VISIBLE
                 txtUsername.visibility = View.VISIBLE
                 homepageRecycler.visibility = View.VISIBLE
                 btnSingIn.visibility = View.GONE
 
                 txtUsername.text = "Hello, ${firebaseUser?.displayName}!"
-                Glide.with(requireActivity())
-                    .load(firebaseUser!!.photoUrl)
-                    .placeholder(imgUserIcon.drawable)
-                    .error(R.drawable.ic_user)
-                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                    .into(imgUserIcon)
-
-                btnEditUserIcon.setOnClickListener {
-                    editUserIcon()
-                }
             } else {
-                btnEditUserIcon.visibility = View.GONE
                 txtUsername.visibility = View.GONE
                 homepageRecycler.visibility = View.GONE
                 btnSingIn.visibility = View.VISIBLE
-
-                Glide.with(requireActivity())
-                    .load(R.drawable.ic_user)
-                    .placeholder(imgUserIcon.drawable)
-                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                    .into(imgUserIcon)
 
                 btnSingIn.setOnClickListener {
                     signIn()
                 }
             }
-        }
-    }
 
-    private fun editUserIcon() {
-        val transitionToGallery = Intent()
-        transitionToGallery.type = "image/*"
-        transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
-        imageTakerLauncher.launch(
-            Intent.createChooser(
-                transitionToGallery,
-                "Select pictures"
-            )
-        )
+            Glide.with(requireActivity())
+                .load(R.drawable.ic_user)
+                .placeholder(binding.imgUserIcon.drawable)
+                .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                .into(binding.imgUserIcon)
+        }
     }
 
     private fun signIn() {
@@ -149,12 +108,6 @@ class HomepageFragment : Fragment(), HomepageCallback {
         signInLauncher.launch(signInIntent)
     }
 
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ) { res ->
-        this.signInResult(res)
-    }
-
     private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
         val response = result.idpResponse
         if (result.resultCode == ComponentActivity.RESULT_OK) {
@@ -167,7 +120,6 @@ class HomepageFragment : Fragment(), HomepageCallback {
 
     override fun onEditClick() {
         with(binding) {
-            btnEditUserIcon.visibility = View.GONE
             txtUsername.visibility = View.GONE
             homepageRecycler.visibility = View.GONE
             btnSave.visibility = View.VISIBLE
@@ -199,7 +151,6 @@ class HomepageFragment : Fragment(), HomepageCallback {
                     editUsername.text.clear()
                 }
 
-                btnEditUserIcon.visibility = View.VISIBLE
                 txtUsername.visibility = View.VISIBLE
                 homepageRecycler.visibility = View.VISIBLE
                 editUsername.visibility = View.GONE
