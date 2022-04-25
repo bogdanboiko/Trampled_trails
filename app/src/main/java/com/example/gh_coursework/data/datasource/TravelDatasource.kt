@@ -2,6 +2,7 @@ package com.example.gh_coursework.data.datasource
 
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.domain.entity.*
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 interface TravelDatasource {
@@ -44,7 +45,11 @@ interface TravelDatasource {
     }
 
     interface Remote {
-        fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>)
+        fun publishRoute(
+            route: RouteDomain,
+            routePoints: List<RoutePointDomain>,
+            currentUser: FirebaseUser
+        )
         fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
     }
 }

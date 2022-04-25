@@ -1,29 +1,23 @@
 package com.example.gh_coursework.data.remote
 
 import android.net.Uri
-import android.util.Log
 import com.example.gh_coursework.data.datasource.TravelDatasource
-import com.example.gh_coursework.data.remote.entity.PublicRoutePointEntity
 import com.example.gh_coursework.data.remote.entity.PublicRoutePointResponseEntity
 import com.example.gh_coursework.data.remote.mapper.mapPublicRoutePointResponseEntityToDomain
 import com.example.gh_coursework.data.remote.mapper.mapRouteDomainToPublicRouteEntity
 import com.example.gh_coursework.data.remote.mapper.mapRoutePointDomainToPublicRoutePointEntity
-import com.example.gh_coursework.domain.entity.PublicRoutePointDomain
 import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.domain.entity.RoutePointDomain
-import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 import java.util.*
 
 class RemoteDataSrcImpl(
@@ -32,7 +26,10 @@ class RemoteDataSrcImpl(
 ) : TravelDatasource.Remote {
     private val ref = storage.reference
 
-    override fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>) {
+    override fun publishRoute(
+        route: RouteDomain,
+        routePoints: List<RoutePointDomain>,
+        currentUser: FirebaseUser) {
         val routeDocRef = db.collection("routes").document()
         val routeImagesAddTasks = mutableListOf<StorageTask<UploadTask.TaskSnapshot>>()
         val routeImagesGetUriTasks = mutableListOf<Task<Uri>>()
@@ -82,7 +79,7 @@ class RemoteDataSrcImpl(
                 routeDocRef.set(
                     mapRouteDomainToPublicRouteEntity(
                         route,
-                        it.map { imageUrl -> imageUrl.toString() })
+                        it.map { imageUrl -> imageUrl.toString() }, currentUser.uid)
                 )
             }
         }

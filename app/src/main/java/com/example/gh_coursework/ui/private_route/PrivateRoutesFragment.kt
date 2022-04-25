@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
@@ -35,6 +36,7 @@ import com.example.gh_coursework.ui.private_route.model.RoutePointModel
 import com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment
 import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
@@ -492,9 +494,9 @@ class PrivateRoutesFragment :
                 null,
                 "",
                 "",
-                null,
                 emptyList(),
-                emptyList()
+                emptyList(),
+                false
             )
 
             viewModel.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
@@ -1101,10 +1103,11 @@ class PrivateRoutesFragment :
             if (route.name?.isEmpty() == true && route.description?.isEmpty() == true) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                routeCaptionText.text = route.name
-                routeDescriptionText.text = route.description
                 emptyDataPlaceholder.visibility = View.GONE
             }
+
+            routeCaptionText.text = route.name
+            routeDescriptionText.text = route.description
 
             routeDetailsEditButton.setOnClickListener {
                 route.routeId?.let {
@@ -1115,8 +1118,42 @@ class PrivateRoutesFragment :
                 }
             }
 
+            if (route.isPublic) {
+                routePublishButton.visibility = View.GONE
+            } else {
+                routePublishButton.visibility = View.VISIBLE
+            }
+
             routePublishButton.setOnClickListener {
-                viewModel.publishRoute(route, currentRoutePointsList)
+                val user = FirebaseAuth.getInstance().currentUser
+                if (user != null) {
+                    if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+                        Toast.makeText(
+                            context,
+                            "Caption or details of publishing route are empty! Fill data before publishing",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        viewModel.publishRoute(route, currentRoutePointsList, user)
+                        viewModel.updateRoute(
+                            RouteModel(
+                                route.routeId,
+                                route.name,
+                                route.description,
+                                route.tagsList,
+                                route.imageList,
+                                true
+                            )
+                        )
+                        routePublishButton.visibility = View.GONE
+                    }
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Sign in pressing the homepage button before publishing route!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
 
             routeImagesPreviewAdapter = ImagesPreviewAdapter {

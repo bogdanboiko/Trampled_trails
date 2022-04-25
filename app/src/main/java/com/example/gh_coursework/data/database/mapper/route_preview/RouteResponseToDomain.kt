@@ -11,9 +11,9 @@ fun mapRouteResponseToDomain(routeResponse: RoutePreviewResponse): RouteDomain {
             route.routeId,
             route.name,
             route.description,
-            route.rating,
             tagList.map(::mapRouteTagEntityToDomain),
-            imageList.map(::mapRouteImageEntityToDomain)
+            imageList.map(::mapRouteImageEntityToDomain),
+            route.isPublic
         )
     }
 }

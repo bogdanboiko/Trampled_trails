@@ -2,9 +2,9 @@ package com.example.gh_coursework.ui.private_route
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.image.AddRouteImageListUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
 import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
+import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.DeleteRouteUseCase
@@ -15,6 +15,7 @@ import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDomainToMo
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointModelToDomain
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -26,6 +27,7 @@ class RouteViewModel(
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
     private val deletePointUseCase: DeletePointUseCase,
     private val deleteRouteUseCase: DeleteRouteUseCase,
+    private val updateRouteDetailsUseCase: UpdateRouteDetailsUseCase,
     private val publishRouteUseCase: PublishRouteUseCase
 ) : ViewModel() {
 
@@ -59,7 +61,17 @@ class RouteViewModel(
         }
     }
 
-    fun publishRoute(route: RouteModel, routePoints: List<RoutePointModel>) {
-        publishRouteUseCase.invoke(mapRouteModelToDomain(route), routePoints.map(::mapRoutePointModelToDomain))
+    fun publishRoute(
+        route: RouteModel,
+        routePoints: List<RoutePointModel>,
+        currentUser: FirebaseUser
+    ) {
+        publishRouteUseCase.invoke(mapRouteModelToDomain(route), routePoints.map(::mapRoutePointModelToDomain), currentUser)
+    }
+
+    fun updateRoute(route: RouteModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            updateRouteDetailsUseCase.invoke(mapRouteModelToDomain(route))
+        }
     }
 }

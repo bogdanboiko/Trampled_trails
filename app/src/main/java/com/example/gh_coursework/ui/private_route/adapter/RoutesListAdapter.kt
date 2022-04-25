@@ -42,7 +42,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
 
         fun bind(item: RouteModel) {
             with(binding) {
-                if (item.name?.isEmpty() == true && item.description?.isEmpty() == true && item.rating == null) {
+                if (item.name?.isEmpty() == true && item.description?.isEmpty() == true) {
                     txtName.visibility = View.INVISIBLE
                     txtDescription.visibility = View.INVISIBLE
 

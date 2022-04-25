@@ -13,6 +13,6 @@ data class RouteEntity(
     val name: String?,
     @ColumnInfo(name = "description")
     val description: String?,
-    @ColumnInfo(name = "rating")
-    val rating: Double?
+    @ColumnInfo(name = "isPublic")
+    val isPublic: Boolean
 )

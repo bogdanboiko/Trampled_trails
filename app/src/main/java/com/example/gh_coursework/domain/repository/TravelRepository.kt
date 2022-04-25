@@ -1,6 +1,7 @@
 package com.example.gh_coursework.domain.repository
 
 import com.example.gh_coursework.domain.entity.*
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 interface TravelRepository {
@@ -40,7 +41,7 @@ interface TravelRepository {
     fun getRouteTags(): Flow<List<RouteTagDomain>>
 
     //Public
-    fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>)
+    fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>, currentUser: FirebaseUser)
     fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
     fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>>
 }
