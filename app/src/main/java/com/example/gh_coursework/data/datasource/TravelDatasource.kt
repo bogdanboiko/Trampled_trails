@@ -42,6 +42,8 @@ interface TravelDatasource {
 
         fun getRouteTags(): Flow<List<RouteTagDomain>>
         suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
+
+        suspend fun savePublicRouteToPrivate(route: PublicRouteDomain, points: List<PublicRoutePointDomain>)
     }
 
     interface Remote {

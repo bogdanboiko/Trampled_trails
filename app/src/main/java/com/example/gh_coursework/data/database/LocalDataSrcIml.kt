@@ -2,6 +2,7 @@ package com.example.gh_coursework.data.database
 
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
+import com.example.gh_coursework.data.database.entity.PointDetailsEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
 import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomainToEntity
@@ -15,6 +16,7 @@ import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEnti
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointsTagsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_tag.mapTagDomainToEntity
+import com.example.gh_coursework.data.database.mapper.public.mapPublicRouteDomainToEntity
 import com.example.gh_coursework.data.database.mapper.route_details.mapRoutePointsImagesResponseToDomain
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteDomainToEntity
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointEntityToDomain
@@ -23,6 +25,7 @@ import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagEntit
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagsDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
+import com.example.gh_coursework.ui.helper.routeTags
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -41,7 +44,8 @@ class LocalDataSrcIml(
     }
 
     override fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>> {
-        return pointDetailsDao.getAllPointsDetails().map { it.map(::mapPointDetailsEntityToPointCompleteDetailsDomain) }
+        return pointDetailsDao.getAllPointsDetails()
+            .map { it.map(::mapPointDetailsEntityToPointCompleteDetailsDomain) }
     }
 
     override suspend fun deletePoint(pointId: Long) {
@@ -51,6 +55,41 @@ class LocalDataSrcIml(
     //PointDetails
     override suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain) {
         pointDetailsDao.updatePointDetails(mapPointDetailsDomainToEntity(poi))
+    }
+
+    override suspend fun savePublicRouteToPrivate(
+        route: PublicRouteDomain,
+        points: List<PublicRoutePointDomain>
+    ) {
+        val routeId = routeDao.insertRoute(mapPublicRouteDomainToEntity(route))
+        addRouteImages(route.imageList.map { RouteImageDomain(routeId, it) })
+        addRouteTagsList(route.tagsList.map {
+            RouteTagsDomain(
+                routeId,
+                routeTags.indexOf(it).toLong() + 1
+            )
+        })
+
+        val routePointList = mutableListOf<RoutePointEntity>()
+
+        points.forEachIndexed { index, point ->
+            val pointId = pointDetailsDao.insertPointCoordinatesAndCreateDetails(
+                PointCoordinatesEntity(
+                    null,
+                    point.x,
+                    point.y,
+                    point.isRoutePoint
+                )
+            )
+
+            pointDetailsDao.updatePointDetails(PointDetailsEntity(pointId, point.caption, point.description))
+
+            routePointList.add(RoutePointEntity(routeId, pointId, index))
+
+            addPointImages(point.imageList.map { PointImageDomain(pointId, it) })
+        }
+
+        routeDao.insertRoutePointsList(routePointList)
     }
 
     override suspend fun addPointImages(images: List<PointImageDomain>) {

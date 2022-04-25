@@ -23,6 +23,12 @@ class TravelRepositoryImpl(
     }
 
     override fun getAllPointsDetails() = localDataSrcIml.getAllPointsDetails()
+    override suspend fun savePublicRouteToPrivate(
+        route: PublicRouteDomain,
+        points: List<PublicRoutePointDomain>
+    ) {
+        localDataSrcIml.savePublicRouteToPrivate(route, points)
+    }
 
     override suspend fun addPointImages(images: List<PointImageDomain>) {
         localDataSrcIml.addPointImages(images)

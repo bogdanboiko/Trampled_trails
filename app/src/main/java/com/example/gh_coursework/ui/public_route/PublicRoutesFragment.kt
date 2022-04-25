@@ -1,14 +1,20 @@
 package com.example.gh_coursework.ui.public_route
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.drawable.toBitmap
+import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
@@ -17,6 +23,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
+import com.example.gh_coursework.domain.entity.PublicRouteDomain
+import com.example.gh_coursework.domain.entity.PublicRoutePointDomain
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
@@ -58,9 +66,14 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.io.File
+import java.io.FileOutputStream
+import java.net.URL
+import java.util.*
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PublicRoutesFragment :
@@ -407,8 +420,8 @@ class PublicRoutesFragment :
 
         routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModelPublic.fetchRoutes(tagsFilter).collect { route ->
-                    routesListAdapter.submitData(route)
-                }
+                routesListAdapter.submitData(route)
+            }
         }
     }
 
@@ -632,6 +645,7 @@ class PublicRoutesFragment :
         publicRoute: PublicRouteModel
     ) {
         binding.bottomSheetDialogRouteDetails.apply {
+            routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
@@ -654,8 +668,90 @@ class PublicRoutesFragment :
                 layoutManager = routeImageLayoutManager
             }
 
+            val imageList = mutableListOf<String>()
+            imageList.addAll(publicRoute.imageList)
+            currentRoutePointsList.forEach {
+                imageList.addAll(it.imageList)
+            }
+
             routeImagesPreviewAdapter.submitList(publicRoute.imageList)
+
+            routeDetailsAddToFavouriteButton.setOnClickListener {
+                routeDetailsAddToFavouriteButton.visibility = View.INVISIBLE
+                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
+                    val newRouteImageUriList = mutableListOf<String>()
+                    val pointList = mutableListOf<PublicRoutePointDomain>()
+
+                    publicRoute.imageList.forEach {
+                        newRouteImageUriList.add(createRouteImageModel(URL(it)))
+                    }
+
+                    currentRoutePointsList.forEach {
+                        val newPointImageUriList = mutableListOf<String>()
+
+                        it.imageList.forEach { link ->
+                            newPointImageUriList.add(createRouteImageModel(URL(link)))
+                        }
+
+                        pointList.add(
+                            PublicRoutePointDomain(
+                                it.pointId,
+                                it.caption,
+                                it.description,
+                                newPointImageUriList,
+                                it.x,
+                                it.y,
+                                it.isRoutePoint
+                            )
+                        )
+                    }
+
+                    with(publicRoute) {
+                        val route = PublicRouteDomain(
+                            routeId,
+                            name,
+                            description,
+                            tagsList,
+                            newRouteImageUriList
+                        )
+
+                        viewModelPublic.savePublicRouteToPrivate(route, pointList)
+                    }
+                }
+            }
         }
+    }
+
+    private fun createRouteImageModel(imageUrl: URL): String {
+        imageUrl.openStream().use {
+            val image = Drawable.createFromStream(it, imageUrl.ref)
+
+            return saveToCacheAndGetUri(
+                image.toBitmap(),
+                Date().time.toString()
+            ).toString()
+        }
+    }
+
+    private fun saveToCacheAndGetUri(bitmap: Bitmap, name: String): Uri {
+        val file = saveImgToCache(bitmap, name)
+        return getImageUri(file, name)
+    }
+
+    private fun saveImgToCache(bitmap: Bitmap, name: String): File {
+        val fileName: String = name
+        val cachePath = File(context?.cacheDir, "/images")
+        cachePath.mkdirs()
+        FileOutputStream("$cachePath/$fileName.jpeg").use {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
+
+        return cachePath
+    }
+
+    private fun getImageUri(fileDir: File, name: String): Uri {
+        val newFile = File(fileDir, "$name.jpeg")
+        return newFile.toUri()
     }
 
     private fun eraseCameraToPoint(x: Double, y: Double) {

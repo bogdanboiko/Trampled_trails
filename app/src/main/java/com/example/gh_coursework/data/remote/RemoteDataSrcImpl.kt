@@ -47,11 +47,8 @@ class RemoteDataSrcImpl(
                     pointImageRef.putFile(Uri.parse(it.image)).addOnSuccessListener {
                         val task = pointImageRef.downloadUrl
                         routePointImageGetUriTasks.add(task)
-                        routeImagesGetUriTasks.add(task)
                     })
             }
-
-            routeImagesAddTasks.addAll(routePointImageAddTasks)
 
             Tasks.whenAll(routePointImageAddTasks).addOnSuccessListener {
                 Tasks.whenAllSuccess<Uri>(routePointImageGetUriTasks).addOnSuccessListener {

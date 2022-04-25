@@ -44,4 +44,5 @@ interface TravelRepository {
     fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>, currentUser: FirebaseUser)
     fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
     fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>>
+    suspend fun savePublicRouteToPrivate(route: PublicRouteDomain, points: List<PublicRoutePointDomain>)
 }
