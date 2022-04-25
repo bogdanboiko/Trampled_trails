@@ -5,5 +5,6 @@ data class PublicRouteEntity(
     val description: String?,
     val rating: Double,
     val tagsList: List<String>,
-    val imageList: List<String>
+    val imageList: List<String>,
+    val userId: String
 )

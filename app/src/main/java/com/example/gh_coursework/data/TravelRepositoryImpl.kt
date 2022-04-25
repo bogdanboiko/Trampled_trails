@@ -2,9 +2,9 @@ package com.example.gh_coursework.data
 
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
-import com.example.gh_coursework.data.remote.RemoteDataSrcImpl
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(
@@ -106,8 +106,12 @@ class TravelRepositoryImpl(
 
     override fun getRouteTags() = localDataSrcIml.getRouteTags()
 
-    override fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>) {
-        remoteDataSrcImpl.publishRoute(route, routePoints)
+    override fun publishRoute(
+        route: RouteDomain,
+        routePoints: List<RoutePointDomain>,
+        currentUser: FirebaseUser
+    ) {
+        remoteDataSrcImpl.publishRoute(route, routePoints, currentUser)
     }
 
     override fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>> {

@@ -3,7 +3,6 @@ package com.example.gh_coursework.ui.private_route
 import android.annotation.SuppressLint
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -1126,7 +1125,8 @@ class PrivateRoutesFragment :
             }
 
             routePublishButton.setOnClickListener {
-                if (FirebaseAuth.getInstance().currentUser != null) {
+                val user = FirebaseAuth.getInstance().currentUser
+                if (user != null) {
                     if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
                         Toast.makeText(
                             context,
@@ -1134,7 +1134,7 @@ class PrivateRoutesFragment :
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        viewModel.publishRoute(route, currentRoutePointsList)
+                        viewModel.publishRoute(route, currentRoutePointsList, user)
                         viewModel.updateRoute(
                             RouteModel(
                                 route.routeId,

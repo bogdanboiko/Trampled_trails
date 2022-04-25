@@ -10,6 +10,7 @@ import com.example.gh_coursework.domain.entity.RouteDomain
 import com.example.gh_coursework.domain.entity.RoutePointDomain
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageTask
@@ -25,7 +26,10 @@ class RemoteDataSrcImpl(
 ) : TravelDatasource.Remote {
     private val ref = storage.reference
 
-    override fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>) {
+    override fun publishRoute(
+        route: RouteDomain,
+        routePoints: List<RoutePointDomain>,
+        currentUser: FirebaseUser) {
         val routeDocRef = db.collection("routes").document()
         val routeImagesAddTasks = mutableListOf<StorageTask<UploadTask.TaskSnapshot>>()
         val routeImagesGetUriTasks = mutableListOf<Task<Uri>>()
@@ -75,7 +79,7 @@ class RemoteDataSrcImpl(
                 routeDocRef.set(
                     mapRouteDomainToPublicRouteEntity(
                         route,
-                        it.map { imageUrl -> imageUrl.toString() })
+                        it.map { imageUrl -> imageUrl.toString() }, currentUser.uid)
                 )
             }
         }
