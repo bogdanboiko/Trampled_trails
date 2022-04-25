@@ -8,6 +8,6 @@ fun mapRouteDomainToEntity(routeDomain: RouteDomain): RouteEntity {
         routeDomain.routeId,
         routeDomain.name,
         routeDomain.description,
-        routeDomain.rating
+        routeDomain.isPublic
     )
 }

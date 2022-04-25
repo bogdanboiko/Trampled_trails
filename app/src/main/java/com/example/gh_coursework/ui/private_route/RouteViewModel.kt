@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.image.AddRouteImageListUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
 import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
+import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.DeleteRouteUseCase
@@ -26,6 +27,7 @@ class RouteViewModel(
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
     private val deletePointUseCase: DeletePointUseCase,
     private val deleteRouteUseCase: DeleteRouteUseCase,
+    private val updateRouteDetailsUseCase: UpdateRouteDetailsUseCase,
     private val publishRouteUseCase: PublishRouteUseCase
 ) : ViewModel() {
 
@@ -61,5 +63,11 @@ class RouteViewModel(
 
     fun publishRoute(route: RouteModel, routePoints: List<RoutePointModel>) {
         publishRouteUseCase.invoke(mapRouteModelToDomain(route), routePoints.map(::mapRoutePointModelToDomain))
+    }
+
+    fun updateRoute(route: RouteModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            updateRouteDetailsUseCase.invoke(mapRouteModelToDomain(route))
+        }
     }
 }

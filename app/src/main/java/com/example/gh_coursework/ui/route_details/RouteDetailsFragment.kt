@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -84,7 +83,6 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configToolBar()
-        configConfirmButton()
         configTagButton()
         configImageRecycler()
         configData()
@@ -105,7 +103,6 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                 viewModel.route.combine(viewModel.images) { route, images ->
                     RouteCompleteModel(route, images)
                 }.collect {
-                    Log.e("e", it.route.toString())
                     routeCaptionText.setText(it.route.name)
                     routeDescriptionText.setText(it.route.description)
 
@@ -129,12 +126,14 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                     } else {
                         imageRecycler.visibility = View.GONE
                     }
+
+                    configConfirmButton(it.route.isPublic)
                 }
             }
         }
     }
 
-    private fun configConfirmButton() {
+    private fun configConfirmButton(isPublic: Boolean) {
         with(binding) {
             confirmEditButton.setOnClickListener {
                 it.visibility = View.GONE
@@ -148,9 +147,9 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                         arguments.routeId,
                         routeCaptionText.text.toString(),
                         routeDescriptionText.text.toString(),
-                        0.0,
                         emptyList(),
-                        emptyList()
+                        emptyList(),
+                        isPublic
                     )
                 )
             }

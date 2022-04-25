@@ -11,9 +11,9 @@ fun mapRouteDomainToModel(routeDomain: RouteDomain): RouteModel {
             routeId,
             name,
             description,
-            rating,
             tagsList.map(::mapRouteTagDomainToModel),
-            imageList.map(::mapRouteImageDomainToModel)
+            imageList.map(::mapRouteImageDomainToModel),
+            isPublic
         )
     }
 }

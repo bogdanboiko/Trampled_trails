@@ -8,8 +8,8 @@ fun mapRouteDetailsModelToDomain(route: RouteDetailsModel): RouteDomain {
         route.routeId,
         route.name,
         route.description,
-        route.rating,
         route.tagList.map(::mapRouteTagModelToDomain),
-        route.imageList?.map(::mapRouteImageModelToDomain)
+        route.imageList.map(::mapRouteImageModelToDomain),
+        route.isPublic
     )
 }
