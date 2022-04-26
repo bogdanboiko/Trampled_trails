@@ -30,7 +30,7 @@ class RemoteDataSrcImpl(
         route: RouteDomain,
         routePoints: List<RoutePointDomain>,
         currentUser: FirebaseUser) {
-        val routeDocRef = db.collection("routes").document()
+        val routeDocRef = db.collection("routes").document(route.routeId)
         val routeImagesAddTasks = mutableListOf<StorageTask<UploadTask.TaskSnapshot>>()
         val routeImagesGetUriTasks = mutableListOf<Task<Uri>>()
 
@@ -38,7 +38,7 @@ class RemoteDataSrcImpl(
             val routePointImageAddTasks = mutableListOf<StorageTask<UploadTask.TaskSnapshot>>()
             val routePointImageGetUriTasks = mutableListOf<Task<Uri>>()
             val routePointDocRef =
-                db.collection("routes").document(routeDocRef.id).collection("points").document()
+                db.collection("routes").document(routeDocRef.id).collection("points").document(point.pointId)
 
             point.imageList.forEach {
                 val generatedImageId = UUID.randomUUID().toString()
@@ -47,11 +47,8 @@ class RemoteDataSrcImpl(
                     pointImageRef.putFile(Uri.parse(it.image)).addOnSuccessListener {
                         val task = pointImageRef.downloadUrl
                         routePointImageGetUriTasks.add(task)
-                        routeImagesGetUriTasks.add(task)
                     })
             }
-
-            routeImagesAddTasks.addAll(routePointImageAddTasks)
 
             Tasks.whenAll(routePointImageAddTasks).addOnSuccessListener {
                 Tasks.whenAllSuccess<Uri>(routePointImageGetUriTasks).addOnSuccessListener {

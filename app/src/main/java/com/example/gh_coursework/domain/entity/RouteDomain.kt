@@ -1,7 +1,7 @@
 package com.example.gh_coursework.domain.entity
 
 data class RouteDomain(
-    val routeId: Long?,
+    val routeId: String,
     val name: String?,
     val description: String?,
     val tagsList: List<RouteTagDomain>,

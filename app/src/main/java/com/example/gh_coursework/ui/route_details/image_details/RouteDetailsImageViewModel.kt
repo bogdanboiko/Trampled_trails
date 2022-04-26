@@ -2,7 +2,6 @@ package com.example.gh_coursework.ui.route_details.image_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.domain.usecase.image.DeletePointImageUseCase
 import com.example.gh_coursework.domain.usecase.image.DeleteRouteImageUseCase
 import com.example.gh_coursework.domain.usecase.image.GetRouteImagesUseCase
@@ -18,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class RouteDetailsImageViewModel(
-    routeId: Long,
+    routeId: String,
     getRouteImagesUseCase: GetRouteImagesUseCase,
     getRoutePointsImagesUseCase: GetRoutePointsImagesUseCase,
     private val deleteRouteImageUseCase: DeleteRouteImageUseCase,

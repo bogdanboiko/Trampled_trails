@@ -9,27 +9,26 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class PointDetailsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun addPointPreview(pointCoordinatesEntity: PointCoordinatesEntity): Long
+    abstract suspend fun addPointPreview(pointCoordinatesEntity: PointCoordinatesEntity)
 
     @Query("DELETE FROM point_coordinates WHERE pointId = :pointId")
-    abstract fun deletePoint(pointId: Long)
+    abstract fun deletePoint(pointId: String)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract suspend fun addPointDetails(details: PointDetailsEntity): Long
+    abstract suspend fun addPointDetails(details: PointDetailsEntity)
 
     @Update
     abstract suspend fun updatePointDetails(details: PointDetailsEntity)
 
     @Query("SELECT * FROM point_coordinates WHERE pointId = :pointId")
-    abstract fun getPointDetails(pointId: Long): Flow<PointDetailsResponse>
+    abstract fun getPointDetails(pointId: String): Flow<PointDetailsResponse>
 
     @Query("SELECT * FROM point_coordinates WHERE isRoutePoint = 0")
     abstract fun getAllPointsDetails(): Flow<List<PointDetailsResponse>>
 
     @Transaction
-    open suspend fun insertPointCoordinatesAndCreateDetails(point: PointCoordinatesEntity): Long {
-        val pointId = addPointPreview(point)
-        addPointDetails(PointDetailsEntity(pointId, "", ""))
-        return pointId
+    open suspend fun insertPointCoordinatesAndCreateDetails(point: PointCoordinatesEntity) {
+        addPointPreview(point)
+        addPointDetails(PointDetailsEntity(point.pointId, "", ""))
     }
 }

@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class RouteDetailsViewModel(
-    routeId: Long,
+    routeId: String,
     getRouteDetailsUseCase: GetRouteDetailsUseCase,
     getRoutePointsImagesUseCase: GetRoutePointsImagesUseCase,
     private val updateRouteDetailsUseCase: UpdateRouteDetailsUseCase,

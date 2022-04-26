@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class RoutePreviewDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertRoute(routeEntity: RouteEntity): Long
+    abstract suspend fun insertRoute(routeEntity: RouteEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertRoutePointsList(coordinatesList: List<RoutePointEntity>)
@@ -24,10 +24,10 @@ abstract class RoutePreviewDao {
         routeEntity: RouteEntity,
         coordinatesList: List<RoutePointEntity>
     ) {
-        val routeId = insertRoute(routeEntity)
+        insertRoute(routeEntity)
 
         coordinatesList.forEach {
-            it.routeId = routeId
+            it.routeId = routeEntity.routeId
         }
 
         insertRoutePointsList(coordinatesList)
@@ -36,14 +36,17 @@ abstract class RoutePreviewDao {
     @Query("SELECT * FROM route_details")
     abstract fun getRoutesResponse(): Flow<List<RoutePreviewResponse>>
 
+    @Query("SELECT * FROM route_details WHERE isPublic = 1")
+    abstract fun getPublicRoutesResponse(): Flow<List<RoutePreviewResponse>>
+
     @Query("SELECT * FROM route_details WHERE routeId = :routeId")
-    abstract fun getRouteDetails(routeId: Long): Flow<RoutePreviewResponse>
+    abstract fun getRouteDetails(routeId: String): Flow<RoutePreviewResponse>
 
     @Query("SELECT * FROM routes_points WHERE routeId = :routeId")
-    abstract fun getRoutePoints(routeId: Long): Flow<List<RoutePointsResponse>>
+    abstract fun getRoutePoints(routeId: String): Flow<List<RoutePointsResponse>>
 
     @Query("SELECT * FROM routes_points WHERE routeId = :routeId")
-    abstract fun getRoutePointsImages(routeId: Long): Flow<List<RoutePointImageResponse>>
+    abstract fun getRoutePointsImages(routeId: String): Flow<List<RoutePointImageResponse>>
 
     @Delete
     abstract fun deleteRoute(route: RouteEntity)

@@ -15,7 +15,7 @@ import com.example.gh_coursework.databinding.ItemPointBinding
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
 
 interface RoutePointsListCallback {
-    fun onPointItemClick(pointId: Long)
+    fun onPointItemClick(pointId: String)
 }
 
 class RoutePointsListAdapter(val callback: RoutePointsListCallback) :

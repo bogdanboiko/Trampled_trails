@@ -15,7 +15,7 @@ import com.example.gh_coursework.data.database.entity.*
         RoutePointEntity::class,
         RouteTagEntity::class,
         RouteTagsEntity::class,
-        RouteImageEntity::class], version = 17
+        RouteImageEntity::class], version = 18
 )
 abstract class TravelDatabase : RoomDatabase() {
     abstract fun getRoutePreviewDao(): RoutePreviewDao

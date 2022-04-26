@@ -23,6 +23,12 @@ class TravelRepositoryImpl(
     }
 
     override fun getAllPointsDetails() = localDataSrcIml.getAllPointsDetails()
+    override suspend fun savePublicRouteToPrivate(
+        route: PublicRouteDomain,
+        points: List<PublicRoutePointDomain>
+    ) {
+        localDataSrcIml.savePublicRouteToPrivate(route, points)
+    }
 
     override suspend fun addPointImages(images: List<PointImageDomain>) {
         localDataSrcIml.addPointImages(images)
@@ -32,9 +38,9 @@ class TravelRepositoryImpl(
         localDataSrcIml.deletePointImage(image)
     }
 
-    override fun getPointOfInterestDetails(id: Long) = localDataSrcIml.getPointOfInterestDetails(id)
+    override fun getPointOfInterestDetails(id: String) = localDataSrcIml.getPointOfInterestDetails(id)
 
-    override fun getPointImages(pointId: Long) = localDataSrcIml.getPointImages(pointId)
+    override fun getPointImages(pointId: String) = localDataSrcIml.getPointImages(pointId)
 
     //PointTag
     override suspend fun addPointTag(tag: PointTagDomain) {
@@ -45,7 +51,7 @@ class TravelRepositoryImpl(
         localDataSrcIml.addPointsTagsList(pointsTagsList)
     }
 
-    override suspend fun deletePoint(pointId: Long) {
+    override suspend fun deletePoint(pointId: String) {
         localDataSrcIml.deletePoint(pointId)
     }
 
@@ -55,7 +61,7 @@ class TravelRepositoryImpl(
 
     override fun getPointTagList() = localDataSrcIml.getPointTagList()
 
-    override fun getPointsTagsList(pointId: Long) = localDataSrcIml.getPointsTagsList(pointId)
+    override fun getPointsTagsList(pointId: String) = localDataSrcIml.getPointsTagsList(pointId)
 
     override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
         localDataSrcIml.removePointsTagsList(pointsTagsList)
@@ -72,10 +78,12 @@ class TravelRepositoryImpl(
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 
-    //RouteDetails
-    override fun getRouteDetails(routeId: Long) = localDataSrcIml.getRouteDetails(routeId)
+    override fun getPublicRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getPublicRoutesList()
 
-    override fun getRoutePointsList(routeId: Long) = localDataSrcIml.getRoutePointsList(routeId)
+    //RouteDetails
+    override fun getRouteDetails(routeId: String) = localDataSrcIml.getRouteDetails(routeId)
+
+    override fun getRoutePointsList(routeId: String) = localDataSrcIml.getRoutePointsList(routeId)
 
     override suspend fun updateRoute(route: RouteDomain) {
         localDataSrcIml.updateRoute(route)
@@ -90,9 +98,9 @@ class TravelRepositoryImpl(
         localDataSrcIml.deleteRouteImage(image)
     }
 
-    override fun getRouteImages(routeId: Long) = localDataSrcIml.getRouteImages(routeId)
+    override fun getRouteImages(routeId: String) = localDataSrcIml.getRouteImages(routeId)
 
-    override fun getRoutePointsImagesList(routeId: Long) =
+    override fun getRoutePointsImagesList(routeId: String) =
         localDataSrcIml.getRoutePointsImagesList(routeId)
 
     //RouteTag

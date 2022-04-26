@@ -5,7 +5,7 @@ import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetPointImagesUseCaseImpl(private val repository: TravelRepository) : GetPointImagesUseCase {
-    override fun invoke(pointId: Long): Flow<List<PointImageDomain>> {
+    override fun invoke(pointId: String): Flow<List<PointImageDomain>> {
         return repository.getPointImages(pointId)
     }
 }

@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class RouteTagDialogViewModel(
-    routeId: Long,
+    routeId: String,
     getRouteTagsUseCase: GetRouteTagsUseCase,
     getRouteDetailsUseCase: GetRouteDetailsUseCase,
     private val addRouteTagsUseCase: AddRouteTagsUseCase,

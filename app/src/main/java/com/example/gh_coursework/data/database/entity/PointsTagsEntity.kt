@@ -21,7 +21,7 @@ import androidx.room.ForeignKey
 )
 data class PointsTagsEntity(
     @ColumnInfo(name = "pointId")
-    val pointId: Long,
+    val pointId: String,
     @ColumnInfo(name = "tagId")
     val tagId: Long
 )

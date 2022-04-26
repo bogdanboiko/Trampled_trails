@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class TagDialogViewModel(
-    private val pointId: Long,
+    private val pointId: String,
     private val addPointTagUseCase: AddPointTagUseCase,
     private val getPointTagListUseCase: GetPointTagListUseCase,
     private val addPointsTagsListUseCase: AddPointsTagsListUseCase,

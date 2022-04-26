@@ -21,10 +21,10 @@ import androidx.room.PrimaryKey
 )
 data class RoutePointEntity(
     @ColumnInfo(name = "routeId")
-    var routeId: Long?,
+    var routeId: String,
     @PrimaryKey
     @ColumnInfo(name = "pointId")
-    val pointId: Long,
+    val pointId: String,
     @ColumnInfo(name = "position")
     val position: Int
 )

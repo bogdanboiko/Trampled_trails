@@ -14,7 +14,7 @@ import androidx.room.ForeignKey
 )
 data class RouteImageEntity(
     @ColumnInfo(name = "routeId")
-    val routeId: Long,
+    val routeId: String,
     @ColumnInfo(name = "image")
     val image: String
 )

@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 class GetRoutePointsImagesUseCaseImpl(private val repository: TravelRepository) :
     GetRoutePointsImagesUseCase {
-    override fun invoke(routeId: Long): Flow<List<RoutePointsImagesDomain>> {
+    override fun invoke(routeId: String): Flow<List<RoutePointsImagesDomain>> {
         return repository.getRoutePointsImagesList(routeId)
     }
 }

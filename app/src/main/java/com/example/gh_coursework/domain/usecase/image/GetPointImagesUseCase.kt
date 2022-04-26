@@ -4,5 +4,5 @@ import com.example.gh_coursework.domain.entity.PointImageDomain
 import kotlinx.coroutines.flow.Flow
 
 interface GetPointImagesUseCase {
-    fun invoke(pointId: Long): Flow<List<PointImageDomain>>
+    fun invoke(pointId: String): Flow<List<PointImageDomain>>
 }

@@ -26,7 +26,7 @@ class PointViewModel(
         }
     }
 
-    fun deletePoint(pointId: Long) {
+    fun deletePoint(pointId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             deletePointUseCase.invoke(pointId)
         }
