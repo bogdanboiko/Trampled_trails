@@ -10,19 +10,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
-import com.example.gh_coursework.ui.adapter.ImagesInDetailsAdapter
+import com.example.gh_coursework.ui.private_image_details.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
+import com.example.gh_coursework.ui.themes.MyAppTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -31,11 +34,12 @@ import java.io.FileOutputStream
 import java.util.*
 
 
-class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
+class PointDetailsFragment : ThemeFragment() {
     private lateinit var layoutManager: LinearLayoutManager
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private lateinit var binding: FragmentPointDetailsBinding
+    private lateinit var theme: MyAppTheme
     private val imageAdapter = ImagesInDetailsAdapter {
         findNavController().navigate(
             PointDetailsFragmentDirections.actionPointDetailsFragmentToPrivateImageDetails(
@@ -84,6 +88,21 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
         configTagButton()
         configImageRecycler()
         configData()
+    }
+
+    override fun syncTheme(appTheme: AppTheme) {
+        theme = appTheme as MyAppTheme
+
+        with(binding) {
+            DrawableCompat.wrap(pointDetailsAppBar.background).setTint(theme.colorSecondary(requireContext()))
+            pointDetailsCollapsingToolbar.setContentScrimColor(theme.colorSecondary(requireContext()))
+
+            if (theme.id() == 0) {
+                gradient.setImageResource(R.drawable.fg_gradient_toolbar_light)
+            } else {
+                gradient.setImageResource(R.drawable.fg_gradient_toolbar_dark)
+            }
+        }
     }
 
     private fun configImageRecycler() {

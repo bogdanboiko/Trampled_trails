@@ -1,27 +1,30 @@
-package com.example.gh_coursework.ui.point_details.image_details
+package com.example.gh_coursework.ui.private_image_details
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gh_coursework.R
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.databinding.FragmentImageDetailsBinding
+import com.example.gh_coursework.ui.themes.MyAppTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.net.URI
 
-class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
+class ImageDetailsFragment : ThemeFragment() {
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var binding: FragmentImageDetailsBinding
+    private lateinit var theme: MyAppTheme
     private val arguments by navArgs<ImageDetailsFragmentArgs>()
     private val viewModel: ImageDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
     private val imageAdapter = ImageDetailsAdapter()
@@ -39,6 +42,15 @@ class ImageDetailsFragment : Fragment(R.layout.fragment_image_details) {
         super.onViewCreated(view, savedInstanceState)
         configRecycler()
         configToolbar()
+    }
+
+    override fun syncTheme(appTheme: AppTheme) {
+        theme = appTheme as MyAppTheme
+
+        with(binding) {
+            DrawableCompat.wrap(topToolbar.background)
+                .setTint(theme.colorSecondary(requireContext()))
+        }
     }
 
     private fun configToolbar() {

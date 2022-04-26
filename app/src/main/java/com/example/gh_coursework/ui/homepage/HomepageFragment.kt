@@ -1,20 +1,24 @@
 package com.example.gh_coursework.ui.homepage
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.CircleCrop
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentHomepageBinding
+import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
@@ -22,10 +26,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 
-class HomepageFragment : Fragment(), HomepageCallback {
+class HomepageFragment : HomepageCallback, ThemeFragment() {
 
     private lateinit var binding: FragmentHomepageBinding
-    private val homepageAdapter = HomepageAdapter(this as HomepageCallback)
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var homepageAdapter: HomepageAdapter
+    private lateinit var theme: MyAppTheme
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
 
     private val signInLauncher = registerForActivityResult(
@@ -39,6 +45,8 @@ class HomepageFragment : Fragment(), HomepageCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        homepageAdapter = HomepageAdapter(this as HomepageCallback, sharedPreferences)
         binding = FragmentHomepageBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -101,7 +109,6 @@ class HomepageFragment : Fragment(), HomepageCallback {
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
             .setIsSmartLockEnabled(false)
-            .setTheme(R.style.Login)
             .setLogo(R.drawable.ic_user)
             .build()
 
@@ -164,6 +171,13 @@ class HomepageFragment : Fragment(), HomepageCallback {
             val id = findNavController().currentDestination?.id
             findNavController().popBackStack(id!!, true)
             findNavController().navigate(id)
+        }
+    }
+
+    override fun syncTheme(appTheme: AppTheme) {
+        theme = appTheme as MyAppTheme
+        with(binding) {
+            root.setBackgroundColor(theme.colorPrimary(requireContext()))
         }
     }
 }
