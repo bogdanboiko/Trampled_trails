@@ -47,6 +47,7 @@ import com.mapbox.maps.plugin.gestures.removeOnMapClickListener
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 
 class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), PointsListCallback {
@@ -72,7 +73,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
         }
 
         if (result == null) {
-            val newPoint = PrivatePointModel(null, point.longitude(), point.latitude(), false)
+            val newPoint = PrivatePointModel(UUID.randomUUID().toString(), point.longitude(), point.latitude(), false)
             viewModel.addPoint(newPoint)
         }
 
@@ -82,7 +83,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
     private val onPointClickEvent = OnPointAnnotationClickListener { annotation ->
         viewLifecycleOwner.lifecycleScope.launch {
 
-            annotation.getData()?.asLong?.let { pointId ->
+            annotation.getData()?.asString?.let { pointId ->
                 pointCoordinates.find { it.pointId == pointId }
                     ?.let { prepareDetailsDialog(annotation, it) }
             }

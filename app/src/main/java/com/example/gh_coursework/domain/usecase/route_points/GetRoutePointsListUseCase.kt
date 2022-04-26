@@ -4,5 +4,5 @@ import com.example.gh_coursework.domain.entity.RoutePointDomain
 import kotlinx.coroutines.flow.Flow
 
 interface GetRoutePointsListUseCase {
-    fun invoke(routeId: Long): Flow<List<RoutePointDomain>>
+    fun invoke(routeId: String): Flow<List<RoutePointDomain>>
 }

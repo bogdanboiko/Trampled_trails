@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface TravelRepository {
     suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
     suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain)
-    suspend fun deletePoint(pointId: Long)
+    suspend fun deletePoint(pointId: String)
 
     suspend fun addPointTag(tag: PointTagDomain)
     suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>)
@@ -26,18 +26,18 @@ interface TravelRepository {
     suspend fun addRouteTagsList(routeTagsList: List<RouteTagsDomain>)
     suspend fun deleteTagsFromRoute(routeTagsList: List<RouteTagsDomain>)
 
-    fun getPointsTagsList(pointId: Long): Flow<List<PointTagDomain>>
-    fun getPointOfInterestDetails(id: Long): Flow<PointDetailsDomain?>
+    fun getPointsTagsList(pointId: String): Flow<List<PointTagDomain>>
+    fun getPointOfInterestDetails(id: String): Flow<PointDetailsDomain?>
     fun getPointTagList(): Flow<List<PointTagDomain>>
 
-    fun getPointImages(pointId: Long): Flow<List<PointImageDomain>>
-    fun getRouteImages(routeId: Long): Flow<List<RouteImageDomain>>
+    fun getPointImages(pointId: String): Flow<List<PointImageDomain>>
+    fun getRouteImages(routeId: String): Flow<List<RouteImageDomain>>
 
     fun getRoutesList(): Flow<List<RouteDomain>>
     fun getPublicRoutesList(): Flow<List<RouteDomain>>
-    fun getRouteDetails(routeId: Long): Flow<RouteDomain>
-    fun getRoutePointsList(routeId: Long): Flow<List<RoutePointDomain>>
-    fun getRoutePointsImagesList(routeId: Long): Flow<List<RoutePointsImagesDomain>>
+    fun getRouteDetails(routeId: String): Flow<RouteDomain>
+    fun getRoutePointsList(routeId: String): Flow<List<RoutePointDomain>>
+    fun getRoutePointsImagesList(routeId: String): Flow<List<RoutePointsImagesDomain>>
 
     fun getRouteTags(): Flow<List<RouteTagDomain>>
 

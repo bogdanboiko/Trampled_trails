@@ -23,7 +23,7 @@ import androidx.room.ForeignKey
 )
 data class RouteTagsEntity(
     @ColumnInfo(name = "routeId")
-    val routeId: Long,
+    val routeId: String,
     @ColumnInfo(name = "tagId")
     val tagId: Long
 )

@@ -4,5 +4,5 @@ import com.example.gh_coursework.domain.entity.RouteDomain
 import kotlinx.coroutines.flow.Flow
 
 interface GetRouteDetailsUseCase {
-    fun invoke(routeId: Long): Flow<RouteDomain>
+    fun invoke(routeId: String): Flow<RouteDomain>
 }

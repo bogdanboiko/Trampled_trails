@@ -14,7 +14,7 @@ import androidx.room.PrimaryKey
 data class PointDetailsEntity(
     @PrimaryKey
     @ColumnInfo(name = "pointId")
-    val pointId: Long,
+    val pointId: String,
     @ColumnInfo(name = "caption")
     val caption: String,
     @ColumnInfo(name = "description")

@@ -14,10 +14,10 @@ abstract class ImageDao {
     abstract fun addRouteImages(image: List<RouteImageEntity>)
 
     @Query("SELECT * FROM point_image WHERE pointId =:pointId")
-    abstract fun getPointImages(pointId: Long): Flow<List<PointImageEntity>>
+    abstract fun getPointImages(pointId: String): Flow<List<PointImageEntity>>
 
     @Query("SELECT * FROM route_image WHERE routeId =:routeId")
-    abstract fun getRouteImages(routeId: Long): Flow<List<RouteImageEntity>>
+    abstract fun getRouteImages(routeId: String): Flow<List<RouteImageEntity>>
 
     @Delete
     abstract fun deletePointImage(image: PointImageEntity)

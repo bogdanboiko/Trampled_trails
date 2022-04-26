@@ -4,7 +4,7 @@ import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
 
 data class PrivatePointDetailsModel(
-    val pointId: Long,
+    val pointId: String,
     val x: Double,
     val y: Double,
     val imageList: List<PointImageModel>,

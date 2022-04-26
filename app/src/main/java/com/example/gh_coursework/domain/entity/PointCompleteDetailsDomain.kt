@@ -1,7 +1,7 @@
 package com.example.gh_coursework.domain.entity
 
 data class PointCompleteDetailsDomain(
-    val pointId: Long,
+    val pointId: String,
     val x: Double,
     val y: Double,
     val tagList: List<PointTagDomain>,

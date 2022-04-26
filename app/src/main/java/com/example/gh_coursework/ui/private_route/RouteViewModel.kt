@@ -43,13 +43,13 @@ class RouteViewModel(
         }
     }
 
-    fun getRoutePointsList(routeId: Long): Flow<List<RoutePointModel>> {
+    fun getRoutePointsList(routeId: String): Flow<List<RoutePointModel>> {
         return getRoutePointsListUseCase.invoke(routeId).map {
             it.map(::mapRoutePointDomainToModel)
         }
     }
 
-    fun deletePoint(pointId: Long) {
+    fun deletePoint(pointId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             deletePointUseCase.invoke(pointId)
         }

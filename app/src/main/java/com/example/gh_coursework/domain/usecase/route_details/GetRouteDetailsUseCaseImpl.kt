@@ -5,7 +5,7 @@ import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetRouteDetailsUseCaseImpl(private val repository: TravelRepository): GetRouteDetailsUseCase {
-    override fun invoke(routeId: Long): Flow<RouteDomain> {
+    override fun invoke(routeId: String): Flow<RouteDomain> {
         return repository.getRouteDetails(routeId)
     }
 }

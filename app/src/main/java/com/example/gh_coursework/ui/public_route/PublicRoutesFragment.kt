@@ -658,17 +658,7 @@ class PublicRoutesFragment :
     ) {
         binding.bottomSheetDialogRouteDetails.apply {
             val savedRoute = savedPublicRoutesList.find {
-                var tagsSimilar = true
-
-                if (it.tagsList.size != publicRoute.tagsList.size) {
-                    tagsSimilar = false
-                } else {
-                    it.tagsList.forEachIndexed { index, tag ->
-                        tagsSimilar = tag.name == publicRoute.tagsList[index]
-                    }
-                }
-
-                return@find it.name == publicRoute.name && it.description == publicRoute.description && tagsSimilar
+                return@find it.routeId == publicRoute.routeId
             }
 
             if (savedRoute == null) {

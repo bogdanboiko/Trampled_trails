@@ -78,6 +78,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.util.*
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PrivateRoutesFragment :
@@ -87,7 +88,7 @@ class PrivateRoutesFragment :
 
     private var filteredTags = emptyList<RouteTagModel>()
     private lateinit var routesFetchingJob: Job
-    private var previousRouteId: Long? = null
+    private var previousRouteId: String? = null
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
 
@@ -121,7 +122,7 @@ class PrivateRoutesFragment :
 
     private val onClickAddDefaultRoutePoint = OnMapClickListener { point ->
         val newPoint = RoutePointModel(
-            null,
+            UUID.randomUUID().toString(),
             "",
             "",
             emptyList(),
@@ -145,7 +146,7 @@ class PrivateRoutesFragment :
 
         if (result == null) {
             val newPoint = RoutePointModel(
-                null,
+                UUID.randomUUID().toString(),
                 "",
                 "",
                 emptyList(),
@@ -491,7 +492,7 @@ class PrivateRoutesFragment :
     private fun saveRoute() {
         if (creatingRouteCoordinatesList.size > 1) {
             val route = RouteModel(
-                null,
+                UUID.randomUUID().toString(),
                 "",
                 "",
                 emptyList(),
@@ -788,8 +789,7 @@ class PrivateRoutesFragment :
         }
 
         routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
-            route.routeId?.let { routeId ->
-                viewModel.getRoutePointsList(routeId)
+                viewModel.getRoutePointsList(route.routeId)
                     .distinctUntilChanged()
                     .collect { pointsList ->
                         if (pointsList.isNotEmpty()) {
@@ -804,7 +804,6 @@ class PrivateRoutesFragment :
                             )
                         }
                     }
-            }
         }
     }
 
@@ -1013,7 +1012,7 @@ class PrivateRoutesFragment :
         }
     }
 
-    override fun onPointItemClick(pointId: Long) {
+    override fun onPointItemClick(pointId: String) {
         val pointPreview = currentRoutePointsList.find {
             it.pointId == pointId
         }
@@ -1023,7 +1022,7 @@ class PrivateRoutesFragment :
     }
 
     private fun loadAnnotatedPointData(annotation: PointAnnotation) {
-        annotation.getData()?.asLong?.let { pointId ->
+        annotation.getData()?.asString?.let { pointId ->
             val point = currentRoutePointsList.find { it.pointId == pointId }
 
             if (point != null) {
@@ -1052,7 +1051,7 @@ class PrivateRoutesFragment :
             pointImagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivatePointImageDetails(
-                        point.pointId!!,
+                        point.pointId,
                         pointImageLayoutManager.findFirstVisibleItemPosition()
                     )
                 )
@@ -1069,7 +1068,7 @@ class PrivateRoutesFragment :
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections
                         .actionPrivateRoutesFragmentToPointDetailsFragment(
-                            pointAnnotation.getData()?.asLong!!
+                            pointAnnotation.getData()?.asString!!
                         )
                 )
             }
@@ -1080,7 +1079,7 @@ class PrivateRoutesFragment :
                 if (currentRoutePointsList.size == 2) {
                     deleteRoute(focusedRoute)
                 } else {
-                    pointAnnotation.getData()?.asLong?.let { pointId ->
+                    pointAnnotation.getData()?.asString?.let { pointId ->
                         viewModel.deletePoint(pointId)
                         pointAnnotationManager.delete(pointAnnotation)
 

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class ImageDetailsViewModel(
-    private val pointId: Long,
+    private val pointId: String,
     private val deletePointImageUseCase: DeletePointImageUseCase,
     private val getPointImagesUseCase: GetPointImagesUseCase
 ) : ViewModel() {
