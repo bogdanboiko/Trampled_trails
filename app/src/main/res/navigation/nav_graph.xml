@@ -72,13 +72,14 @@
 
     <fragment
         android:id="@+id/privateImageDetails"
-        android:name="com.example.gh_coursework.ui.point_details.image_details.ImageDetailsFragment"
+        android:name="com.example.gh_coursework.ui.private_image_details.ImageDetailsFragment"
         android:label="image_details_fragment"
         tools:layout="@layout/fragment_image_details">
         <argument
             android:name="pointId"
             app:argType="long" />
-        <argument android:name="clickedItemCount"
+        <argument
+            android:name="clickedItemCount"
             app:argType="integer" />
     </fragment>
 
@@ -165,7 +166,8 @@
         <argument
             android:name="routeId"
             app:argType="long" />
-        <argument android:name="clickedItemCount"
+        <argument
+            android:name="clickedItemCount"
             app:argType="integer" />
     </fragment>
 
@@ -184,6 +186,14 @@
         android:label="public_routes_fragment"
         tools:layout="@layout/fragment_public_route">
         <action
+            android:id="@+id/action_publicRouteFragment_to_privateRouteFragment"
+            app:destination="@id/privateRoutesFragment"
+            app:popUpTo="@id/publicRouteFragment"/>
+        <action
+            android:id="@+id/action_publicRouteFragment_to_privatePointFragment"
+            app:destination="@id/privatePointsFragment"
+            app:popUpTo="@id/publicRouteFragment"/>
+        <action
             android:id="@+id/action_publicRouteFragment_to_publicImageFragment"
             app:destination="@id/publicImageFragment"
             app:popUpTo="@id/publicRouteFragment" />
@@ -191,6 +201,13 @@
             android:id="@+id/action_publicRouteFragment_to_publicRouteFilterByTagsDialogFragment"
             app:destination="@id/publicRouteFilterByTagsDialogFragment"
             app:popUpTo="@id/publicRouteFragment" />
+        <action
+            android:id="@+id/action_publicRouteFragment_to_homepageFragment"
+            app:destination="@id/homepageFragment"
+            app:popUpTo="@id/publicRouteFragment" />
+        <argument
+            android:name="popUpTo"
+            app:argType="string" />
     </fragment>
 
     <fragment
