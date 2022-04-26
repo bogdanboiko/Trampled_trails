@@ -69,7 +69,6 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var theme: MyAppTheme
-    private lateinit var lastSeenCoordinate: Point
 
     private val onMapClickListener = OnMapClickListener { point ->
         val result = pointAnnotationManager.annotations.find {
@@ -322,7 +321,6 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
     private fun onNavigateToHomepageButtonClickListener() {
         binding.homepageButton.setOnClickListener {
-            lastSeenCoordinate = binding.mapView.getMapboxMap().cameraState.center
             findNavController().navigate(
                 PrivatePointsFragmentDirections
                     .actionPrivatePointsFragmentToHomepageFragment()

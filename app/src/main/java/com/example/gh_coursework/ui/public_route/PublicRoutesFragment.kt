@@ -92,7 +92,6 @@ class PublicRoutesFragment :
     private var tagsFilter = emptyList<String>()
     private lateinit var focusedPublicRoute: PublicRouteModel
     private lateinit var routePointsJob: Job
-    private lateinit var lastSeenCoordinate: Point
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var routePointsDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -299,7 +298,6 @@ class PublicRoutesFragment :
     private fun configBottomNavBar() {
         binding.bottomNavigationView.menu.getItem(0).isChecked = true
         binding.bottomNavigationView.menu.getItem(2).setOnMenuItemClickListener {
-            lastSeenCoordinate = binding.mapView.getMapboxMap().cameraState.center
             if (arguments.popUpTo == "point") {
                 findNavController().navigate(
                     PublicRoutesFragmentDirections.actionPublicRouteFragmentToPrivatePointFragment()
@@ -468,8 +466,6 @@ class PublicRoutesFragment :
 
     private fun onNavigateToHomepageButtonClickListener() {
         binding.homepageButton.setOnClickListener {
-            lastSeenCoordinate = binding.mapView.getMapboxMap().cameraState.center
-
             findNavController().navigate(
                 PublicRoutesFragmentDirections.actionPublicRouteFragmentToHomepageFragment()
             )

@@ -107,7 +107,6 @@ class PrivateRoutesFragment :
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private lateinit var focusedRoute: RouteModel
-    private lateinit var lastSeenCoordinate: Point
     private lateinit var routePointsJob: Job
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -504,7 +503,6 @@ class PrivateRoutesFragment :
     private fun configBottomNavBar() {
         binding.bottomNavigationView.menu.getItem(2).isChecked = true
         binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            lastSeenCoordinate = binding.mapView.getMapboxMap().cameraState.center
             findNavController().navigate(
                 PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment("route")
             )
@@ -548,8 +546,6 @@ class PrivateRoutesFragment :
 
     private fun onNavigateToHomepageButtonClickListener() {
         binding.homepageButton.setOnClickListener {
-            lastSeenCoordinate = binding.mapView.getMapboxMap().cameraState.center
-
             findNavController().navigate(
                 PrivateRoutesFragmentDirections
                     .actionPrivateRoutesFragmentToHomepageFragment()
