@@ -1,7 +1,7 @@
 package com.example.gh_coursework.di
 
 import com.example.gh_coursework.ui.point_details.PointDetailsViewModel
-import com.example.gh_coursework.ui.point_details.image_details.ImageDetailsViewModel
+import com.example.gh_coursework.ui.private_image_details.ImageDetailsViewModel
 import com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogViewModel
 import com.example.gh_coursework.ui.private_point.PointViewModel
 import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogViewModel
