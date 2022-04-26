@@ -78,6 +78,8 @@ class TravelRepositoryImpl(
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 
+    override fun getPublicRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getPublicRoutesList()
+
     //RouteDetails
     override fun getRouteDetails(routeId: Long) = localDataSrcIml.getRouteDetails(routeId)
 

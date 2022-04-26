@@ -142,4 +142,8 @@ val pointUseCasesModule = module {
     single<SavePublicRouteToPrivateUseCase> {
         SavePublicRouteToPrivateUseCaseImpl(get())
     }
+
+    single<GetPublicRouteListUseCase> {
+        GetPublicRouteListUseCaseImpl(get())
+    }
 }

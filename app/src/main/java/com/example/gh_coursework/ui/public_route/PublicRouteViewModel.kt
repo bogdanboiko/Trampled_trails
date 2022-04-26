@@ -10,8 +10,10 @@ import com.example.gh_coursework.domain.entity.PublicRouteDomain
 import com.example.gh_coursework.domain.entity.PublicRoutePointDomain
 import com.example.gh_coursework.domain.usecase.public.FetchRoutePointsUseCase
 import com.example.gh_coursework.domain.usecase.public.SavePublicRouteToPrivateUseCase
+import com.example.gh_coursework.domain.usecase.route_details.GetPublicRouteListUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
+import com.example.gh_coursework.ui.private_route.mapper.mapRouteDomainToModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRouteModelToDomain
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDomainToModel
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointModelToDomain
@@ -31,7 +33,8 @@ import kotlinx.coroutines.launch
 class PublicRouteViewModel(
     private val query: Query,
     private val fetchRoutePointsUseCase: FetchRoutePointsUseCase,
-    private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase
+    private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase,
+    private val getPublicRouteListUseCase: GetPublicRouteListUseCase
 ) : ViewModel() {
     fun fetchRoutes(tagsFilter: List<String>) = Pager(
     PagingConfig(pageSize = 10)
@@ -45,5 +48,9 @@ class PublicRouteViewModel(
 
     suspend fun savePublicRouteToPrivate(route: PublicRouteDomain, points: List<PublicRoutePointDomain>) {
         savePublicRouteToPrivateUseCase.invoke(route, points)
+    }
+
+    fun fetchPublicRouteList(): Flow<List<RouteModel>>  {
+        return getPublicRouteListUseCase.invoke().map { it.map(::mapRouteDomainToModel) }
     }
 }

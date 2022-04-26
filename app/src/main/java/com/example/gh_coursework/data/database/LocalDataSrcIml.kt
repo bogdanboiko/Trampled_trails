@@ -169,6 +169,10 @@ class LocalDataSrcIml(
         return routeDao.getRoutesResponse().map { it.map(::mapRouteResponseToDomain) }
     }
 
+    override fun getPublicRoutesList(): Flow<List<RouteDomain>> {
+        return routeDao.getPublicRoutesResponse().map{ it.map(::mapRouteResponseToDomain) }
+    }
+
     override fun getRoutePointsList(routeId: Long): Flow<List<RoutePointDomain>> {
         return routeDao.getRoutePoints(routeId).map { it.map(::mapRoutePointEntityToDomain) }
     }

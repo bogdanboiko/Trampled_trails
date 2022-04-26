@@ -48,7 +48,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        PublicRouteViewModel(get(), get(), get())
+        PublicRouteViewModel(get(), get(), get(), get())
     }
 
     viewModel {

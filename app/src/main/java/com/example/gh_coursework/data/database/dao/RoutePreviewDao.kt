@@ -36,6 +36,9 @@ abstract class RoutePreviewDao {
     @Query("SELECT * FROM route_details")
     abstract fun getRoutesResponse(): Flow<List<RoutePreviewResponse>>
 
+    @Query("SELECT * FROM route_details WHERE isPublic = 1")
+    abstract fun getPublicRoutesResponse(): Flow<List<RoutePreviewResponse>>
+
     @Query("SELECT * FROM route_details WHERE routeId = :routeId")
     abstract fun getRouteDetails(routeId: Long): Flow<RoutePreviewResponse>
 

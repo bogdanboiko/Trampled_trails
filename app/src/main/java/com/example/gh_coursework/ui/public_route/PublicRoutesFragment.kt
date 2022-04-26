@@ -28,6 +28,7 @@ import com.example.gh_coursework.domain.entity.PublicRoutePointDomain
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
+import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.public_route.adapter.*
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
@@ -68,6 +69,7 @@ import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -81,6 +83,7 @@ class PublicRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
+    private var savedPublicRoutesList = emptyList<RouteModel>()
     private lateinit var routesFetchingJob: Job
     private var tagsFilter = emptyList<String>()
     private lateinit var routeImagesPreviewAdapter: PublicImageAdapter
@@ -191,6 +194,7 @@ class PublicRoutesFragment :
 
         configMap()
         configBottomNavBar()
+        fetchSavedPublicRoutes()
         setUpBottomSheetsRecyclers()
         configImageRecyclers()
         configBottomSheetDialogs()
@@ -217,6 +221,14 @@ class PublicRoutesFragment :
         }
 
         mapboxNavigation.startTripSession(withForegroundService = false)
+    }
+
+    private fun fetchSavedPublicRoutes() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModelPublic.fetchPublicRouteList().collect {
+                savedPublicRoutesList = it
+            }
+        }
     }
 
     override fun onStart() {
@@ -645,7 +657,26 @@ class PublicRoutesFragment :
         publicRoute: PublicRouteModel
     ) {
         binding.bottomSheetDialogRouteDetails.apply {
-            routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
+            val savedRoute = savedPublicRoutesList.find {
+                var tagsSimilar = true
+
+                if (it.tagsList.size != publicRoute.tagsList.size) {
+                    tagsSimilar = false
+                } else {
+                    it.tagsList.forEachIndexed { index, tag ->
+                        tagsSimilar = tag.name == publicRoute.tagsList[index]
+                    }
+                }
+
+                return@find it.name == publicRoute.name && it.description == publicRoute.description && tagsSimilar
+            }
+
+            if (savedRoute == null) {
+                routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
+            } else {
+                routeDetailsAddToFavouriteButton.visibility = View.INVISIBLE
+            }
+
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
