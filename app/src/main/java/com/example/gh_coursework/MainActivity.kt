@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.dolatkia.animatedThemeManager.AppTheme
@@ -15,9 +14,10 @@ import com.example.gh_coursework.ui.themes.DarkTheme
 import com.example.gh_coursework.ui.themes.LightTheme
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity :
-    AppCompatActivity(),
+    ThemeActivity(),
     PermissionsListener {
 
     private lateinit var binding: ActivityMainBinding

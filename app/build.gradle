@@ -8,14 +8,6 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        debug {
-            storeFile file('C:\\Users\\pashk\\keystore\\coursework.jks')
-            storePassword 'courseworkgkhb'
-            keyPassword 'courseworkgkhb'
-            keyAlias 'debugkey'
-        }
-    }
     compileSdkVersion 32
     buildToolsVersion "31.0.0"
 

@@ -23,7 +23,6 @@ import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
-import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
@@ -93,7 +92,6 @@ class PrivateRoutesFragment :
 
     private var filteredTags = emptyList<RouteTagModel>()
     private lateinit var routesFetchingJob: Job
-    private lateinit var theme: MyAppTheme
     private lateinit var theme: MyAppTheme
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
@@ -284,17 +282,6 @@ class PrivateRoutesFragment :
         }
 
         mapboxNavigation.startTripSession(withForegroundService = false)
-    }
-
-    private fun configBottomNavBar() {
-        binding.bottomNavigationView.menu.getItem(2).isChecked = true
-        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            findNavController().navigate(
-                PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment()
-            )
-
-            return@setOnMenuItemClickListener true
-        }
     }
 
     override fun onStart() {
