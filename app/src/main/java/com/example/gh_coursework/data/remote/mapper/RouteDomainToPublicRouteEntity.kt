@@ -10,6 +10,7 @@ fun mapRouteDomainToPublicRouteEntity(route: RouteDomain, imageList: List<String
         0.0,
         route.tagsList.map { it.name },
         imageList,
-        uid
+        uid,
+        route.isPublic
     )
 }

@@ -1,13 +1,15 @@
 package com.example.gh_coursework.data.database
 
+import android.os.Environment
+import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.PointDetailsEntity
 import com.example.gh_coursework.data.database.entity.RoutePointEntity
+import com.example.gh_coursework.data.database.mapper.images.mapPointImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntityToDomain
-import com.example.gh_coursework.data.database.mapper.images.mapPointImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToPointCompleteDetailsDomain
@@ -29,6 +31,8 @@ import com.example.gh_coursework.ui.helper.routeTags
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.io.File
+
 
 class LocalDataSrcIml(
     private val routeDao: RoutePreviewDao,
@@ -57,12 +61,14 @@ class LocalDataSrcIml(
         pointDetailsDao.updatePointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
-    override suspend fun savePublicRouteToPrivate(
+    override suspend fun saveFirebaseRouteToLocal(
         route: PublicRouteDomain,
         points: List<PublicRoutePointDomain>
     ) {
+        Log.e("e", "saving route $route")
         routeDao.insertRoute(mapPublicRouteDomainToEntity(route))
-        addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it) })
+        imageDao.deleteAllRouteLocalStoredImages(route.routeId)
+        addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it, true) })
         addRouteTagsList(route.tagsList.map {
             RouteTagsDomain(
                 route.routeId,
@@ -85,8 +91,8 @@ class LocalDataSrcIml(
             pointDetailsDao.updatePointDetails(PointDetailsEntity(point.pointId, point.caption, point.description))
 
             routePointList.add(RoutePointEntity(route.routeId, point.pointId, index))
-
-            addPointImages(point.imageList.map { PointImageDomain(point.pointId, it) })
+            imageDao.deleteAllPointLocalStoredImages(point.pointId)
+            addPointImages(point.imageList.map { PointImageDomain(point.pointId, it, true) })
         }
 
         routeDao.insertRoutePointsList(routePointList)

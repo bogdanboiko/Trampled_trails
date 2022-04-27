@@ -66,7 +66,9 @@ class RouteViewModel(
         routePoints: List<RoutePointModel>,
         currentUser: FirebaseUser
     ) {
-        publishRouteUseCase.invoke(mapRouteModelToDomain(route), routePoints.map(::mapRoutePointModelToDomain), currentUser)
+        viewModelScope.launch(Dispatchers.IO) {
+            publishRouteUseCase.invoke(mapRouteModelToDomain(route), routePoints.map(::mapRoutePointModelToDomain), currentUser.uid)
+        }
     }
 
     fun updateRoute(route: RouteModel) {

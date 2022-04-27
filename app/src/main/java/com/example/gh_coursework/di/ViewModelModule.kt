@@ -1,5 +1,6 @@
 package com.example.gh_coursework.di
 
+import com.example.gh_coursework.ActivityViewModel
 import com.example.gh_coursework.ui.point_details.PointDetailsViewModel
 import com.example.gh_coursework.ui.point_details.image_details.ImageDetailsViewModel
 import com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogViewModel
@@ -57,5 +58,9 @@ val viewModelModule = module {
 
     viewModel {
         PointFilterByTagDialogViewModel(get(), get())
+    }
+
+    viewModel {
+        ActivityViewModel(get(), get(), get(), get(), get(), get())
     }
 }

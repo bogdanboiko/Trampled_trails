@@ -194,7 +194,8 @@ class PointDetailsFragment : Fragment(R.layout.fragment_point_details) {
                         (image.intrinsicHeight * 0.9).toInt()
                     ),
                     Date().time.toString()
-                ).toString()
+                ).toString(),
+                false
             )
         }
     }

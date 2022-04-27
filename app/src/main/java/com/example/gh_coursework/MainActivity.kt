@@ -8,22 +8,27 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.gh_coursework.databinding.ActivityMainBinding
+import com.example.gh_coursework.ui.private_route.RouteViewModel
 import com.facebook.FacebookSdk
 import com.facebook.appevents.AppEventsLogger
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity :
     AppCompatActivity(),
     PermissionsListener {
 
     private lateinit var binding: ActivityMainBinding
+    private val viewModel: ActivityViewModel by viewModel()
     private val permissionsManager = PermissionsManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        viewModel.uploadActualRoutesToFirebase()
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()

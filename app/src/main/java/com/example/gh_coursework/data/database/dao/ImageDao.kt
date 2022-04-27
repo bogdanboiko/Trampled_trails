@@ -22,6 +22,12 @@ abstract class ImageDao {
     @Delete
     abstract fun deletePointImage(image: PointImageEntity)
 
+    @Query("DELETE FROM route_image WHERE routeId = :routeId AND isUploaded = 0")
+    abstract fun deleteAllRouteLocalStoredImages(routeId: String)
+
+    @Query("DELETE FROM point_image WHERE pointId = :pointId AND isUploaded = 0")
+    abstract fun deleteAllPointLocalStoredImages(pointId: String)
+
     @Delete
     abstract fun deleteRouteImage(image: RouteImageEntity)
 }

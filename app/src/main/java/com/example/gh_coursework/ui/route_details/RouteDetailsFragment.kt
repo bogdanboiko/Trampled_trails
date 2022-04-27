@@ -210,7 +210,8 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
                         (image.intrinsicHeight * 0.9).toInt()
                     ),
                     Date().time.toString()
-                ).toString()
+                ).toString(),
+                false
             )
         }
     }

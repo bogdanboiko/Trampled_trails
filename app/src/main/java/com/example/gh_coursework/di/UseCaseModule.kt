@@ -135,8 +135,8 @@ val pointUseCasesModule = module {
         PublishRouteUseCaseImpl(get())
     }
 
-    single<FetchRoutePointsUseCase> {
-        FetchRoutePointsUseCaseImpl(get())
+    single<FetchRoutePointsFromRemoteUseCase> {
+        FetchRoutePointsFromRemoteUseCaseImpl(get())
     }
 
     single<SavePublicRouteToPrivateUseCase> {
@@ -145,5 +145,9 @@ val pointUseCasesModule = module {
 
     single<GetPublicRouteListUseCase> {
         GetPublicRouteListUseCaseImpl(get())
+    }
+
+    single<GetUserRouteListUseCase> {
+        GetUserRouteListUseCaseImpl(get())
     }
 }
