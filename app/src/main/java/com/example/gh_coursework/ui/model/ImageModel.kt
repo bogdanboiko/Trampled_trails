@@ -1,6 +1,18 @@
 package com.example.gh_coursework.ui.model
 
-sealed class ImageModel(val image: String) {
-    data class PointImageModel(val pointId: String, val pointImage: String): ImageModel(pointImage)
-    data class RouteImageModel(val routeId: String, val routeImage: String): ImageModel(routeImage)
+sealed class ImageModel() {
+    abstract val image: String
+    abstract val isUploaded: Boolean
+
+    data class PointImageModel(
+        val pointId: String,
+        override val image: String,
+        override val isUploaded: Boolean
+    ) : ImageModel()
+
+    data class RouteImageModel(
+        val routeId: String,
+        override val image: String,
+        override val isUploaded: Boolean
+    ) : ImageModel()
 }

@@ -5,5 +5,5 @@ import com.example.gh_coursework.domain.entity.RoutePointDomain
 import com.google.firebase.auth.FirebaseUser
 
 interface PublishRouteUseCase {
-    fun invoke(route: RouteDomain, routePoints: List<RoutePointDomain>, currentUser: FirebaseUser)
+    suspend fun invoke(route: RouteDomain, routePoints: List<RoutePointDomain>, currentUser: String)
 }

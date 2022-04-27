@@ -1,6 +1,6 @@
 package com.example.gh_coursework.domain.entity
 
-class PublicRoutePointDomain(
+data class PublicRoutePointDomain(
     val pointId: String,
     val caption: String,
     val description: String,

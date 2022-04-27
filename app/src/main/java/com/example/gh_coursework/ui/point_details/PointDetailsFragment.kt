@@ -213,7 +213,8 @@ class PointDetailsFragment : ThemeFragment() {
                         (image.intrinsicHeight * 0.9).toInt()
                     ),
                     Date().time.toString()
-                ).toString()
+                ).toString(),
+                false
             )
         }
     }

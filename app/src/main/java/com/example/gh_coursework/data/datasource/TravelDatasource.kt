@@ -43,16 +43,21 @@ interface TravelDatasource {
 
         fun getRouteTags(): Flow<List<RouteTagDomain>>
         suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
-
-        suspend fun savePublicRouteToPrivate(route: PublicRouteDomain, points: List<PublicRoutePointDomain>)
+        fun makePrivateRoutePublic(routeId: String)
+        suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain, points: List<PublicRoutePointDomain>)
     }
 
     interface Remote {
-        fun publishRoute(
+        suspend fun publishRoute(
             route: RouteDomain,
             routePoints: List<RoutePointDomain>,
-            currentUser: FirebaseUser
+            currentUser: String
         )
+
         fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
+        suspend fun savePointImages(imageList: List<PointImageDomain>, pointId: String, routeId: String)
+        suspend fun saveRouteImages(imageList: List<RouteImageDomain>, routeId: String)
+        fun getUserRoutes(userId: String): Flow<List<PublicRouteDomain>>
+        fun makePrivateRoutePublic(routeId: String)
     }
 }

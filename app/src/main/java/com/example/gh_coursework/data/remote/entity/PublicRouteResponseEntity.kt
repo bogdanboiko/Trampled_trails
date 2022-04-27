@@ -1,10 +1,9 @@
-package com.example.gh_coursework.ui.public_route.model
+package com.example.gh_coursework.data.remote.entity
 
-data class PublicRouteModel(
+data class PublicRouteResponseEntity(
     val routeId: String,
     val name: String,
     val description: String,
-    val rating: Double,
     val tagsList: List<String>,
     val imageList: List<String>,
     val isPublic: Boolean

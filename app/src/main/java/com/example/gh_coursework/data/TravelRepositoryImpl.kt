@@ -4,7 +4,6 @@ import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePoin
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 class TravelRepositoryImpl(
@@ -23,12 +22,16 @@ class TravelRepositoryImpl(
     }
 
     override fun getAllPointsDetails() = localDataSrcIml.getAllPointsDetails()
-    override suspend fun savePublicRouteToPrivate(
+
+    override suspend fun saveFirebaseRouteToLocal(
         route: PublicRouteDomain,
         points: List<PublicRoutePointDomain>
     ) {
-        localDataSrcIml.savePublicRouteToPrivate(route, points)
+        localDataSrcIml.saveFirebaseRouteToLocal(route, points)
     }
+
+    override fun getUserRoutes(userId: String) = remoteDataSrcImpl.getUserRoutes(userId)
+
 
     override suspend fun addPointImages(images: List<PointImageDomain>) {
         localDataSrcIml.addPointImages(images)
@@ -114,15 +117,28 @@ class TravelRepositoryImpl(
 
     override fun getRouteTags() = localDataSrcIml.getRouteTags()
 
-    override fun publishRoute(
+    override suspend fun publishRoute(
         route: RouteDomain,
         routePoints: List<RoutePointDomain>,
-        currentUser: FirebaseUser
+        currentUser: String
     ) {
         remoteDataSrcImpl.publishRoute(route, routePoints, currentUser)
     }
 
     override fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>> {
         return remoteDataSrcImpl.fetchRoutePoints(routeId)
+    }
+
+    override suspend fun saveRouteImagesToFirebase(imageList: List<RouteImageDomain>, routeId: String) {
+        remoteDataSrcImpl.saveRouteImages(imageList, routeId)
+    }
+
+    override suspend fun savePointImagesToFirebase(imageList: List<PointImageDomain>, pointId: String, routeId: String) {
+        remoteDataSrcImpl.savePointImages(imageList, pointId, routeId)
+    }
+
+    override fun makePrivateRoutePublic(routeId: String) {
+        remoteDataSrcImpl.makePrivateRoutePublic(routeId)
+        localDataSrcIml.makePrivateRoutePublic(routeId)
     }
 }

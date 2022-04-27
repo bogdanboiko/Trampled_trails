@@ -63,21 +63,26 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
                 }
 
                 if (item.imageList.isNotEmpty()) {
-
-                    Glide.with(itemView)
-                        .load(Drawable.createFromPath(Uri.parse(item.imageList[0].image).path))
-                        .placeholder(imgMapImage.drawable)
-                        .error(R.drawable.ic_image_placeholder)
-                        .transform(RoundedCorners(10))
-                        .into(imgMapImage)
+                    val imageLink = item.imageList[0]
+                    if (imageLink.isUploaded) {
+                        Glide.with(itemView)
+                            .load(imageLink.image)
+                            .placeholder(imgMapImage.drawable)
+                            .error(R.drawable.ic_image_placeholder)
+                            .transform(RoundedCorners(10))
+                            .into(imgMapImage)
+                    } else {
+                        Glide.with(itemView)
+                            .load(Drawable.createFromPath(Uri.parse(item.imageList[0].image).path))
+                            .placeholder(imgMapImage.drawable)
+                            .error(R.drawable.ic_image_placeholder)
+                            .transform(RoundedCorners(10))
+                            .into(imgMapImage)
+                    }
                 }
 
                 root.setOnClickListener {
-                    item.pointId.let { pointId ->
-                        if (pointId != null) {
-                            callback.onPointItemClick(pointId)
-                        }
-                    }
+                    callback.onPointItemClick(item.pointId)
                 }
             }
 

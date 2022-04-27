@@ -42,8 +42,12 @@ interface TravelRepository {
     fun getRouteTags(): Flow<List<RouteTagDomain>>
 
     //Public
-    fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>, currentUser: FirebaseUser)
+    suspend fun publishRoute(route: RouteDomain, routePoints: List<RoutePointDomain>, currentUser: String)
     fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
     fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>>
-    suspend fun savePublicRouteToPrivate(route: PublicRouteDomain, points: List<PublicRoutePointDomain>)
+    suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain, points: List<PublicRoutePointDomain>)
+    suspend fun saveRouteImagesToFirebase(imageList: List<RouteImageDomain>, routeId: String)
+    suspend fun savePointImagesToFirebase(imageList: List<PointImageDomain>, pointId: String, routeId: String)
+    fun getUserRoutes(userId: String): Flow<List<PublicRouteDomain>>
+    fun makePrivateRoutePublic(routeId: String)
 }

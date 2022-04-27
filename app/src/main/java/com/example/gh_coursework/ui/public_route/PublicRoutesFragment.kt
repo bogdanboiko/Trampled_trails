@@ -839,7 +839,8 @@ class PublicRoutesFragment :
                             name,
                             description,
                             tagsList,
-                            newRouteImageUriList
+                            newRouteImageUriList,
+                            true
                         )
 
                         viewModelPublic.savePublicRouteToPrivate(route, pointList)

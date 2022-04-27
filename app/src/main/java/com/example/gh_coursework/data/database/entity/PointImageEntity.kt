@@ -16,5 +16,7 @@ data class PointImageEntity(
     @ColumnInfo(name = "pointId")
     val pointId: String,
     @ColumnInfo(name = "image")
-    val image: String
+    val image: String,
+    @ColumnInfo(name = "isUploaded")
+    val isUploaded: Boolean
 )

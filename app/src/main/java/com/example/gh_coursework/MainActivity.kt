@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.dolatkia.animatedThemeManager.AppTheme
@@ -16,16 +17,19 @@ import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 
 class MainActivity :
-    PermissionsListener,
-    ThemeActivity() {
+    AppCompatActivity(),
+    PermissionsListener {
 
     private lateinit var binding: ActivityMainBinding
+    private val viewModel: ActivityViewModel by viewModel()
     private val permissionsManager = PermissionsManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        viewModel.uploadActualRoutesToFirebase()
 
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()

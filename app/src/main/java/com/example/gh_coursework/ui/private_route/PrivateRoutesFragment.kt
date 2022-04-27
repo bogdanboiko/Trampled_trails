@@ -23,6 +23,7 @@ import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
+import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
@@ -92,9 +93,8 @@ class PrivateRoutesFragment :
 
     private var filteredTags = emptyList<RouteTagModel>()
     private lateinit var routesFetchingJob: Job
-
     private lateinit var theme: MyAppTheme
-
+    private lateinit var theme: MyAppTheme
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
 
@@ -284,6 +284,17 @@ class PrivateRoutesFragment :
         }
 
         mapboxNavigation.startTripSession(withForegroundService = false)
+    }
+
+    private fun configBottomNavBar() {
+        binding.bottomNavigationView.menu.getItem(2).isChecked = true
+        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
+            findNavController().navigate(
+                PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment()
+            )
+
+            return@setOnMenuItemClickListener true
+        }
     }
 
     override fun onStart() {
@@ -901,21 +912,21 @@ class PrivateRoutesFragment :
         }
 
         routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.getRoutePointsList(route.routeId)
-                    .distinctUntilChanged()
-                    .collect { pointsList ->
-                        if (pointsList.isNotEmpty()) {
-                            currentRoutePointsList =
-                                pointsList.map { it.copy() } as MutableList<RoutePointModel>
+            viewModel.getRoutePointsList(route.routeId)
+                .distinctUntilChanged()
+                .collect { pointsList ->
+                    if (pointsList.isNotEmpty()) {
+                        currentRoutePointsList =
+                            pointsList.map { it.copy() } as MutableList<RoutePointModel>
 
-                            buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
-                            fetchAnnotatedRoutePoints()
-                            eraseCameraToPoint(
-                                currentRoutePointsList[0].x,
-                                currentRoutePointsList[0].y
-                            )
-                        }
+                        buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
+                        fetchAnnotatedRoutePoints()
+                        eraseCameraToPoint(
+                            currentRoutePointsList[0].x,
+                            currentRoutePointsList[0].y
+                        )
                     }
+                }
         }
     }
 
@@ -1249,12 +1260,10 @@ class PrivateRoutesFragment :
             routeDescriptionText.text = route.description
 
             routeDetailsEditButton.setOnClickListener {
-                route.routeId.let {
-                    findNavController().navigate(
-                        PrivateRoutesFragmentDirections
-                            .actionPrivateRoutesFragmentToRouteDetailsFragment(it)
-                    )
-                }
+                findNavController().navigate(
+                    PrivateRoutesFragmentDirections
+                        .actionPrivateRoutesFragmentToRouteDetailsFragment(route.routeId)
+                )
             }
 
             if (route.isPublic) {
@@ -1273,17 +1282,7 @@ class PrivateRoutesFragment :
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        viewModel.publishRoute(route, currentRoutePointsList, user)
-                        viewModel.updateRoute(
-                            RouteModel(
-                                route.routeId,
-                                route.name,
-                                route.description,
-                                route.tagsList,
-                                route.imageList,
-                                true
-                            )
-                        )
+                        viewModel.publishRoute(route.routeId)
                         routePublishButton.visibility = View.GONE
                     }
                 } else {
