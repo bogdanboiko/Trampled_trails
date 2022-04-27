@@ -16,6 +16,6 @@ val networkModule = module {
     }
 
     single {
-        get<FirebaseFirestore>().collection("routes").limit(10)
+        get<FirebaseFirestore>().collection("routes").whereEqualTo("public", true).limit(10)
     }
 }

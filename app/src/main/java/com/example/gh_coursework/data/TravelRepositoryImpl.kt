@@ -23,7 +23,7 @@ class TravelRepositoryImpl(
 
     override fun getAllPointsDetails() = localDataSrcIml.getAllPointsDetails()
 
-    override suspend fun savePublicRouteToPrivate(
+    override suspend fun saveFirebaseRouteToLocal(
         route: PublicRouteDomain,
         points: List<PublicRoutePointDomain>
     ) {
@@ -135,5 +135,10 @@ class TravelRepositoryImpl(
 
     override suspend fun savePointImagesToFirebase(imageList: List<PointImageDomain>, pointId: String, routeId: String) {
         remoteDataSrcImpl.savePointImages(imageList, pointId, routeId)
+    }
+
+    override fun makePrivateRoutePublic(routeId: String) {
+        remoteDataSrcImpl.makePrivateRoutePublic(routeId)
+        localDataSrcIml.makePrivateRoutePublic(routeId)
     }
 }

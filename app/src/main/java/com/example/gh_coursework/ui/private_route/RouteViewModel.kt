@@ -3,6 +3,7 @@ package com.example.gh_coursework.ui.private_route
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
+import com.example.gh_coursework.domain.usecase.public.MakePrivateRoutePublicUseCase
 import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
@@ -27,8 +28,7 @@ class RouteViewModel(
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
     private val deletePointUseCase: DeletePointUseCase,
     private val deleteRouteUseCase: DeleteRouteUseCase,
-    private val updateRouteDetailsUseCase: UpdateRouteDetailsUseCase,
-    private val publishRouteUseCase: PublishRouteUseCase
+    private val makePrivateRoutePublicUseCase: MakePrivateRoutePublicUseCase
 ) : ViewModel() {
 
     val routes = getRoutesListUseCase.invoke()
@@ -62,18 +62,8 @@ class RouteViewModel(
     }
 
     fun publishRoute(
-        route: RouteModel,
-        routePoints: List<RoutePointModel>,
-        currentUser: FirebaseUser
+        routeId: String
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            publishRouteUseCase.invoke(mapRouteModelToDomain(route), routePoints.map(::mapRoutePointModelToDomain), currentUser.uid)
-        }
-    }
-
-    fun updateRoute(route: RouteModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            updateRouteDetailsUseCase.invoke(mapRouteModelToDomain(route))
-        }
+        makePrivateRoutePublicUseCase.invoke(routeId)
     }
 }

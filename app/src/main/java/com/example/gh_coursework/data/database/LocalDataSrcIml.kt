@@ -61,6 +61,10 @@ class LocalDataSrcIml(
         pointDetailsDao.updatePointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
+    override fun makePrivateRoutePublic(routeId: String) {
+        routeDao.makePrivateRoutePublic(routeId)
+    }
+
     override suspend fun saveFirebaseRouteToLocal(
         route: PublicRouteDomain,
         points: List<PublicRoutePointDomain>

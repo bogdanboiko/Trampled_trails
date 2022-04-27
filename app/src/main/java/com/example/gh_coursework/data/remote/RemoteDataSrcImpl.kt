@@ -180,4 +180,8 @@ class RemoteDataSrcImpl(
 
         emit(data.map(::mapPublicRouteResponseToDomain))
     }.flowOn(Dispatchers.IO)
+
+    override fun makePrivateRoutePublic(routeId: String) {
+        db.collection("routes").document(routeId).update("public", true)
+    }
 }

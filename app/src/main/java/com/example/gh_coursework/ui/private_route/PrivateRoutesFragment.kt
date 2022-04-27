@@ -789,21 +789,21 @@ class PrivateRoutesFragment :
         }
 
         routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.getRoutePointsList(route.routeId)
-                    .distinctUntilChanged()
-                    .collect { pointsList ->
-                        if (pointsList.isNotEmpty()) {
-                            currentRoutePointsList =
-                                pointsList.map { it.copy() } as MutableList<RoutePointModel>
+            viewModel.getRoutePointsList(route.routeId)
+                .distinctUntilChanged()
+                .collect { pointsList ->
+                    if (pointsList.isNotEmpty()) {
+                        currentRoutePointsList =
+                            pointsList.map { it.copy() } as MutableList<RoutePointModel>
 
-                            buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
-                            fetchAnnotatedRoutePoints()
-                            eraseCameraToPoint(
-                                currentRoutePointsList[0].x,
-                                currentRoutePointsList[0].y
-                            )
-                        }
+                        buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
+                        fetchAnnotatedRoutePoints()
+                        eraseCameraToPoint(
+                            currentRoutePointsList[0].x,
+                            currentRoutePointsList[0].y
+                        )
                     }
+                }
         }
     }
 
@@ -1109,12 +1109,10 @@ class PrivateRoutesFragment :
             routeDescriptionText.text = route.description
 
             routeDetailsEditButton.setOnClickListener {
-                route.routeId?.let {
-                    findNavController().navigate(
-                        PrivateRoutesFragmentDirections
-                            .actionPrivateRoutesFragmentToRouteDetailsFragment(it)
-                    )
-                }
+                findNavController().navigate(
+                    PrivateRoutesFragmentDirections
+                        .actionPrivateRoutesFragmentToRouteDetailsFragment(route.routeId)
+                )
             }
 
             if (route.isPublic) {
@@ -1133,17 +1131,7 @@ class PrivateRoutesFragment :
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        viewModel.publishRoute(route, currentRoutePointsList, user)
-                        viewModel.updateRoute(
-                            RouteModel(
-                                route.routeId,
-                                route.name,
-                                route.description,
-                                route.tagsList,
-                                route.imageList,
-                                true
-                            )
-                        )
+                        viewModel.publishRoute(route.routeId)
                         routePublishButton.visibility = View.GONE
                     }
                 } else {
@@ -1158,7 +1146,7 @@ class PrivateRoutesFragment :
             routeImagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateRouteImageDetails(
-                        route.routeId!!,
+                        route.routeId,
                         routeImageLayoutManager.findFirstVisibleItemPosition()
                     )
                 )
