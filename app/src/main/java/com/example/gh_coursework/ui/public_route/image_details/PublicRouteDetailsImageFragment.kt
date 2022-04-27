@@ -4,18 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gh_coursework.R
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.databinding.FragmentPublicImageDetailsBinding
+import com.example.gh_coursework.ui.themes.MyAppTheme
 
-class PublicRouteDetailsImageFragment : Fragment(R.layout.fragment_public_image_details) {
+class PublicRouteDetailsImageFragment : ThemeFragment() {
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var binding: FragmentPublicImageDetailsBinding
+    private lateinit var theme: MyAppTheme
     private val arguments by navArgs<PublicRouteDetailsImageFragmentArgs>()
     private val imageAdapter = PublicImageAdapter()
 
@@ -32,6 +35,15 @@ class PublicRouteDetailsImageFragment : Fragment(R.layout.fragment_public_image_
         super.onViewCreated(view, savedInstanceState)
         configRecycler()
         configToolbar()
+    }
+
+    override fun syncTheme(appTheme: AppTheme) {
+        theme = appTheme as MyAppTheme
+
+        with(binding) {
+            DrawableCompat.wrap(topToolbar.background)
+                .setTint(theme.colorSecondary(requireContext()))
+        }
     }
 
     private fun configToolbar() {

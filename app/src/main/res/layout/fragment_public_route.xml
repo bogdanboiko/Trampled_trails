@@ -12,14 +12,14 @@
         android:elevation="-3dp" />
 
     <ImageButton
-        android:id="@+id/mapRoutePointModSwitcher"
+        android:id="@+id/homepageButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:layout_marginTop="35dp"
-        android:background="@drawable/ic_routes"
+        android:background="@drawable/ic_home_dark"
         android:elevation="-2dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -43,7 +43,7 @@
             android:text="routes"
             android:textSize="12sp"
             android:visibility="visible"
-            app:icon="@drawable/ic_routes"
+            app:icon="@drawable/ic_routes_dark"
             app:iconGravity="end"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -62,7 +62,7 @@
             android:text="points"
             android:textSize="12sp"
             android:visibility="visible"
-            app:icon="@drawable/ic_points"
+            app:icon="@drawable/ic_points_dark"
             app:iconGravity="start"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

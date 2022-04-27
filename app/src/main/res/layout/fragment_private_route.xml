@@ -17,7 +17,7 @@
         android:layout_height="50dp"
         android:layout_marginStart="15dp"
         android:layout_marginTop="35dp"
-        android:background="@drawable/ic_routes"
+        android:background="@drawable/ic_routes_dark"
         android:elevation="-2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,7 +28,7 @@
         android:layout_height="50dp"
         android:layout_marginEnd="15dp"
         android:layout_marginTop="35dp"
-        android:background="@drawable/ic_home"
+        android:background="@drawable/ic_home_dark"
         android:elevation="-2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -99,7 +99,7 @@
             android:text="routes"
             android:textSize="12sp"
             android:visibility="visible"
-            app:icon="@drawable/ic_routes"
+            app:icon="@drawable/ic_routes_dark"
             app:iconGravity="end"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -118,7 +118,7 @@
             android:text="points"
             android:textSize="12sp"
             android:visibility="visible"
-            app:icon="@drawable/ic_points"
+            app:icon="@drawable/ic_points_dark"
             app:iconGravity="start"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
@@ -139,13 +139,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:switchBkgCheckedColor="@color/purple_200"
-        app:switchBkgNotCheckedColor="@color/purple_200"
+        app:switchBkgCheckedColor="@color/yellow_dark"
+        app:switchBkgNotCheckedColor="@color/yellow_dark"
         app:switchDesign="android"
-        app:switchToggleCheckedColor="@color/teal_200"
-        app:switchToggleCheckedImage="@drawable/ic_pin_route_rotated"
-        app:switchToggleNotCheckedColor="@color/teal_200"
-        app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated" />
+        app:switchToggleCheckedColor="@color/yellow_light"
+        app:switchToggleCheckedImage="@drawable/ic_pin_route_rotated_dark"
+        app:switchToggleNotCheckedColor="@color/yellow_light"
+        app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated_dark" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/saveRouteButton"

@@ -1,4 +1,4 @@
-package com.example.gh_coursework.ui.point_details.image_details
+package com.example.gh_coursework.ui.private_image_details
 
 import android.graphics.drawable.Drawable
 import android.net.Uri

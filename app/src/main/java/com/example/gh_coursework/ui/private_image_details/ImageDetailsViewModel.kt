@@ -1,4 +1,4 @@
-package com.example.gh_coursework.ui.point_details.image_details
+package com.example.gh_coursework.ui.private_image_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

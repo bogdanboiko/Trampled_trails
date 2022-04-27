@@ -1,6 +1,7 @@
 package com.example.gh_coursework.ui.private_point
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,25 +10,28 @@ import android.widget.LinearLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
-import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
+import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.private_point.adapter.PointsListAdapter
 import com.example.gh_coursework.ui.private_point.adapter.PointsListCallback
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
 import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
 import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
+import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
@@ -50,7 +54,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 
-class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), PointsListCallback {
+class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private lateinit var pointsFetchingJob: Job
     private lateinit var imagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointDetailsImagesLayoutManager: LinearLayoutManager
@@ -65,6 +69,7 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
     private lateinit var pointListBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
     private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
+    private lateinit var theme: MyAppTheme
 
     private val onMapClickListener = OnMapClickListener { point ->
         val result = pointAnnotationManager.annotations.find {
@@ -138,11 +143,73 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
 
+    override fun syncTheme(appTheme: AppTheme) {
+        theme = appTheme as MyAppTheme
+        val colorStates = ColorStateList(
+            arrayOf(
+                intArrayOf(-android.R.attr.state_checked),
+                intArrayOf(android.R.attr.state_checked)
+            ), intArrayOf(
+                theme.colorSecondaryVariant(requireContext()),
+                theme.colorOnSecondary(requireContext())
+            )
+        )
+
+        with(binding) {
+            if (theme.id() == 0) {
+                mapRoutePointModSwitcher.setImageResource(R.drawable.ic_points_light)
+                homepageButton.setImageResource(R.drawable.ic_home_light)
+                centralPointer.setImageResource(R.drawable.ic_pin_point_light)
+            } else {
+                mapRoutePointModSwitcher.setImageResource(R.drawable.ic_points_dark)
+                homepageButton.setImageResource(R.drawable.ic_home_dark)
+                centralPointer.setImageResource(R.drawable.ic_pin_point_dark)
+            }
+
+            cancelButton.backgroundTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            fab.backgroundTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+
+            DrawableCompat.wrap(getPointsList.background)
+                .setTint(theme.colorOnPrimary(requireContext()))
+            getPointsList.iconTint = ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            getPointsList.setTextColor(theme.colorPrimaryVariant(requireContext()))
+
+            DrawableCompat.wrap(bottomAppBar.background)
+                .setTint(theme.colorPrimary(requireContext()))
+            bottomNavigationView.itemIconTintList = colorStates
+            bottomNavigationView.itemTextColor = colorStates
+
+            pointDetailsBottomSheetDialogLayout.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            pointDetailsBottomSheetDialogLayout.pointDetailsEditButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            pointDetailsBottomSheetDialogLayout.pointDetailsDeleteButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            pointDetailsBottomSheetDialogLayout.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(
+                    requireContext()
+                )
+            )
+
+            bottomSheetDialogPoints.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogPoints.pointFilterByTagButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            bottomSheetDialogPoints.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(
+                    requireContext()
+                )
+            )
+        }
+    }
+
     private fun configBottomNavBar() {
         binding.bottomNavigationView.menu.getItem(2).isChecked = true
         binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
             findNavController().navigate(
-                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment()
+                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment("point")
             )
 
             return@setOnMenuItemClickListener true
@@ -206,6 +273,9 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
                 executeClickAtPoint()
             } else {
                 with(binding) {
+                    mapRoutePointModSwitcher.visibility = View.INVISIBLE
+                    homepageButton.visibility = View.INVISIBLE
+                    getPointsList.visibility = View.INVISIBLE
                     centralPointer.visibility = View.VISIBLE
                     cancelButton.visibility = View.VISIBLE
                     fab.setImageDrawable(
@@ -226,6 +296,9 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
     private fun configCancelButton() {
         binding.cancelButton.setOnClickListener {
             with(binding) {
+                binding.mapRoutePointModSwitcher.visibility = View.VISIBLE
+                binding.homepageButton.visibility = View.VISIBLE
+                binding.getPointsList.visibility = View.VISIBLE
                 centralPointer.visibility = View.INVISIBLE
                 cancelButton.visibility = View.INVISIBLE
                 fab.setImageDrawable(
@@ -312,11 +385,17 @@ class PrivatePointsFragment : Fragment(R.layout.fragment_private_points), Points
     }
 
     private fun addAnnotationToMap(point: PrivatePointDetailsModel) {
+        val pointIcon: Int = if (theme.id() == 0) {
+            R.drawable.ic_pin_point_light
+        } else {
+            R.drawable.ic_pin_point_dark
+        }
+
         activity?.applicationContext?.let {
             convertDrawableToBitmap(
                 AppCompatResources.getDrawable(
                     it,
-                    R.drawable.ic_pin_point
+                    pointIcon
                 )
             )?.let { image ->
                 pointAnnotationManager.create(

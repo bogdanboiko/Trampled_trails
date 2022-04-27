@@ -22,7 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="35dp"
         android:layout_marginStart="15dp"
-        android:background="@drawable/ic_points"
+        android:background="@drawable/ic_points_dark"
         android:elevation="-2dp"/>
 
     <ImageButton
@@ -31,7 +31,7 @@
         android:layout_height="50dp"
         android:layout_marginEnd="15dp"
         android:layout_marginTop="35dp"
-        android:background="@drawable/ic_home"
+        android:background="@drawable/ic_home_dark"
         android:elevation="-2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -68,7 +68,7 @@
         android:text="points"
         android:textSize="12sp"
         android:visibility="visible"
-        app:icon="@drawable/ic_points"
+        app:icon="@drawable/ic_points_dark"
         app:iconGravity="start"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -82,7 +82,7 @@
         android:visibility="invisible"
         mapbox:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
-        mapbox:srcCompat="@drawable/ic_pin_point" />
+        mapbox:srcCompat="@drawable/ic_pin_point_dark" />
 
 
     <androidx.constraintlayout.widget.Guideline

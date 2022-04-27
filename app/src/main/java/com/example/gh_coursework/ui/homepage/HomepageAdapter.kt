@@ -1,11 +1,15 @@
 package com.example.gh_coursework.ui.homepage
 
+import android.content.SharedPreferences
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.dolatkia.animatedThemeManager.ThemeManager
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.ItemHomepageBinding
 import com.example.gh_coursework.databinding.ItemHomepageSwitchBinding
+import com.example.gh_coursework.ui.themes.DarkTheme
+import com.example.gh_coursework.ui.themes.LightTheme
 
 interface HomepageCallback {
     fun onEditClick()
@@ -14,7 +18,10 @@ interface HomepageCallback {
 
 data class Data(val viewType: Int, val image: Int, val text: String)
 
-class HomepageAdapter(private val callback: HomepageCallback) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class HomepageAdapter(
+    private val callback: HomepageCallback,
+    private val sharedPreferences: SharedPreferences
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val VIEW_TYPE_THEME = 1
@@ -83,6 +90,19 @@ class HomepageAdapter(private val callback: HomepageCallback) : RecyclerView.Ada
                 with(binding) {
                     imgItemHomepage.setImageResource(item.image)
                     txtItemHomepage.text = item.text
+                    switchTheme.isChecked = sharedPreferences.getBoolean("theme_switch", false)
+
+                    switchTheme.setOnCheckedChangeListener { _, isChecked ->
+                        if (isChecked) {
+                            ThemeManager.instance.changeTheme(LightTheme(), switchTheme)
+                            sharedPreferences.edit().putString("theme", "light").apply()
+                        } else {
+                            ThemeManager.instance.changeTheme(DarkTheme(), switchTheme)
+                            sharedPreferences.edit().putString("theme", "dark").apply()
+                        }
+
+                        sharedPreferences.edit().putBoolean("theme_switch", isChecked).apply()
+                    }
             }
         }
     }

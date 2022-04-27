@@ -1,6 +1,7 @@
 package com.example.gh_coursework.ui.private_route
 
 import android.annotation.SuppressLint
+import android.content.res.ColorStateList
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,22 +11,24 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.fragment.app.Fragment
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
-import com.example.gh_coursework.ui.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
 import com.example.gh_coursework.ui.model.ImageModel
+import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -35,6 +38,7 @@ import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
 import com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment
 import com.example.gh_coursework.ui.route_details.model.RouteTagModel
+import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonPrimitive
@@ -82,13 +86,15 @@ import java.util.*
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PrivateRoutesFragment :
-    Fragment(R.layout.fragment_private_route),
+    ThemeFragment(),
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
     private var filteredTags = emptyList<RouteTagModel>()
     private lateinit var routesFetchingJob: Job
-    private var previousRouteId: String? = null
+
+    private lateinit var theme: MyAppTheme
+
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
 
@@ -102,6 +108,7 @@ class PrivateRoutesFragment :
 
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
+    private var previousRouteId: String? = null
     private lateinit var focusedRoute: RouteModel
     private lateinit var lastSeenCoordinate: Point
     private lateinit var routePointsJob: Job
@@ -279,17 +286,6 @@ class PrivateRoutesFragment :
         mapboxNavigation.startTripSession(withForegroundService = false)
     }
 
-    private fun configBottomNavBar() {
-        binding.bottomNavigationView.menu.getItem(2).isChecked = true
-        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            findNavController().navigate(
-                PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment()
-            )
-
-            return@setOnMenuItemClickListener true
-        }
-    }
-
     override fun onStart() {
         super.onStart()
         mapboxNavigation.registerRoutesObserver(routesObserver)
@@ -309,6 +305,98 @@ class PrivateRoutesFragment :
     override fun onDestroy() {
         super.onDestroy()
         mapboxNavigation.onDestroy()
+    }
+
+    override fun syncTheme(appTheme: AppTheme) {
+        theme = appTheme as MyAppTheme
+        val colorStates = ColorStateList(
+            arrayOf(
+                intArrayOf(-android.R.attr.state_checked),
+                intArrayOf(android.R.attr.state_checked)
+            ), intArrayOf(
+                theme.colorSecondaryVariant(requireContext()),
+                theme.colorOnSecondary(requireContext())
+            )
+        )
+
+        with(binding) {
+            if (theme.id() == 0) {
+                mapRoutePointModSwitcher.setImageResource(R.drawable.ic_routes_light)
+                homepageButton.setImageResource(R.drawable.ic_home_light)
+
+                pointTypeSwitchButton.setSwitchToggleCheckedDrawableRes(R.drawable.ic_pin_route_rotated_light)
+                pointTypeSwitchButton.setSwitchToggleNotCheckedDrawableRes(R.drawable.ic_pin_point_rotated_light)
+            } else {
+                mapRoutePointModSwitcher.setImageResource(R.drawable.ic_routes_dark)
+                homepageButton.setImageResource(R.drawable.ic_home_dark)
+
+                pointTypeSwitchButton.setSwitchToggleCheckedDrawableRes(R.drawable.ic_pin_route_rotated_dark)
+                pointTypeSwitchButton.setSwitchToggleNotCheckedDrawableRes(R.drawable.ic_pin_point_rotated_dark)
+            }
+
+            saveRouteButton.backgroundTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            createButton.backgroundTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+
+            resetRouteButton.backgroundTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            undoPointCreatingButton.backgroundTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+
+            pointTypeSwitchButton.switchBkgCheckedColor =
+                theme.colorSecondaryVariant(requireContext())
+            pointTypeSwitchButton.switchBkgNotCheckedColor =
+                theme.colorSecondaryVariant(requireContext())
+            pointTypeSwitchButton.switchToggleCheckedColor = theme.colorSecondary(requireContext())
+            pointTypeSwitchButton.switchToggleNotCheckedColor =
+                theme.colorSecondary(requireContext())
+
+            DrawableCompat.wrap(getRoutesList.background)
+                .setTint(theme.colorOnPrimary(requireContext()))
+            DrawableCompat.wrap(getRoutePointsList.background)
+                .setTint(theme.colorOnPrimary(requireContext()))
+            getRoutesList.iconTint = ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            getRoutesList.setTextColor(theme.colorPrimaryVariant(requireContext()))
+            getRoutePointsList.iconTint =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            getRoutePointsList.setTextColor(theme.colorPrimaryVariant(requireContext()))
+
+            DrawableCompat.wrap(bottomAppBar.background)
+                .setTint(theme.colorPrimary(requireContext()))
+            bottomNavigationView.itemIconTintList = colorStates
+            bottomNavigationView.itemTextColor = colorStates
+
+            bottomSheetDialogRoutes.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogRoutes.routeFilterByTagButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogRoutes.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(
+                    requireContext()
+                )
+            )
+
+            bottomSheetDialogRoutePoints.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogRoutePoints.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(
+                    requireContext()
+                )
+            )
+
+            bottomSheetDialogRouteDetails.routeDetailsDeleteButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogRouteDetails.routeDetailsEditButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogRouteDetails.routePublishButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+
+            bottomSheetDialogPointDetails.pointDetailsDeleteButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogPointDetails.pointDetailsEditButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+        }
     }
 
     private fun configImageRecyclers() {
@@ -371,6 +459,8 @@ class PrivateRoutesFragment :
                     pointTypeSwitchButton.visibility = View.VISIBLE
                     saveRouteButton.visibility = View.VISIBLE
 
+                    mapRoutePointModSwitcher.visibility = View.INVISIBLE
+                    homepageButton.visibility = View.INVISIBLE
                     getRoutePointsList.visibility = View.INVISIBLE
                     getRoutesList.visibility = View.INVISIBLE
 
@@ -392,6 +482,8 @@ class PrivateRoutesFragment :
                     )
 
                 } else if (it == MapState.PRESENTATION) {
+                    mapRoutePointModSwitcher.visibility = View.VISIBLE
+                    homepageButton.visibility = View.VISIBLE
                     getRoutePointsList.visibility = View.VISIBLE
                     getRoutesList.visibility = View.VISIBLE
 
@@ -416,18 +508,38 @@ class PrivateRoutesFragment :
         }
     }
 
+    private fun configBottomNavBar() {
+        binding.bottomNavigationView.menu.getItem(2).isChecked = true
+        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
+            findNavController().navigate(
+                PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment("route")
+            )
+
+            return@setOnMenuItemClickListener true
+        }
+    }
+
     private fun switchOnMapClickListener(isChecked: Boolean) {
+        val pointIcon: Int
+        val routeIcon: Int
+
+        if (theme.id() == 0) {
+            pointIcon = R.drawable.ic_pin_route_light
+            routeIcon = R.drawable.ic_pin_point_light
+        } else {
+            pointIcon = R.drawable.ic_pin_route_dark
+            routeIcon = R.drawable.ic_pin_point_dark
+        }
+
         mapboxMap.removeOnMapClickListener(onClickAddAnnotatedRoutePoint)
         mapboxMap.removeOnMapClickListener(onClickAddDefaultRoutePoint)
 
         if (isChecked) {
             mapboxMap.addOnMapClickListener(onClickAddDefaultRoutePoint)
-
-            binding.centralPointer.setImageResource(R.drawable.ic_pin_route)
+            binding.centralPointer.setImageResource(pointIcon)
         } else if (!isChecked) {
             mapboxMap.addOnMapClickListener(onClickAddAnnotatedRoutePoint)
-
-            binding.centralPointer.setImageResource(R.drawable.ic_pin_point)
+            binding.centralPointer.setImageResource(routeIcon)
         }
     }
 
@@ -839,6 +951,16 @@ class PrivateRoutesFragment :
     private fun fetchAnnotatedRoutePoints() {
         val annotatedPoints = mutableListOf<RoutePointModel>()
         val imageList = mutableListOf<ImageModel>()
+        val startFlag: Int
+        val finishFlag: Int
+
+        if (theme.id() == 0) {
+            startFlag = R.drawable.ic_start_flag_light
+            finishFlag = R.drawable.ic_finish_flag_light
+        } else {
+            startFlag = R.drawable.ic_start_flag_dark
+            finishFlag = R.drawable.ic_finish_flag_dark
+        }
 
         pointAnnotationManager.deleteAll()
         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
@@ -850,7 +972,7 @@ class PrivateRoutesFragment :
                     currentRoutePointsList.first().x,
                     currentRoutePointsList.first().y,
                 ),
-                R.drawable.ic_start_flag
+                startFlag
             )
         } else {
             addFlagAnnotationToMap(
@@ -858,7 +980,7 @@ class PrivateRoutesFragment :
                     currentRoutePointsList.first().x,
                     currentRoutePointsList.first().y + 0.00005,
                 ),
-                R.drawable.ic_start_flag
+                startFlag
             )
         }
 
@@ -868,7 +990,7 @@ class PrivateRoutesFragment :
                     currentRoutePointsList.last().x,
                     currentRoutePointsList.last().y,
                 ),
-                R.drawable.ic_finish_flag
+                finishFlag
             )
         } else {
             addFlagAnnotationToMap(
@@ -876,7 +998,7 @@ class PrivateRoutesFragment :
                     currentRoutePointsList.last().x,
                     currentRoutePointsList.last().y + 0.00005,
                 ),
-                R.drawable.ic_finish_flag
+                finishFlag
             )
         }
 
@@ -897,11 +1019,17 @@ class PrivateRoutesFragment :
     }
 
     private fun addAnnotationToMap(point: RoutePointModel) {
+        val pointIcon: Int = if (theme.id() == 0) {
+            R.drawable.ic_pin_point_light
+        } else {
+            R.drawable.ic_pin_point_dark
+        }
+
         activity?.applicationContext?.let {
             convertDrawableToBitmap(
                 AppCompatResources.getDrawable(
                     it,
-                    R.drawable.ic_pin_point
+                    pointIcon
                 )
             )?.let { image ->
                 pointAnnotationManager.create(
@@ -928,6 +1056,12 @@ class PrivateRoutesFragment :
     }
 
     private fun addWaypoint(point: RoutePointModel) {
+        val flag: Int = if (theme.id() == 0) {
+            R.drawable.ic_start_flag_light
+        } else {
+            R.drawable.ic_start_flag_dark
+        }
+
         creatingRouteCoordinatesList.add(point)
 
         if (creatingRouteCoordinatesList.size == 1) {
@@ -937,7 +1071,7 @@ class PrivateRoutesFragment :
                         creatingRouteCoordinatesList[0].x,
                         creatingRouteCoordinatesList[0].y
                     ),
-                    R.drawable.ic_start_flag
+                    flag
                 )
             } else {
                 addFlagAnnotationToMap(
@@ -945,7 +1079,7 @@ class PrivateRoutesFragment :
                         creatingRouteCoordinatesList[0].x,
                         creatingRouteCoordinatesList[0].y + 0.00005
                     ),
-                    R.drawable.ic_start_flag
+                    flag
                 )
             }
         } else if (creatingRouteCoordinatesList.size == 2) {
@@ -995,11 +1129,17 @@ class PrivateRoutesFragment :
     }
 
     private fun addEmptyAnnotationToMap(point: RoutePointModel) {
+        val pointIcon: Int = if (theme.id() == 0) {
+            R.drawable.ic_pin_point_light
+        } else {
+            R.drawable.ic_pin_point_dark
+        }
+
         activity?.applicationContext?.let {
             convertDrawableToBitmap(
                 AppCompatResources.getDrawable(
                     it,
-                    R.drawable.ic_pin_point
+                    pointIcon
                 )
             )?.let { image ->
                 pointAnnotationManager.create(
@@ -1109,7 +1249,7 @@ class PrivateRoutesFragment :
             routeDescriptionText.text = route.description
 
             routeDetailsEditButton.setOnClickListener {
-                route.routeId?.let {
+                route.routeId.let {
                     findNavController().navigate(
                         PrivateRoutesFragmentDirections
                             .actionPrivateRoutesFragmentToRouteDetailsFragment(it)
@@ -1158,7 +1298,7 @@ class PrivateRoutesFragment :
             routeImagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPrivateRouteImageDetails(
-                        route.routeId!!,
+                        route.routeId,
                         routeImageLayoutManager.findFirstVisibleItemPosition()
                     )
                 )

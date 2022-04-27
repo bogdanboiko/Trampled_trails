@@ -1,21 +1,23 @@
 package com.example.gh_coursework
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeActivity
 import com.example.gh_coursework.databinding.ActivityMainBinding
-import com.facebook.FacebookSdk
-import com.facebook.appevents.AppEventsLogger
+import com.example.gh_coursework.ui.themes.DarkTheme
+import com.example.gh_coursework.ui.themes.LightTheme
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 
 class MainActivity :
-    AppCompatActivity(),
-    PermissionsListener {
+    PermissionsListener,
+    ThemeActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private val permissionsManager = PermissionsManager(this)
@@ -75,6 +77,19 @@ class MainActivity :
                 10
             )
         }
+    }
+
+    override fun getStartTheme(): AppTheme {
+        val sharedPref = this.getPreferences(Context.MODE_PRIVATE)
+        return if (sharedPref.getBoolean("theme_switch", false)) {
+            LightTheme()
+        } else {
+            DarkTheme()
+        }
+    }
+
+    override fun syncTheme(appTheme: AppTheme) {
+        // useless
     }
 }
 

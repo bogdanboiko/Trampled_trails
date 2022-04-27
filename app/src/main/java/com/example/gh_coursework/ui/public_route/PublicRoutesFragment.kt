@@ -3,6 +3,7 @@ package com.example.gh_coursework.ui.public_route
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
+import android.content.res.ColorStateList
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -13,14 +14,18 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
 import com.example.gh_coursework.domain.entity.PublicRouteDomain
@@ -33,6 +38,7 @@ import com.example.gh_coursework.ui.public_route.adapter.*
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 import com.example.gh_coursework.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment
+import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
@@ -79,25 +85,28 @@ import java.util.*
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PublicRoutesFragment :
-    Fragment(R.layout.fragment_public_route),
+    ThemeFragment(),
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
     private var savedPublicRoutesList = emptyList<RouteModel>()
     private lateinit var routesFetchingJob: Job
-    private var tagsFilter = emptyList<String>()
     private lateinit var routeImagesPreviewAdapter: PublicImageAdapter
     private lateinit var pointImagesPreviewAdapter: PublicImageAdapter
+
+    private lateinit var theme: MyAppTheme
 
     private lateinit var pointImageLayoutManager: LinearLayoutManager
     private lateinit var routeImageLayoutManager: LinearLayoutManager
     private lateinit var binding: FragmentPublicRouteBinding
 
     private val viewModelPublic: PublicRouteViewModel by viewModel()
+    private val arguments by navArgs<PublicRoutesFragmentArgs>()
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
+    private var tagsFilter = emptyList<String>()
     private lateinit var focusedPublicRoute: PublicRouteModel
     private lateinit var routePointsJob: Job
 
@@ -198,6 +207,7 @@ class PublicRoutesFragment :
         setUpBottomSheetsRecyclers()
         configImageRecyclers()
         configBottomSheetDialogs()
+        onNavigateToHomepageButtonClickListener()
         initMapboxNavigation()
         initRouteLine()
 
@@ -223,14 +233,6 @@ class PublicRoutesFragment :
         mapboxNavigation.startTripSession(withForegroundService = false)
     }
 
-    private fun fetchSavedPublicRoutes() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModelPublic.fetchPublicRouteList().collect {
-                savedPublicRoutesList = it
-            }
-        }
-    }
-
     override fun onStart() {
         super.onStart()
         mapboxNavigation.registerRoutesObserver(routesObserver)
@@ -248,11 +250,91 @@ class PublicRoutesFragment :
         mapboxNavigation.onDestroy()
     }
 
+    override fun syncTheme(appTheme: AppTheme) {
+        theme = appTheme as MyAppTheme
+        val colorStates = ColorStateList(
+            arrayOf(
+                intArrayOf(-android.R.attr.state_checked),
+                intArrayOf(android.R.attr.state_checked)
+            ), intArrayOf(
+                theme.colorSecondaryVariant(requireContext()),
+                theme.colorOnSecondary(requireContext())
+            )
+        )
+
+        with(binding) {
+            if (theme.id() == 0) {
+                homepageButton.setImageResource(R.drawable.ic_home_light)
+            } else {
+                homepageButton.setImageResource(R.drawable.ic_home_dark)
+            }
+
+            createButton.backgroundTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+
+            DrawableCompat.wrap(getRoutesList.background)
+                .setTint(theme.colorOnPrimary(requireContext()))
+            DrawableCompat.wrap(getRoutePointsList.background)
+                .setTint(theme.colorOnPrimary(requireContext()))
+            getRoutesList.iconTint = ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            getRoutesList.setTextColor(theme.colorPrimaryVariant(requireContext()))
+            getRoutePointsList.iconTint =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            getRoutePointsList.setTextColor(theme.colorPrimaryVariant(requireContext()))
+
+            DrawableCompat.wrap(bottomAppBar.background)
+                .setTint(theme.colorPrimary(requireContext()))
+            bottomNavigationView.itemIconTintList = colorStates
+            bottomNavigationView.itemTextColor = colorStates
+
+            bottomSheetDialogRoutes.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogRoutes.routeFilterByTagButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogRoutes.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(
+                    requireContext()
+                )
+            )
+
+            bottomSheetDialogRoutePoints.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogRoutePoints.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(
+                    requireContext()
+                )
+            )
+
+            bottomSheetDialogRouteDetails.routeDetailsAddToFavouriteButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+
+            bottomSheetDialogPointDetails.pointDetailsAddToFavouriteButton.imageTintList =
+                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+        }
+    }
+
     private fun configBottomNavBar() {
         binding.bottomNavigationView.menu.getItem(0).isChecked = true
         binding.bottomNavigationView.menu.getItem(2).setOnMenuItemClickListener {
-            findNavController().popBackStack()
+            if (arguments.popUpTo == "point") {
+                findNavController().navigate(
+                    PublicRoutesFragmentDirections.actionPublicRouteFragmentToPrivatePointFragment()
+                )
+            } else if (arguments.popUpTo == "route") {
+                findNavController().navigate(
+                    PublicRoutesFragmentDirections.actionPublicRouteFragmentToPrivateRouteFragment()
+                )
+            }
+
             return@setOnMenuItemClickListener true
+        }
+    }
+
+    private fun fetchSavedPublicRoutes() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModelPublic.fetchPublicRouteList().collect {
+                savedPublicRoutesList = it
+            }
         }
     }
 
@@ -408,6 +490,14 @@ class PublicRoutesFragment :
         }
     }
 
+    private fun onNavigateToHomepageButtonClickListener() {
+        binding.homepageButton.setOnClickListener {
+            findNavController().navigate(
+                PublicRoutesFragmentDirections.actionPublicRouteFragmentToHomepageFragment()
+            )
+        }
+    }
+
     private fun initMapboxNavigation() {
         mapboxNavigation = MapboxNavigationProvider.create(
             NavigationOptions.Builder(requireActivity().applicationContext)
@@ -505,6 +595,16 @@ class PublicRoutesFragment :
     private fun fetchAnnotatedRoutePoints() {
         val annotatedPoints = mutableListOf<RoutePointModel>()
         val imageList = mutableListOf<String>()
+        val startFlag: Int
+        val finishFlag: Int
+
+        if (theme.id() == 0) {
+            startFlag = R.drawable.ic_start_flag_light
+            finishFlag = R.drawable.ic_finish_flag_light
+        } else {
+            startFlag = R.drawable.ic_start_flag_dark
+            finishFlag = R.drawable.ic_finish_flag_dark
+        }
 
         pointAnnotationManager.deleteAll()
         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
@@ -516,7 +616,7 @@ class PublicRoutesFragment :
                     currentRoutePointsList.first().x,
                     currentRoutePointsList.first().y,
                 ),
-                R.drawable.ic_start_flag
+                startFlag
             )
         } else {
             addFlagAnnotationToMap(
@@ -524,7 +624,7 @@ class PublicRoutesFragment :
                     currentRoutePointsList.first().x,
                     currentRoutePointsList.first().y + 0.00005,
                 ),
-                R.drawable.ic_start_flag
+                startFlag
             )
         }
 
@@ -534,7 +634,7 @@ class PublicRoutesFragment :
                     currentRoutePointsList.last().x,
                     currentRoutePointsList.last().y,
                 ),
-                R.drawable.ic_finish_flag
+                finishFlag
             )
         } else {
             addFlagAnnotationToMap(
@@ -542,7 +642,7 @@ class PublicRoutesFragment :
                     currentRoutePointsList.last().x,
                     currentRoutePointsList.last().y + 0.00005,
                 ),
-                R.drawable.ic_finish_flag
+                finishFlag
             )
         }
 
@@ -563,11 +663,17 @@ class PublicRoutesFragment :
     }
 
     private fun addAnnotationToMap(point: RoutePointModel) {
+        val pointIcon: Int = if (theme.id() == 0) {
+            R.drawable.ic_pin_point_light
+        } else {
+            R.drawable.ic_pin_point_dark
+        }
+
         activity?.applicationContext?.let {
             convertDrawableToBitmap(
                 AppCompatResources.getDrawable(
                     it,
-                    R.drawable.ic_pin_point
+                    pointIcon
                 )
             )?.let { image ->
                 pointAnnotationManager.create(

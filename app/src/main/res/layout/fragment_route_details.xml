@@ -11,7 +11,7 @@
         android:id="@+id/routeDetailsAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/teal_200"
+        android:background="@color/yellow_light"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:expanded="true">
@@ -21,14 +21,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
-            app:contentScrim="@color/teal_200"
+            app:contentScrim="@color/yellow_light"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
+                android:id="@id/gradient"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:elevation="1dp"
-                android:src="@drawable/fg_gradient_toolbar" />
+                android:src="@drawable/fg_gradient_toolbar_dark" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/imageRecycler"

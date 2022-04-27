@@ -10,21 +10,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
+import com.dolatkia.animatedThemeManager.AppTheme
+import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentRouteDetailsBinding
-import com.example.gh_coursework.ui.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.model.ImageModel
 import com.example.gh_coursework.ui.model.ImageModel.RouteImageModel
+import com.example.gh_coursework.ui.private_image_details.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.route_details.model.RouteCompleteModel
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
+import com.example.gh_coursework.ui.themes.MyAppTheme
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -33,10 +36,11 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.*
 
-class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
+class RouteDetailsFragment : ThemeFragment() {
 
     private lateinit var binding: FragmentRouteDetailsBinding
     private lateinit var layoutManager: LinearLayoutManager
+    private lateinit var theme: MyAppTheme
     private val arguments by navArgs<RouteDetailsFragmentArgs>()
     private val viewModel: RouteDetailsViewModel by viewModel { parametersOf(arguments.routeId) }
     private val imageAdapter = ImagesInDetailsAdapter {
@@ -86,6 +90,22 @@ class RouteDetailsFragment : Fragment(R.layout.fragment_route_details) {
         configTagButton()
         configImageRecycler()
         configData()
+    }
+
+    override fun syncTheme(appTheme: AppTheme) {
+        theme = appTheme as MyAppTheme
+
+        with(binding) {
+            DrawableCompat.wrap(routeDetailsAppBar.background)
+                .setTint(theme.colorSecondary(requireContext()))
+            routeDetailsCollapsingToolbar.setContentScrimColor(theme.colorSecondary(requireContext()))
+
+            if (theme.id() == 0) {
+                gradient.setImageResource(R.drawable.fg_gradient_toolbar_light)
+            } else {
+                gradient.setImageResource(R.drawable.fg_gradient_toolbar_dark)
+            }
+        }
     }
 
     private fun configImageRecycler() {

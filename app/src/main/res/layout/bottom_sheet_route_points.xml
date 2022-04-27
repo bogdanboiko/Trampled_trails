@@ -4,7 +4,7 @@
     android:id="@+id/routePointsBottomSheetDialog"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray"
+    android:background="@color/gray"
     android:orientation="vertical"
     android:paddingBottom="70dp"
     app:behavior_hideable="true"
@@ -18,7 +18,7 @@
         android:layout_marginTop="50dp"
         android:gravity="center"
         android:text="Points list is empty. Create your first route with annotated points!"
-        android:textColor="@color/map_background"
+        android:textColor="@color/beige"
         android:textSize="20sp"
         android:visibility="visible" />
 
