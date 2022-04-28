@@ -26,18 +26,35 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 
-class HomepageFragment : HomepageCallback, ThemeFragment() {
+interface LoginCallback {
+    fun onSuccessLogin()
+}
+
+class HomepageFragment : ThemeFragment(), HomepageCallback {
 
     private lateinit var binding: FragmentHomepageBinding
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var homepageAdapter: HomepageAdapter
     private lateinit var theme: MyAppTheme
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private var callback: LoginCallback? = null
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
         this.signInResult(res)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        callback = context as? LoginCallback
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        callback = null
     }
 
     override fun onCreateView(
@@ -120,6 +137,7 @@ class HomepageFragment : HomepageCallback, ThemeFragment() {
         if (result.resultCode == ComponentActivity.RESULT_OK) {
             firebaseUser = FirebaseAuth.getInstance().currentUser
             configHomepage()
+            callback?.onSuccessLogin()
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }
@@ -178,6 +196,7 @@ class HomepageFragment : HomepageCallback, ThemeFragment() {
         theme = appTheme as MyAppTheme
         with(binding) {
             root.setBackgroundColor(theme.colorPrimary(requireContext()))
+            txtUsername.setTextColor(theme.colorSecondaryVariant(requireContext()))
         }
     }
 }

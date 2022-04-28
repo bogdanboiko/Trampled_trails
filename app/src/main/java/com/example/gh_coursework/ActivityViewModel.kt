@@ -21,26 +21,19 @@ class ActivityViewModel(
     private val fetchRoutePointsFromRemoteUseCase: FetchRoutePointsFromRemoteUseCase,
     private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase
 ) : ViewModel() {
-    fun uploadActualRoutesToFirebase() {
+    fun uploadActualRoutesToFirebase(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            var user = FirebaseAuth.getInstance().currentUser
-            if (user == null) {
-//                Tasks.await(FirebaseAuth.getInstance().signInAnonymously().addOnSuccessListener {
-//                    user = it.user
-//                })
-                return@launch
-            }
             viewModelScope.launch(Dispatchers.IO) {
                 getRoutesListUseCase.invoke().first().forEach { route ->
                     publishRouteUseCase.invoke(
                         route,
                         getRoutePointsListUseCase.invoke(route.routeId).first(),
-                        user.uid
+                        id
                     )
                 }
             }.invokeOnCompletion {
                 viewModelScope.launch(Dispatchers.IO) {
-                    getUserRouteListUseCase.invoke(user.uid).collect { routesToSave ->
+                    getUserRouteListUseCase.invoke(id).collect { routesToSave ->
                         routesToSave.forEach { route ->
                             viewModelScope.launch(Dispatchers.IO) {
                                 fetchRoutePointsFromRemoteUseCase.invoke(route.routeId)

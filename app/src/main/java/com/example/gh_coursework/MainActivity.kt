@@ -4,21 +4,25 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeActivity
 import com.example.gh_coursework.databinding.ActivityMainBinding
+import com.example.gh_coursework.ui.homepage.LoginCallback
 import com.example.gh_coursework.ui.themes.DarkTheme
 import com.example.gh_coursework.ui.themes.LightTheme
+import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity :
     ThemeActivity(),
-    PermissionsListener {
+    PermissionsListener,
+    LoginCallback {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: ActivityViewModel by viewModel()
@@ -29,12 +33,24 @@ class MainActivity :
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel.uploadActualRoutesToFirebase()
-
         if (PermissionsManager.areLocationPermissionsGranted(this)) {
             requestStoragePermission()
         } else {
             permissionsManager.requestLocationPermissions(this)
+        }
+
+        getUserid()?.let { viewModel.uploadActualRoutesToFirebase(it) }
+    }
+
+    override fun onSuccessLogin() {
+        getUserid()?.let { viewModel.uploadActualRoutesToFirebase(it) }
+    }
+
+    private fun getUserid(): String? {
+        return if (FirebaseAuth.getInstance().currentUser == null) {
+            Settings.Secure.ANDROID_ID
+        } else {
+            FirebaseAuth.getInstance().currentUser?.uid
         }
     }
 
