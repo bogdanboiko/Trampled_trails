@@ -26,6 +26,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
 
+interface LoginCallback {
+    fun onSuccessLogin()
+}
+
 class HomepageFragment : HomepageCallback, ThemeFragment() {
 
     private lateinit var binding: FragmentHomepageBinding
@@ -33,11 +37,24 @@ class HomepageFragment : HomepageCallback, ThemeFragment() {
     private lateinit var homepageAdapter: HomepageAdapter
     private lateinit var theme: MyAppTheme
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
+    private var callback: LoginCallback? = null
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
     ) { res ->
         this.signInResult(res)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        callback = context as? LoginCallback
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        callback = null
     }
 
     override fun onCreateView(
@@ -120,6 +137,7 @@ class HomepageFragment : HomepageCallback, ThemeFragment() {
         if (result.resultCode == ComponentActivity.RESULT_OK) {
             firebaseUser = FirebaseAuth.getInstance().currentUser
             configHomepage()
+            callback?.onSuccessLogin()
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }

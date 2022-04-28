@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeActivity
 import com.example.gh_coursework.databinding.ActivityMainBinding
+import com.example.gh_coursework.ui.homepage.LoginCallback
 import com.example.gh_coursework.ui.themes.DarkTheme
 import com.example.gh_coursework.ui.themes.LightTheme
 import com.mapbox.android.core.permissions.PermissionsListener
@@ -18,7 +19,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity :
     ThemeActivity(),
-    PermissionsListener {
+    PermissionsListener,
+    LoginCallback {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: ActivityViewModel by viewModel()
@@ -94,6 +96,10 @@ class MainActivity :
 
     override fun syncTheme(appTheme: AppTheme) {
         // useless
+    }
+
+    override fun onSuccessLogin() {
+        viewModel.uploadActualRoutesToFirebase()
     }
 }
 
