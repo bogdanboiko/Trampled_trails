@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface TravelRepository {
     suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
     suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain)
+    suspend fun deleteAllPoints()
     suspend fun deletePoint(pointId: String)
 
     suspend fun addPointTag(tag: PointTagDomain)
@@ -21,6 +22,7 @@ interface TravelRepository {
 
     suspend fun addRoute(route: RouteDomain, coordinatesList: List<RoutePointDomain>)
     suspend fun updateRoute(route: RouteDomain)
+    suspend fun deleteAllRoutes()
     suspend fun deleteRoute(route: RouteDomain)
 
     suspend fun addRouteTagsList(routeTagsList: List<RouteTagsDomain>)
@@ -38,7 +40,6 @@ interface TravelRepository {
     fun getRouteDetails(routeId: String): Flow<RouteDomain>
     fun getRoutePointsList(routeId: String): Flow<List<RoutePointDomain>>
     fun getRoutePointsImagesList(routeId: String): Flow<List<RoutePointsImagesDomain>>
-
     fun getRouteTags(): Flow<List<RouteTagDomain>>
 
     //Public

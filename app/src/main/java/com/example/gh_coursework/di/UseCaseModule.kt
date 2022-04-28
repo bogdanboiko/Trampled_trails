@@ -19,6 +19,10 @@ val pointUseCasesModule = module {
         AddPointPreviewWithDetailsUseCaseImpl(get())
     }
 
+    single<DeleteAllPointsUseCase> {
+        DeleteAllPointsUseCaseImpl(get())
+    }
+
     single<DeletePointUseCase> {
         DeletePointUseCaseImpl(get())
     }
@@ -81,6 +85,10 @@ val pointUseCasesModule = module {
 
     single<GetRoutesListUseCase> {
         GetRoutesListUseCaseImpl(get())
+    }
+
+    single<DeleteAllRoutesUseCase> {
+        DeleteAllRoutesUseCaseImpl(get())
     }
 
     single<DeleteRouteUseCase> {

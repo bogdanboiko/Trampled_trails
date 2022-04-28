@@ -16,6 +16,10 @@ class TravelRepositoryImpl(
         localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
+    override suspend fun deleteAllPoints() {
+        localDataSrcIml.deleteAllPoints()
+    }
+
     //PointDetails
     override suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain) {
         localDataSrcIml.updatePointOfInterestDetails(poi)
@@ -75,13 +79,17 @@ class TravelRepositoryImpl(
         localDataSrcIml.addRoute(route, coordinatesList.map(::mapRoutePointDomainToEntity))
     }
 
-    override suspend fun deleteRoute(route: RouteDomain) {
-        localDataSrcIml.deleteRoute(route)
-    }
-
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 
     override fun getPublicRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getPublicRoutesList()
+
+    override suspend fun deleteAllRoutes() {
+        localDataSrcIml.deleteAllRoutes()
+    }
+
+    override suspend fun deleteRoute(route: RouteDomain) {
+        localDataSrcIml.deleteRoute(route)
+    }
 
     //RouteDetails
     override fun getRouteDetails(routeId: String) = localDataSrcIml.getRouteDetails(routeId)

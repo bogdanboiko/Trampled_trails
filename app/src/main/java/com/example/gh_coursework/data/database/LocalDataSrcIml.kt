@@ -52,6 +52,10 @@ class LocalDataSrcIml(
             .map { it.map(::mapPointDetailsEntityToPointCompleteDetailsDomain) }
     }
 
+    override suspend fun deleteAllPoints() {
+        pointDetailsDao.deleteAllPoints()
+    }
+
     override suspend fun deletePoint(pointId: String) {
         pointDetailsDao.deletePoint(pointId)
     }
@@ -167,10 +171,6 @@ class LocalDataSrcIml(
         routeDao.addRoute(mapRouteDomainToEntity(route), routePointEntitiesList)
     }
 
-    override suspend fun deleteRoute(route: RouteDomain) {
-        routeDao.deleteRoute(mapRouteDomainToEntity(route))
-    }
-
     override fun getRouteDetails(routeId: String): Flow<RouteDomain> {
         return routeDao.getRouteDetails(routeId).map(::mapRouteResponseToDomain)
     }
@@ -190,6 +190,14 @@ class LocalDataSrcIml(
 
     override suspend fun updateRoute(route: RouteDomain) {
         routeDao.updateRouteDetails(mapRouteDomainToEntity(route))
+    }
+
+    override suspend fun deleteAllRoutes() {
+        routeDao.deleteAllRoutes()
+    }
+
+    override suspend fun deleteRoute(route: RouteDomain) {
+        routeDao.deleteRoute(mapRouteDomainToEntity(route))
     }
 
     //RouteImage
