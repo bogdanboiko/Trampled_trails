@@ -39,10 +39,19 @@ class MainActivity :
             permissionsManager.requestLocationPermissions(this)
         }
 
-        getUserid()?.let { viewModel.uploadActualRoutesToFirebase(it) }
+        uploadData()
     }
 
     override fun onSuccessLogin() {
+        uploadData()
+    }
+
+    override fun onSuccessLogOut() {
+        uploadData()
+        viewModel.deleteAll()
+    }
+
+    private fun uploadData() {
         getUserid()?.let { viewModel.uploadActualRoutesToFirebase(it) }
     }
 
