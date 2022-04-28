@@ -2,6 +2,7 @@ package com.example.gh_coursework
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gh_coursework.domain.usecase.deleted.DeleteAllUseCase
 import com.example.gh_coursework.domain.usecase.public.FetchRoutePointsFromRemoteUseCase
 import com.example.gh_coursework.domain.usecase.public.GetUserRouteListUseCase
 import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
@@ -14,13 +15,21 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ActivityViewModel(
+    private val deleteAllUseCase: DeleteAllUseCase,
     private val getRoutesListUseCase: GetRoutesListUseCase,
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
-    private val publishRouteUseCase: PublishRouteUseCase,
     private val getUserRouteListUseCase: GetUserRouteListUseCase,
+    private val publishRouteUseCase: PublishRouteUseCase,
     private val fetchRoutePointsFromRemoteUseCase: FetchRoutePointsFromRemoteUseCase,
     private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase
 ) : ViewModel() {
+
+    fun deleteAll() {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteAllUseCase.invoke()
+        }
+    }
+
     fun uploadActualRoutesToFirebase(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
             viewModelScope.launch(Dispatchers.IO) {
