@@ -178,6 +178,7 @@ class HomepageFragment : HomepageCallback, ThemeFragment() {
         theme = appTheme as MyAppTheme
         with(binding) {
             root.setBackgroundColor(theme.colorPrimary(requireContext()))
+            txtUsername.setTextColor(theme.colorSecondaryVariant(requireContext()))
         }
     }
 }
