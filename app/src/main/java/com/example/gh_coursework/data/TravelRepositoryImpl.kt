@@ -1,5 +1,7 @@
 package com.example.gh_coursework.data
 
+import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointDomainToEntity
+import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedRouteDomainToEntity
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
@@ -10,6 +12,15 @@ class TravelRepositoryImpl(
     private val localDataSrcIml: TravelDatasource.Local,
     private val remoteDataSrcImpl: TravelDatasource.Remote
 ) : TravelRepository {
+
+    //Deleted routes and points
+    override suspend fun addDeletedPoint(point: DeletedPointDomain) {
+        localDataSrcIml.addDeletedPoint(mapDeletedPointDomainToEntity(point))
+    }
+
+    override suspend fun addDeletedRoute(route: DeletedRouteDomain) {
+        localDataSrcIml.addDeletedRoute(mapDeletedRouteDomainToEntity(route))
+    }
 
     //PointPreview
     override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {

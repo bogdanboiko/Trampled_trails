@@ -1,10 +1,12 @@
 package com.example.gh_coursework.domain.repository
 
 import com.example.gh_coursework.domain.entity.*
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 interface TravelRepository {
+    suspend fun addDeletedPoint(point: DeletedPointDomain)
+    suspend fun addDeletedRoute(route: DeletedRouteDomain)
+
     suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
     suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain)
     suspend fun deleteAllPoints()

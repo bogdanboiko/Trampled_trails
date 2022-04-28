@@ -13,7 +13,7 @@ val datasourceModule = module {
     }
 
     single<TravelDatasource.Local> {
-        LocalDataSrcIml(get(), get(), get(), get(), get())
+        LocalDataSrcIml(get(), get(), get(), get(), get(), get())
     }
 }
 

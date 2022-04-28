@@ -1,12 +1,16 @@
 package com.example.gh_coursework.data.datasource
 
+import com.example.gh_coursework.data.database.entity.DeletedPointsEntity
+import com.example.gh_coursework.data.database.entity.DeletedRoutesEntity
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.domain.entity.*
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 interface TravelDatasource {
     interface Local {
+        suspend fun addDeletedPoint(point: DeletedPointsEntity)
+        suspend fun addDeletedRoute(route: DeletedRoutesEntity)
+
         suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain)
         suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
         suspend fun deletePoint(pointId: String)

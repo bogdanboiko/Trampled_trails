@@ -1,11 +1,8 @@
 package com.example.gh_coursework.data.database
 
-import android.os.Environment
 import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
-import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
-import com.example.gh_coursework.data.database.entity.PointDetailsEntity
-import com.example.gh_coursework.data.database.entity.RoutePointEntity
+import com.example.gh_coursework.data.database.entity.*
 import com.example.gh_coursework.data.database.mapper.images.mapPointImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomainToEntity
@@ -31,16 +28,24 @@ import com.example.gh_coursework.ui.helper.routeTags
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import java.io.File
-
 
 class LocalDataSrcIml(
+    private val deleteDao: DeleteDao,
     private val routeDao: RoutePreviewDao,
     private val pointDetailsDao: PointDetailsDao,
     private val tagDao: PointTagDao,
     private val imageDao: ImageDao,
     private val routeTagDao: RouteTagDao
 ) : TravelDatasource.Local {
+
+    //Deleted routes and points
+    override suspend fun addDeletedPoint(point: DeletedPointsEntity) {
+        deleteDao.addDeletedPoint(point)
+    }
+
+    override suspend fun addDeletedRoute(route: DeletedRoutesEntity) {
+        deleteDao.addDeletedRoute(route)
+    }
 
     //PointPreview
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {

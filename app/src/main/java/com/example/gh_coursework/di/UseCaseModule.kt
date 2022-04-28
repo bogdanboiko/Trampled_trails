@@ -1,5 +1,9 @@
 package com.example.gh_coursework.di
 
+import com.example.gh_coursework.domain.usecase.deleted.AddDeletedPointUseCase
+import com.example.gh_coursework.domain.usecase.deleted.AddDeletedPointUseCaseImpl
+import com.example.gh_coursework.domain.usecase.deleted.AddDeletedRouteUseCase
+import com.example.gh_coursework.domain.usecase.deleted.AddDeletedRouteUseCaseImpl
 import com.example.gh_coursework.domain.usecase.image.*
 import com.example.gh_coursework.domain.usecase.point_details.*
 import com.example.gh_coursework.domain.usecase.point_preview.*
@@ -13,6 +17,15 @@ import com.example.gh_coursework.domain.usecase.route_tag.*
 import org.koin.dsl.module
 
 val pointUseCasesModule = module {
+
+    //Deleted routes and points
+    single<AddDeletedPointUseCase> {
+        AddDeletedPointUseCaseImpl(get())
+    }
+
+    single<AddDeletedRouteUseCase> {
+        AddDeletedRouteUseCaseImpl(get())
+    }
 
     //Point preview
     single<AddPointPreviewWithDetailsUseCase> {
