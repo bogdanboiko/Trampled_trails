@@ -30,7 +30,7 @@ interface LoginCallback {
     fun onSuccessLogin()
 }
 
-class HomepageFragment : HomepageCallback, ThemeFragment() {
+class HomepageFragment : ThemeFragment(), HomepageCallback {
 
     private lateinit var binding: FragmentHomepageBinding
     private lateinit var sharedPreferences: SharedPreferences
