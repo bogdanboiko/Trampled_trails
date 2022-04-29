@@ -25,7 +25,7 @@ val viewModelModule = module {
     }
 
     viewModel { parameters ->
-        TagDialogViewModel(parameters[0], get(), get(), get(), get(), get(), get())
+        TagDialogViewModel(parameters[0], get(), get(), get(), get())
     }
 
     viewModel { parameters ->
@@ -57,7 +57,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        PointFilterByTagDialogViewModel(get(), get())
+        PointFilterByTagDialogViewModel(get())
     }
 
     viewModel {

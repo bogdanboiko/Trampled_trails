@@ -96,37 +96,6 @@ class LocalDataSrcIml(
         routeDao.makePrivateRoutePublic(routeId)
     }
 
-    override suspend fun saveFirebaseRouteToLocal(
-        route: PublicRouteDomain,
-        points: List<PublicRoutePointDomain>
-    ) {
-        routeDao.insertRoute(mapPublicRouteDomainToEntity(route))
-        imageDao.deleteAllRouteLocalStoredImages(route.routeId)
-        addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it, true) })
-        addRouteTagsList(route.tagsList.map {
-            RouteTagsDomain(
-                route.routeId,
-                routeTags.indexOf(it).toLong() + 1
-            )
-        })
-
-        points.forEach { point ->
-            pointDetailsDao.insertPointCoordinatesAndCreateDetails(
-                PointCoordinatesEntity(
-                    point.pointId,
-                    point.x,
-                    point.y,
-                    route.routeId,
-                    point.isRoutePoint
-                )
-            )
-
-            pointDetailsDao.updatePointDetails(PointDetailsEntity(point.pointId, point.caption, point.description))
-            imageDao.deleteAllPointLocalStoredImages(point.pointId)
-            addPointImages(point.imageList.map { PointImageDomain(point.pointId, it, true) })
-        }
-    }
-
     override suspend fun addPointImages(images: List<PointImageDomain>) {
         imageDao.addPointImages(images.map(::mapPointImageDomainToEntity))
     }
@@ -144,16 +113,8 @@ class LocalDataSrcIml(
     }
 
     //PointTag
-    override suspend fun addPointTag(tag: PointTagDomain) {
-        tagDao.addTag(mapTagDomainToEntity(tag))
-    }
-
     override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
         tagDao.addTagsToPoint(pointsTagsList.map(::mapPointsTagsDomainToEntity))
-    }
-
-    override suspend fun deletePointTag(tag: PointTagDomain) {
-        tagDao.deleteTag(mapTagDomainToEntity(tag))
     }
 
     override fun getPointTagList(): Flow<List<PointTagDomain>> {
@@ -243,5 +204,43 @@ class LocalDataSrcIml(
 
         return routeTagDao.getTagsList()
             .map { it.map(::mapRouteTagEntityToDomain) }
+    }
+
+    //Public
+    override suspend fun saveFirebaseRouteToLocal(
+        route: PublicRouteDomain,
+        points: List<PublicRoutePointDomain>
+    ) {
+        Log.e("e", "saving route $route")
+        routeDao.insertRoute(mapPublicRouteDomainToEntity(route))
+        imageDao.deleteAllRouteLocalStoredImages(route.routeId)
+        addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it, true) })
+        addRouteTagsList(route.tagsList.map {
+            RouteTagsDomain(
+                route.routeId,
+                routeTags.indexOf(it).toLong() + 1
+            )
+        })
+
+        val routePointList = mutableListOf<RoutePointEntity>()
+
+        points.forEachIndexed { index, point ->
+            pointDetailsDao.insertPointCoordinatesAndCreateDetails(
+                PointCoordinatesEntity(
+                    point.pointId,
+                    point.x,
+                    point.y,
+                    point.isRoutePoint
+                )
+            )
+
+            pointDetailsDao.updatePointDetails(PointDetailsEntity(point.pointId, point.caption, point.description))
+
+            routePointList.add(RoutePointEntity(route.routeId, point.pointId, index))
+            imageDao.deleteAllPointLocalStoredImages(point.pointId)
+            addPointImages(point.imageList.map { PointImageDomain(point.pointId, it, true) })
+        }
+
+        routeDao.insertRoutePointsList(routePointList)
     }
 }

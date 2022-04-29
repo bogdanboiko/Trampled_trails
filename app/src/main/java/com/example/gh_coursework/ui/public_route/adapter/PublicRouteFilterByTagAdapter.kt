@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gh_coursework.databinding.ItemRouteTagBinding
+import com.example.gh_coursework.databinding.ItemTagBinding
 
 class PublicRouteFilterByTagAdapter : ListAdapter<String, PublicRouteFilterByTagAdapter.TagViewHolder>(Diff) {
     private var _filterByTagList = mutableListOf<String>()
@@ -16,7 +16,7 @@ class PublicRouteFilterByTagAdapter : ListAdapter<String, PublicRouteFilterByTag
         _filterByTagList = tags
     }
 
-    inner class TagViewHolder(private val binding: ItemRouteTagBinding) :
+    inner class TagViewHolder(private val binding: ItemTagBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(tag: String) {
             binding.tagCheckbox.apply {
@@ -38,7 +38,7 @@ class PublicRouteFilterByTagAdapter : ListAdapter<String, PublicRouteFilterByTag
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagViewHolder {
         return TagViewHolder(
-            ItemRouteTagBinding.inflate(
+            ItemTagBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

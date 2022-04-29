@@ -84,10 +84,6 @@ val pointUseCasesModule = module {
     }
 
     //Point tag
-    single<AddPointTagUseCase> {
-        AddPointTagUseCaseImpl(get())
-    }
-
     single<GetPointTagsUseCase> {
         GetPointTagsUseCaseImpl(get())
     }
@@ -102,10 +98,6 @@ val pointUseCasesModule = module {
 
     single<RemovePointsTagsListUseCase> {
         RemovePointsTagsListUseCaseImpl(get())
-    }
-
-    single<DeletePointTagUseCase> {
-        DeletePointTagUseCaseImpl(get())
     }
 
     //RoutePreview

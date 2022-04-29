@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gh_coursework.databinding.ItemRouteTagBinding
+import com.example.gh_coursework.databinding.ItemTagBinding
 import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 import java.util.*
 
@@ -30,7 +30,7 @@ class RouteTagAdapter : ListAdapter<RouteTagModel, RouteTagAdapter.TagViewHolder
         _removeTagList = LinkedList<RouteTagModel>()
     }
 
-    inner class TagViewHolder(private val binding: ItemRouteTagBinding) :
+    inner class TagViewHolder(private val binding: ItemTagBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(tagModel: RouteTagModel) {
             binding.tagCheckbox.apply {
@@ -61,7 +61,7 @@ class RouteTagAdapter : ListAdapter<RouteTagModel, RouteTagAdapter.TagViewHolder
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagViewHolder {
         return TagViewHolder(
-            ItemRouteTagBinding.inflate(
+            ItemTagBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

@@ -9,11 +9,7 @@ import com.example.gh_coursework.databinding.ItemTagBinding
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import java.util.*
 
-interface DeleteTag {
-    fun deleteTag(tag: PointTagModel)
-}
-
-class TagAdapter(private val deleteTag: DeleteTag) :
+class TagAdapter :
     ListAdapter<PointTagModel, TagAdapter.TagViewHolder>(Diff) {
     private var checkedTagList = emptyList<PointTagModel>()
     private var _addTagList = LinkedList<PointTagModel>()
@@ -61,12 +57,6 @@ class TagAdapter(private val deleteTag: DeleteTag) :
                         }
                     }
                 }
-            }
-
-            binding.deleteTagButton.setOnClickListener {
-                deleteTag.deleteTag(tagModel)
-                addTagList.remove(tagModel)
-                removeTagList.remove(tagModel)
             }
         }
     }
