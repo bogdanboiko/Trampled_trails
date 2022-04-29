@@ -1,6 +1,5 @@
 package com.example.gh_coursework.data.database
 
-import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.*
 import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointDomainToEntity
@@ -102,7 +101,6 @@ class LocalDataSrcIml(
         route: PublicRouteDomain,
         points: List<PublicRoutePointDomain>
     ) {
-        Log.e("e", "saving route $route")
         routeDao.insertRoute(mapPublicRouteDomainToEntity(route))
         imageDao.deleteAllRouteLocalStoredImages(route.routeId)
         addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it, true) })
@@ -113,26 +111,21 @@ class LocalDataSrcIml(
             )
         })
 
-        val routePointList = mutableListOf<RoutePointEntity>()
-
-        points.forEachIndexed { index, point ->
+        points.forEach { point ->
             pointDetailsDao.insertPointCoordinatesAndCreateDetails(
                 PointCoordinatesEntity(
                     point.pointId,
                     point.x,
                     point.y,
+                    route.routeId,
                     point.isRoutePoint
                 )
             )
 
             pointDetailsDao.updatePointDetails(PointDetailsEntity(point.pointId, point.caption, point.description))
-
-            routePointList.add(RoutePointEntity(route.routeId, point.pointId, index))
             imageDao.deleteAllPointLocalStoredImages(point.pointId)
             addPointImages(point.imageList.map { PointImageDomain(point.pointId, it, true) })
         }
-
-        routeDao.insertRoutePointsList(routePointList)
     }
 
     override suspend fun addPointImages(images: List<PointImageDomain>) {
@@ -182,22 +175,10 @@ class LocalDataSrcIml(
         route: RouteDomain,
         coordinatesList: List<PointCoordinatesEntity>
     ) {
-        val routePointEntitiesList = mutableListOf<RoutePointEntity>()
-        var position = 0
-
+        routeDao.insertRoute(mapRouteDomainToEntity(route))
         coordinatesList.forEach {
             addPointOfInterestCoordinates(mapPointEntityToDomain(it))
-            routePointEntitiesList.add(
-                RoutePointEntity(
-                    route.routeId,
-                    it.pointId,
-                    position
-                )
-            )
-            position++
         }
-
-        routeDao.addRoute(mapRouteDomainToEntity(route), routePointEntitiesList)
     }
 
     override fun getRouteDetails(routeId: String): Flow<RouteDomain> {

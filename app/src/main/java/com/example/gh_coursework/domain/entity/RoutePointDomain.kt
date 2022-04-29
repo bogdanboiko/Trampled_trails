@@ -8,5 +8,6 @@ data class RoutePointDomain(
     val imageList: List<PointImageDomain>,
     val x: Double,
     val y: Double,
+    val routeId: String?,
     val isRoutePoint: Boolean
 )

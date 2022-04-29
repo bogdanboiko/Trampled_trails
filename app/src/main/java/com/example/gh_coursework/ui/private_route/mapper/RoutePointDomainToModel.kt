@@ -15,6 +15,7 @@ fun mapRoutePointDomainToModel(point: RoutePointDomain): RoutePointModel {
             imageList.map(::mapPointImageDomainToModel),
             x,
             y,
+            point.routeId,
             isRoutePoint
         )
     }

@@ -106,6 +106,7 @@ class PrivateRoutesFragment :
 
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
+    private var creatingRouteId: String? = null
     private var previousRouteId: String? = null
     private lateinit var focusedRoute: RouteModel
     private lateinit var lastSeenCoordinate: Point
@@ -126,17 +127,22 @@ class PrivateRoutesFragment :
     private val navigationLocationProvider = NavigationLocationProvider()
 
     private val onClickAddDefaultRoutePoint = OnMapClickListener { point ->
-        val newPoint = RoutePointModel(
-            UUID.randomUUID().toString(),
-            "",
-            "",
-            emptyList(),
-            emptyList(),
-            point.longitude(),
-            point.latitude(),
-            true
-        )
-        addWaypoint(newPoint)
+        val newPoint = creatingRouteId?.let {
+            RoutePointModel(
+                UUID.randomUUID().toString(),
+                "",
+                "",
+                emptyList(),
+                emptyList(),
+                point.longitude(),
+                point.latitude(),
+                it,
+                true
+            )
+        }
+        if (newPoint != null) {
+            addWaypoint(newPoint)
+        }
         configUndoPointCreationButton()
         configResetRouteButton()
 
@@ -150,18 +156,25 @@ class PrivateRoutesFragment :
         }
 
         if (result == null) {
-            val newPoint = RoutePointModel(
-                UUID.randomUUID().toString(),
-                "",
-                "",
-                emptyList(),
-                emptyList(),
-                point.longitude(),
-                point.latitude(),
-                false
-            )
-            addEmptyAnnotationToMap(newPoint)
-            addWaypoint(newPoint)
+            val newPoint = creatingRouteId?.let {
+                RoutePointModel(
+                    UUID.randomUUID().toString(),
+                    "",
+                    "",
+                    emptyList(),
+                    emptyList(),
+                    point.longitude(),
+                    point.latitude(),
+                    it,
+                    false
+                )
+            }
+
+            if (newPoint != null) {
+                addEmptyAnnotationToMap(newPoint)
+                addWaypoint(newPoint)
+            }
+
             configUndoPointCreationButton()
             configResetRouteButton()
         }
@@ -449,6 +462,7 @@ class PrivateRoutesFragment :
         mapState.observe(viewLifecycleOwner) {
             with(binding) {
                 if (it == MapState.CREATOR) {
+                    creatingRouteId = UUID.randomUUID().toString()
                     setEmptyRoute()
                     pointAnnotationManager.deleteAll()
                     pointAnnotationManager.removeClickListener(onAnnotatedPointClickEvent)
@@ -480,6 +494,7 @@ class PrivateRoutesFragment :
                     )
 
                 } else if (it == MapState.PRESENTATION) {
+                    creatingRouteId = null
                     mapRoutePointModSwitcher.visibility = View.VISIBLE
                     homepageButton.visibility = View.VISIBLE
                     getRoutePointsList.visibility = View.VISIBLE
@@ -601,16 +616,20 @@ class PrivateRoutesFragment :
 
     private fun saveRoute() {
         if (creatingRouteCoordinatesList.size > 1) {
-            val route = RouteModel(
-                UUID.randomUUID().toString(),
-                "",
-                "",
-                emptyList(),
-                emptyList(),
-                false
-            )
+            val route = creatingRouteId?.let {
+                RouteModel(
+                    it,
+                    "",
+                    "",
+                    emptyList(),
+                    emptyList(),
+                    false
+                )
+            }
 
-            viewModel.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
+            if (route != null) {
+                viewModel.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
+            }
             creatingRouteCoordinatesList.clear()
         }
     }

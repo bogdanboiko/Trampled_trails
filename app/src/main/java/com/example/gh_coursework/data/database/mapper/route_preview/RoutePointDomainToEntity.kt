@@ -9,6 +9,7 @@ fun mapRoutePointDomainToEntity(point: RoutePointDomain): PointCoordinatesEntity
             pointId,
             x,
             y,
+            point.routeId,
             isRoutePoint
         )
     }

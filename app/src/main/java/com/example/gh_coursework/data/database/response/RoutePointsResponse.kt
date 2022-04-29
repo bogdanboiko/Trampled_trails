@@ -7,12 +7,6 @@ import com.example.gh_coursework.data.database.entity.*
 
 data class RoutePointsResponse(
     @Embedded
-    val routePointEntity: RoutePointEntity,
-
-    @Relation(
-        parentColumn = "pointId",
-        entityColumn = "pointId",
-    )
     val coordinate: PointCoordinatesEntity,
 
     @Relation(
