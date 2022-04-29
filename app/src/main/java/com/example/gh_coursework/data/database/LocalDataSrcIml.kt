@@ -1,6 +1,5 @@
 package com.example.gh_coursework.data.database
 
-import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.*
 import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointDomainToEntity
@@ -13,7 +12,7 @@ import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomain
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToDomain
-import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToPointCompleteDetailsDomain
+import com.example.gh_coursework.data.database.mapper.point_details.mapPointResponseToDomain
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
@@ -22,7 +21,6 @@ import com.example.gh_coursework.data.database.mapper.point_tag.mapTagDomainToEn
 import com.example.gh_coursework.data.database.mapper.public.mapPublicRouteDomainToEntity
 import com.example.gh_coursework.data.database.mapper.route_details.mapRoutePointsImagesResponseToDomain
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteDomainToEntity
-import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteResponseToDomain
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagEntityToDomain
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagsDomainToEntity
@@ -76,9 +74,9 @@ class LocalDataSrcIml(
         pointDetailsDao.insertPointCoordinatesAndCreateDetails(mapPointDomainToEntity(poi))
     }
 
-    override fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>> {
+    override fun getAllPointsDetails(): Flow<List<PointDomain>> {
         return pointDetailsDao.getAllPointsDetails()
-            .map { it.map(::mapPointDetailsEntityToPointCompleteDetailsDomain) }
+            .map { it.map(::mapPointResponseToDomain) }
     }
 
     override suspend fun deleteAllPoints() {
@@ -102,7 +100,6 @@ class LocalDataSrcIml(
         route: PublicRouteDomain,
         points: List<PublicRoutePointDomain>
     ) {
-        Log.e("e", "saving route $route")
         routeDao.insertRoute(mapPublicRouteDomainToEntity(route))
         imageDao.deleteAllRouteLocalStoredImages(route.routeId)
         addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it, true) })
@@ -113,26 +110,21 @@ class LocalDataSrcIml(
             )
         })
 
-        val routePointList = mutableListOf<RoutePointEntity>()
-
-        points.forEachIndexed { index, point ->
+        points.forEach { point ->
             pointDetailsDao.insertPointCoordinatesAndCreateDetails(
                 PointCoordinatesEntity(
                     point.pointId,
                     point.x,
                     point.y,
+                    route.routeId,
                     point.isRoutePoint
                 )
             )
 
             pointDetailsDao.updatePointDetails(PointDetailsEntity(point.pointId, point.caption, point.description))
-
-            routePointList.add(RoutePointEntity(route.routeId, point.pointId, index))
             imageDao.deleteAllPointLocalStoredImages(point.pointId)
             addPointImages(point.imageList.map { PointImageDomain(point.pointId, it, true) })
         }
-
-        routeDao.insertRoutePointsList(routePointList)
     }
 
     override suspend fun addPointImages(images: List<PointImageDomain>) {
@@ -182,22 +174,10 @@ class LocalDataSrcIml(
         route: RouteDomain,
         coordinatesList: List<PointCoordinatesEntity>
     ) {
-        val routePointEntitiesList = mutableListOf<RoutePointEntity>()
-        var position = 0
-
+        routeDao.insertRoute(mapRouteDomainToEntity(route))
         coordinatesList.forEach {
             addPointOfInterestCoordinates(mapPointEntityToDomain(it))
-            routePointEntitiesList.add(
-                RoutePointEntity(
-                    route.routeId,
-                    it.pointId,
-                    position
-                )
-            )
-            position++
         }
-
-        routeDao.addRoute(mapRouteDomainToEntity(route), routePointEntitiesList)
     }
 
     override fun getRouteDetails(routeId: String): Flow<RouteDomain> {
@@ -213,8 +193,8 @@ class LocalDataSrcIml(
         return routeDao.getPublicRoutesResponse().map{ it.map(::mapRouteResponseToDomain) }
     }
 
-    override fun getRoutePointsList(routeId: String): Flow<List<RoutePointDomain>> {
-        return routeDao.getRoutePoints(routeId).map { it.map(::mapRoutePointEntityToDomain) }
+    override fun getRoutePointsList(routeId: String): Flow<List<PointDomain>> {
+        return routeDao.getRoutePoints(routeId).map { it.map(::mapPointResponseToDomain) }
     }
 
     override suspend fun updateRoute(route: RouteDomain) {

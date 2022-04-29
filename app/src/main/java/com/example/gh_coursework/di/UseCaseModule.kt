@@ -58,7 +58,7 @@ val pointUseCasesModule = module {
     }
 
     //Point details
-    single<AddPointDetailsUseCase> {
+    single<UpdatePointDetailsUseCase> {
         AddPointDetailsUseCaseImpl(get())
     }
 
@@ -66,8 +66,8 @@ val pointUseCasesModule = module {
         GetPointDetailsUseCaseImpl(get())
     }
 
-    single<GetAllPointsDetails> {
-        GetAllPointsDetailsImpl(get())
+    single<GetAllPointsUseCase> {
+        GetAllPointsUseCaseImpl(get())
     }
 
     //Point images
@@ -165,8 +165,8 @@ val pointUseCasesModule = module {
     }
 
     //Public
-    single<PublishRouteUseCase> {
-        PublishRouteUseCaseImpl(get())
+    single<UploadRouteToFirebaseUseCase> {
+        UploadRouteToFirebaseUseCaseImpl(get())
     }
 
     single<FetchRoutePointsFromRemoteUseCase> {

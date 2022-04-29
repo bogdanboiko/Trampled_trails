@@ -12,5 +12,6 @@ data class RoutePointModel(
     val imageList: List<PointImageModel>,
     val x: Double,
     val y: Double,
+    val routeId: String?,
     val isRoutePoint: Boolean
 )

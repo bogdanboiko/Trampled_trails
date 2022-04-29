@@ -1,20 +1,21 @@
-package com.example.gh_coursework.data.database.mapper.route_preview
+package com.example.gh_coursework.data.database.mapper.point_details
 
 import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
-import com.example.gh_coursework.data.database.response.RoutePointsResponse
-import com.example.gh_coursework.domain.entity.RoutePointDomain
+import com.example.gh_coursework.data.database.response.PointResponse
+import com.example.gh_coursework.domain.entity.PointDomain
 
-fun mapRoutePointEntityToDomain(routePointsResponse: RoutePointsResponse): RoutePointDomain {
-    with(routePointsResponse) {
-        return RoutePointDomain(
-            pointDetails.pointId,
+fun mapPointResponseToDomain(point: PointResponse): PointDomain {
+    with(point) {
+        return PointDomain(
+            coordinate.pointId,
             pointDetails.caption,
             pointDetails.description,
             tagList.map(::mapPointTagEntityToDomain),
             imageList.map(::mapPointImageEntityToDomain),
             coordinate.x,
             coordinate.y,
+            coordinate.routeId,
             coordinate.isRoutePoint
         )
     }

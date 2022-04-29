@@ -7,6 +7,7 @@ data class PublicRoutePointResponseEntity(
     val imageList: List<String>,
     val x: Double,
     val y: Double,
+    val routeId: String?,
     val isRoutePoint: Boolean,
     val position: Long
 )

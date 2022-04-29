@@ -5,7 +5,7 @@ import androidx.room.Junction
 import androidx.room.Relation
 import com.example.gh_coursework.data.database.entity.*
 
-data class PointDetailsResponse(
+data class PointResponse(
     @Embedded
     val coordinate: PointCoordinatesEntity,
 

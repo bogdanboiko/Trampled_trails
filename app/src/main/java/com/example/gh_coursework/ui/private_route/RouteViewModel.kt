@@ -4,8 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
 import com.example.gh_coursework.domain.usecase.public.MakePrivateRoutePublicUseCase
-import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
-import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.DeleteRouteUseCase
@@ -16,7 +14,6 @@ import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDomainToMo
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointModelToDomain
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

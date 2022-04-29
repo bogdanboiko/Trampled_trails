@@ -6,6 +6,6 @@ import com.example.gh_coursework.domain.repository.TravelRepository
 class AddPointPreviewWithDetailsUseCaseImpl(private val repository: TravelRepository) :
     AddPointPreviewWithDetailsUseCase {
     override suspend fun invoke(point: PointPreviewDomain) {
-        repository.addPointOfInterestCoordinatesWithDetails(point)
+        repository.addPointCoordinatesWithDetails(point)
     }
 }
