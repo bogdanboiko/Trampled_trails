@@ -1,15 +1,15 @@
 package com.example.gh_coursework.domain.usecase.public
 
 import com.example.gh_coursework.domain.entity.RouteDomain
-import com.example.gh_coursework.domain.entity.RoutePointDomain
+import com.example.gh_coursework.domain.entity.PointDomain
 import com.example.gh_coursework.domain.repository.TravelRepository
 
-class PublishRouteUseCaseImpl(private val repository: TravelRepository): PublishRouteUseCase {
+class UploadRouteToFirebaseUseCaseImpl(private val repository: TravelRepository): UploadRouteToFirebaseUseCase {
     override suspend fun invoke(
         route: RouteDomain,
-        routePoints: List<RoutePointDomain>,
+        routePoints: List<PointDomain>,
         currentUser: String
     ) {
-        repository.publishRoute(route, routePoints, currentUser)
+        repository.uploadRouteToFirebase(route, routePoints, currentUser)
     }
 }

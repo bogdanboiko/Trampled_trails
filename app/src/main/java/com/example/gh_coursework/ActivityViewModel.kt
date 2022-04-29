@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.deleted.*
 import com.example.gh_coursework.domain.usecase.public.FetchRoutePointsFromRemoteUseCase
 import com.example.gh_coursework.domain.usecase.public.GetUserRouteListUseCase
-import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
+import com.example.gh_coursework.domain.usecase.public.UploadRouteToFirebaseUseCase
 import com.example.gh_coursework.domain.usecase.public.SavePublicRouteToPrivateUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
@@ -23,7 +23,7 @@ class ActivityViewModel(
     private val getRoutesListUseCase: GetRoutesListUseCase,
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
     private val getUserRouteListUseCase: GetUserRouteListUseCase,
-    private val publishRouteUseCase: PublishRouteUseCase,
+    private val publishRouteUseCase: UploadRouteToFirebaseUseCase,
     private val fetchRoutePointsFromRemoteUseCase: FetchRoutePointsFromRemoteUseCase,
     private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase
 ) : ViewModel() {

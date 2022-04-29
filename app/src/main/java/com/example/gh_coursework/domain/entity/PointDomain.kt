@@ -1,6 +1,6 @@
 package com.example.gh_coursework.domain.entity
 
-data class RoutePointDomain(
+data class PointDomain(
     val pointId: String,
     val caption: String,
     val description: String,
@@ -8,5 +8,6 @@ data class RoutePointDomain(
     val imageList: List<PointImageDomain>,
     val x: Double,
     val y: Double,
+    val routeId: String?,
     val isRoutePoint: Boolean
 )

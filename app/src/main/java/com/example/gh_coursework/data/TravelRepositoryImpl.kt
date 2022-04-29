@@ -41,7 +41,7 @@ class TravelRepositoryImpl(
     }
 
     //PointPreview
-    override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {
+    override suspend fun addPointCoordinatesWithDetails(poi: PointPreviewDomain) {
         localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
@@ -50,7 +50,7 @@ class TravelRepositoryImpl(
     }
 
     //PointDetails
-    override suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain) {
+    override suspend fun updatePointDetails(poi: PointDetailsDomain) {
         localDataSrcIml.updatePointOfInterestDetails(poi)
     }
 
@@ -96,7 +96,7 @@ class TravelRepositoryImpl(
     }
 
     //RoutePreview
-    override suspend fun addRoute(route: RouteDomain, coordinatesList: List<RoutePointDomain>) {
+    override suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointDomain>) {
         localDataSrcIml.addRoute(route, coordinatesList.map(::mapRoutePointDomainToEntity))
     }
 
@@ -147,12 +147,13 @@ class TravelRepositoryImpl(
     override fun getRouteTags() = localDataSrcIml.getRouteTags()
 
     //Public
-    override suspend fun publishRoute(
+    override suspend fun uploadRouteToFirebase(
+        dev
         route: RouteDomain,
-        routePoints: List<RoutePointDomain>,
+        routePoints: List<PointDomain>,
         currentUser: String
     ) {
-        remoteDataSrcImpl.publishRoute(route, routePoints, currentUser)
+        remoteDataSrcImpl.uploadRouteToFirebase(route, routePoints, currentUser)
     }
 
     override fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>> {
@@ -163,8 +164,8 @@ class TravelRepositoryImpl(
         remoteDataSrcImpl.saveRouteImages(imageList, routeId)
     }
 
-    override suspend fun savePointImagesToFirebase(imageList: List<PointImageDomain>, pointId: String, routeId: String) {
-        remoteDataSrcImpl.savePointImages(imageList, pointId, routeId)
+    override suspend fun savePointImagesToFirebase(imageList: List<PointImageDomain>, pointId: String) {
+        remoteDataSrcImpl.savePointImages(imageList, pointId)
     }
 
     override fun makePrivateRoutePublic(routeId: String) {

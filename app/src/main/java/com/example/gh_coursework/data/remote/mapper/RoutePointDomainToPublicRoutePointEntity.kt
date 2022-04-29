@@ -1,10 +1,10 @@
 package com.example.gh_coursework.data.remote.mapper
 
 import com.example.gh_coursework.data.remote.entity.PublicRoutePointEntity
-import com.example.gh_coursework.domain.entity.RoutePointDomain
+import com.example.gh_coursework.domain.entity.PointDomain
 
 fun mapRoutePointDomainToPublicRoutePointEntity(
-    routePoint: RoutePointDomain,
+    routePoint: PointDomain,
     imageList: List<String>,
     position: Int
 ): PublicRoutePointEntity {
@@ -14,6 +14,7 @@ fun mapRoutePointDomainToPublicRoutePointEntity(
         imageList,
         routePoint.x,
         routePoint.y,
+        routePoint.routeId,
         routePoint.isRoutePoint,
         position
     )

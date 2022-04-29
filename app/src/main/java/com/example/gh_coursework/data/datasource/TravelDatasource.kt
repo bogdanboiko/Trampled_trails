@@ -36,7 +36,7 @@ interface TravelDatasource {
 
         fun getPointsTagsList(pointId: String): Flow<List<PointTagDomain>>
         fun getPointOfInterestDetails(id: String): Flow<PointDetailsDomain?>
-        fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>>
+        fun getAllPointsDetails(): Flow<List<PointDomain>>
         fun getPointTagList(): Flow<List<PointTagDomain>>
 
         fun getPointImages(pointId: String): Flow<List<PointImageDomain>>
@@ -45,7 +45,7 @@ interface TravelDatasource {
         fun getPublicRoutesList(): Flow<List<RouteDomain>>
         fun getRoutesList(): Flow<List<RouteDomain>>
         fun getRouteDetails(routeId: String): Flow<RouteDomain>
-        fun getRoutePointsList(routeId: String): Flow<List<RoutePointDomain>>
+        fun getRoutePointsList(routeId: String): Flow<List<PointDomain>>
         fun getRoutePointsImagesList(routeId: String): Flow<List<RoutePointsImagesDomain>>
         fun getRouteTags(): Flow<List<RouteTagDomain>>
 
@@ -57,13 +57,14 @@ interface TravelDatasource {
         suspend fun deletePoint(pointId: String)
         suspend fun deleteRoute(routeId: String)
 
-        suspend fun publishRoute(
+        suspend fun uploadRouteToFirebase(
             route: RouteDomain,
-            routePoints: List<RoutePointDomain>,
+            routePoints: List<PointDomain>,
             currentUser: String
         )
 
-        suspend fun savePointImages(imageList: List<PointImageDomain>, pointId: String, routeId: String)
+        suspend fun uploadPointsToFirebase(points: List<PointDomain>)
+        suspend fun savePointImages(imageList: List<PointImageDomain>, pointId: String)
         suspend fun saveRouteImages(imageList: List<RouteImageDomain>, routeId: String)
 
         fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
