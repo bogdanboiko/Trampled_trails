@@ -11,9 +11,42 @@ class TravelRepositoryImpl(
     private val remoteDataSrcImpl: TravelDatasource.Remote
 ) : TravelRepository {
 
+    //Deleted routes and points
+    override suspend fun addDeletedPoint(point: DeletedPointDomain) {
+        localDataSrcIml.addDeletedPoint(point)
+    }
+
+    override suspend fun addDeletedRoute(route: DeletedRouteDomain) {
+        localDataSrcIml.addDeletedRoute(route)
+    }
+
+    override suspend fun clearDeletedPointsTable() {
+        localDataSrcIml.clearDeletedPointsTable()
+    }
+
+    override suspend fun clearDeletedRoutesTable() {
+        localDataSrcIml.clearDeletedRoutesTable()
+    }
+
+    override fun getDeletedPoints() = localDataSrcIml.getDeletedPoints()
+
+    override fun getDeletedRoutes() = localDataSrcIml.getDeletedRoutes()
+
+    override suspend fun deleteRemotePoint(pointId: String) {
+        remoteDataSrcImpl.deletePoint(pointId)
+    }
+
+    override suspend fun deleteRemoteRoute(routeId: String) {
+        remoteDataSrcImpl.deleteRoute(routeId)
+    }
+
     //PointPreview
     override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {
         localDataSrcIml.addPointOfInterestCoordinates(poi)
+    }
+
+    override suspend fun deleteAllPoints() {
+        localDataSrcIml.deleteAllPoints()
     }
 
     //PointDetails
@@ -75,13 +108,17 @@ class TravelRepositoryImpl(
         localDataSrcIml.addRoute(route, coordinatesList.map(::mapRoutePointDomainToEntity))
     }
 
-    override suspend fun deleteRoute(route: RouteDomain) {
-        localDataSrcIml.deleteRoute(route)
-    }
-
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 
     override fun getPublicRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getPublicRoutesList()
+
+    override suspend fun deleteAllRoutes() {
+        localDataSrcIml.deleteAllRoutes()
+    }
+
+    override suspend fun deleteRoute(route: RouteDomain) {
+        localDataSrcIml.deleteRoute(route)
+    }
 
     //RouteDetails
     override fun getRouteDetails(routeId: String) = localDataSrcIml.getRouteDetails(routeId)

@@ -1,6 +1,5 @@
 package com.example.gh_coursework.data.remote
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
@@ -14,6 +13,7 @@ class FirestorePagingSource(
     private val queryRoutes: Query,
     private val tagsFilter: List<String>
 ) : PagingSource<QuerySnapshot, PublicRouteModel>() {
+
     override fun getRefreshKey(state: PagingState<QuerySnapshot, PublicRouteModel>): QuerySnapshot? {
         return null
     }
@@ -21,7 +21,7 @@ class FirestorePagingSource(
     override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, PublicRouteModel> {
         return try {
             withContext(Dispatchers.IO) {
-                var currentPage = params.key ?: if (tagsFilter.isNotEmpty()) {
+                val currentPage = params.key ?: if (tagsFilter.isNotEmpty()) {
                     Tasks.await(
                         queryRoutes.whereArrayContainsAny(
                             "tagsList",

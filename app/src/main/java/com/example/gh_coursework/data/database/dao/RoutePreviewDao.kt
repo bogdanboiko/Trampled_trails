@@ -48,9 +48,12 @@ abstract class RoutePreviewDao {
     @Query("SELECT * FROM routes_points WHERE routeId = :routeId")
     abstract fun getRoutePointsImages(routeId: String): Flow<List<RoutePointImageResponse>>
 
-    @Delete
-    abstract fun deleteRoute(route: RouteEntity)
-
     @Query("UPDATE route_details SET isPublic = 1 WHERE routeId = :routeId")
     abstract fun makePrivateRoutePublic(routeId: String)
+
+    @Query("DELETE FROM route_details")
+    abstract fun deleteAllRoutes()
+
+    @Delete
+    abstract fun deleteRoute(route: RouteEntity)
 }

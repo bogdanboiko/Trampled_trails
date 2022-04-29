@@ -53,4 +53,8 @@ val localDataBaseModule = module {
     single {
         get<TravelDatabase>().getImageDao()
     }
+
+    single {
+        get<TravelDatabase>().getDeleteDao()
+    }
 }

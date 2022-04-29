@@ -28,6 +28,7 @@ import com.google.firebase.auth.UserProfileChangeRequest
 
 interface LoginCallback {
     fun onSuccessLogin()
+    fun onSuccessLogOut()
 }
 
 class HomepageFragment : ThemeFragment(), HomepageCallback {
@@ -189,6 +190,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
             val id = findNavController().currentDestination?.id
             findNavController().popBackStack(id!!, true)
             findNavController().navigate(id)
+            callback?.onSuccessLogOut()
         }
     }
 

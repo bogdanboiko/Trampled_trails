@@ -6,7 +6,10 @@ import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.*
 
 @Database(
-    entities = [PointCoordinatesEntity::class,
+    entities = [
+        DeletedPointsEntity::class,
+        DeletedRoutesEntity::class,
+        PointCoordinatesEntity::class,
         PointDetailsEntity::class,
         PointTagEntity::class,
         PointsTagsEntity::class,
@@ -15,7 +18,7 @@ import com.example.gh_coursework.data.database.entity.*
         RoutePointEntity::class,
         RouteTagEntity::class,
         RouteTagsEntity::class,
-        RouteImageEntity::class], version = 19
+        RouteImageEntity::class], version = 20
 )
 abstract class TravelDatabase : RoomDatabase() {
     abstract fun getRoutePreviewDao(): RoutePreviewDao
@@ -23,4 +26,5 @@ abstract class TravelDatabase : RoomDatabase() {
     abstract fun getPointTagDao(): PointTagDao
     abstract fun getRouteTagDao(): RouteTagDao
     abstract fun getImageDao(): ImageDao
+    abstract fun getDeleteDao(): DeleteDao
 }

@@ -11,11 +11,14 @@ abstract class PointDetailsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun addPointPreview(pointCoordinatesEntity: PointCoordinatesEntity)
 
-    @Query("DELETE FROM point_coordinates WHERE pointId = :pointId")
-    abstract fun deletePoint(pointId: String)
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract suspend fun addPointDetails(details: PointDetailsEntity)
+
+    @Query("DELETE FROM point_coordinates")
+    abstract fun deleteAllPoints()
+
+    @Query("DELETE FROM point_coordinates WHERE pointId = :pointId")
+    abstract fun deletePoint(pointId: String)
 
     @Update
     abstract suspend fun updatePointDetails(details: PointDetailsEntity)
