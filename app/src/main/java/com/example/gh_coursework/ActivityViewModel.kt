@@ -3,19 +3,24 @@ package com.example.gh_coursework
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.deleted.DeleteAllUseCase
+import com.example.gh_coursework.domain.usecase.deleted.DeleteRemoteRouteUseCase
+import com.example.gh_coursework.domain.usecase.deleted.GetDeletedPointsUseCase
+import com.example.gh_coursework.domain.usecase.deleted.GetDeletedRoutesUseCase
 import com.example.gh_coursework.domain.usecase.public.FetchRoutePointsFromRemoteUseCase
 import com.example.gh_coursework.domain.usecase.public.GetUserRouteListUseCase
 import com.example.gh_coursework.domain.usecase.public.PublishRouteUseCase
 import com.example.gh_coursework.domain.usecase.public.SavePublicRouteToPrivateUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class ActivityViewModel(
     private val deleteAllUseCase: DeleteAllUseCase,
+    private val deleteRemoteRouteUseCase: DeleteRemoteRouteUseCase,
+    private val getDeletedRoutesUseCase: GetDeletedRoutesUseCase,
+    private val getDeletedPointsUseCase: GetDeletedPointsUseCase,
     private val getRoutesListUseCase: GetRoutesListUseCase,
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
     private val getUserRouteListUseCase: GetUserRouteListUseCase,
@@ -24,9 +29,18 @@ class ActivityViewModel(
     private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase
 ) : ViewModel() {
 
+    val deletedRoutes = getDeletedRoutesUseCase.invoke()
+    val deletedPoints = getDeletedPointsUseCase.invoke()
+
     fun deleteAll() {
         viewModelScope.launch(Dispatchers.IO) {
             deleteAllUseCase.invoke()
+        }
+    }
+
+    fun deleteRemoteRoute(routeId: String) {
+        viewModelScope.launch {
+            deleteRemoteRouteUseCase.invoke(routeId)
         }
     }
 

@@ -29,6 +29,22 @@ class RemoteDataSrcImpl(
 ) : TravelDatasource.Remote {
     private val ref = storage.reference
 
+    override suspend fun deletePoint(pointId: String) {
+        db.collection("points").document(pointId)
+            .delete()
+            .addOnFailureListener {
+                Log.e("Error deleting point ", it.toString())
+            }
+    }
+
+    override suspend fun deleteRoute(routeId: String) {
+        db.collection("routes").document(routeId)
+            .delete()
+            .addOnFailureListener {
+                Log.e("Error deleting route ", it.toString())
+            }
+    }
+
     override suspend fun publishRoute(
         route: RouteDomain,
         routePoints: List<RoutePointDomain>,

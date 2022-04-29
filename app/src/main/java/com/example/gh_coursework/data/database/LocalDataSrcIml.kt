@@ -3,6 +3,10 @@ package com.example.gh_coursework.data.database
 import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.*
+import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointDomainToEntity
+import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointEntityToDomain
+import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedRouteDomainToEntity
+import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedRouteEntityToDomain
 import com.example.gh_coursework.data.database.mapper.images.mapPointImageDomainToEntity
 import com.example.gh_coursework.data.database.mapper.images.mapPointImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomainToEntity
@@ -39,12 +43,24 @@ class LocalDataSrcIml(
 ) : TravelDatasource.Local {
 
     //Deleted routes and points
-    override suspend fun addDeletedPoint(point: DeletedPointsEntity) {
-        deleteDao.addDeletedPoint(point)
+    override suspend fun addDeletedPoint(point: DeletedPointDomain) {
+        deleteDao.addDeletedPoint(mapDeletedPointDomainToEntity(point))
     }
 
-    override suspend fun addDeletedRoute(route: DeletedRoutesEntity) {
-        deleteDao.addDeletedRoute(route)
+    override suspend fun addDeletedRoute(route: DeletedRouteDomain) {
+        deleteDao.addDeletedRoute(mapDeletedRouteDomainToEntity(route))
+    }
+
+    override fun getDeletedPoints(): Flow<List<DeletedPointDomain>> {
+        return deleteDao.getDeletedPoints().map {
+            it.map(::mapDeletedPointEntityToDomain)
+        }
+    }
+
+    override fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>> {
+        return deleteDao.getDeletedRoutes().map {
+            it.map(::mapDeletedRouteEntityToDomain)
+        }
     }
 
     //PointPreview

@@ -1,15 +1,15 @@
 package com.example.gh_coursework.data.datasource
 
-import com.example.gh_coursework.data.database.entity.DeletedPointsEntity
-import com.example.gh_coursework.data.database.entity.DeletedRoutesEntity
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
 
 interface TravelDatasource {
     interface Local {
-        suspend fun addDeletedPoint(point: DeletedPointsEntity)
-        suspend fun addDeletedRoute(route: DeletedRoutesEntity)
+        suspend fun addDeletedPoint(point: DeletedPointDomain)
+        suspend fun addDeletedRoute(route: DeletedRouteDomain)
+        fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>>
+        fun getDeletedPoints(): Flow<List<DeletedPointDomain>>
 
         suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain)
         suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
@@ -54,6 +54,9 @@ interface TravelDatasource {
     }
 
     interface Remote {
+        suspend fun deletePoint(pointId: String)
+        suspend fun deleteRoute(routeId: String)
+
         suspend fun publishRoute(
             route: RouteDomain,
             routePoints: List<RoutePointDomain>,

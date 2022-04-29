@@ -8,6 +8,7 @@ import android.provider.Settings
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeActivity
 import com.example.gh_coursework.databinding.ActivityMainBinding
@@ -17,6 +18,8 @@ import com.example.gh_coursework.ui.themes.LightTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity :
@@ -39,7 +42,20 @@ class MainActivity :
             permissionsManager.requestLocationPermissions(this)
         }
 
+        syncDeletedData()
         uploadData()
+    }
+
+    private fun syncDeletedData() {
+        lifecycleScope.launch {
+            viewModel.deletedRoutes.collect {
+                if (it.isNotEmpty()) {
+                    it.forEach { route ->
+                        viewModel.deleteRemoteRoute(route.routeId)
+                    }
+                }
+            }
+        }
     }
 
     override fun onSuccessLogin() {

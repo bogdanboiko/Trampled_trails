@@ -1,7 +1,5 @@
 package com.example.gh_coursework.data
 
-import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointDomainToEntity
-import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedRouteDomainToEntity
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
@@ -15,11 +13,23 @@ class TravelRepositoryImpl(
 
     //Deleted routes and points
     override suspend fun addDeletedPoint(point: DeletedPointDomain) {
-        localDataSrcIml.addDeletedPoint(mapDeletedPointDomainToEntity(point))
+        localDataSrcIml.addDeletedPoint(point)
     }
 
     override suspend fun addDeletedRoute(route: DeletedRouteDomain) {
-        localDataSrcIml.addDeletedRoute(mapDeletedRouteDomainToEntity(route))
+        localDataSrcIml.addDeletedRoute(route)
+    }
+
+    override fun getDeletedPoints() = localDataSrcIml.getDeletedPoints()
+
+    override fun getDeletedRoutes() = localDataSrcIml.getDeletedRoutes()
+
+    override suspend fun deleteRemotePoint(pointId: String) {
+        remoteDataSrcImpl.deletePoint(pointId)
+    }
+
+    override suspend fun deleteRemoteRoute(routeId: String) {
+        remoteDataSrcImpl.deleteRoute(routeId)
     }
 
     //PointPreview
