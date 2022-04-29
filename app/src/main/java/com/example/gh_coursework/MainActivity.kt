@@ -3,6 +3,9 @@ package com.example.gh_coursework
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Toast
@@ -18,7 +21,6 @@ import com.example.gh_coursework.ui.themes.LightTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -42,20 +44,7 @@ class MainActivity :
             permissionsManager.requestLocationPermissions(this)
         }
 
-        syncDeletedData()
         uploadData()
-    }
-
-    private fun syncDeletedData() {
-        lifecycleScope.launch {
-            viewModel.deletedRoutes.collect {
-                if (it.isNotEmpty()) {
-                    it.forEach { route ->
-                        viewModel.deleteRemoteRoute(route.routeId)
-                    }
-                }
-            }
-        }
     }
 
     override fun onSuccessLogin() {
@@ -63,12 +52,17 @@ class MainActivity :
     }
 
     override fun onSuccessLogOut() {
-        uploadData()
-        viewModel.deleteAll()
+        lifecycleScope.launch {
+            uploadData()
+        }.invokeOnCompletion {
+            viewModel.deleteAll()
+        }
     }
 
     private fun uploadData() {
-        getUserid()?.let { viewModel.uploadActualRoutesToFirebase(it) }
+        if (isInternetAvailable()) {
+            getUserid()?.let { viewModel.uploadActualRoutesToFirebase(it) }
+        }
     }
 
     private fun getUserid(): String? {
@@ -77,6 +71,31 @@ class MainActivity :
         } else {
             FirebaseAuth.getInstance().currentUser?.uid
         }
+    }
+
+    private fun isInternetAvailable(): Boolean {
+        val connectivityManager: ConnectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            connectivityManager.run {
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)?.run {
+                    return when {
+                        hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                        hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                        hasTransport(NetworkCapabilities.TRANSPORT_VPN) -> true
+                        else -> false
+                    }
+                }
+            }
+        } else {
+            val networkConnection = connectivityManager.activeNetworkInfo ?: return false
+            return networkConnection.isConnected &&
+                    (networkConnection.type == ConnectivityManager.TYPE_WIFI
+                            || networkConnection.type == ConnectivityManager.TYPE_MOBILE)
+        }
+
+        return false
     }
 
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {

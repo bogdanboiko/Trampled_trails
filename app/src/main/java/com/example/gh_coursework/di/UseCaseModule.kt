@@ -24,8 +24,28 @@ val pointUseCasesModule = module {
         AddDeletedRouteUseCaseImpl(get())
     }
 
+    single<ClearDeletedPointsTableUseCase> {
+        ClearDeletedPointsTableUseCaseImpl(get())
+    }
+
+    single<ClearDeletedRoutesTableUseCase> {
+        ClearDeletedRoutesTableUseCaseImpl(get())
+    }
+
     single<DeleteAllUseCase> {
         DeleteAllUseCaseImpl(get())
+    }
+
+    single<DeleteRemoteRouteUseCase> {
+        DeleteRemoteRouteUseCaseImpl(get())
+    }
+
+    single<GetDeletedPointsUseCase> {
+        GetDeletedPointsUseCaseImpl(get())
+    }
+
+    single<GetDeletedRoutesUseCase> {
+        GetDeletedRoutesUseCaseImpl(get())
     }
 
     //Point preview

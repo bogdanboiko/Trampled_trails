@@ -1,9 +1,6 @@
 package com.example.gh_coursework.data.database.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.gh_coursework.data.database.entity.DeletedPointsEntity
 import com.example.gh_coursework.data.database.entity.DeletedRoutesEntity
 import kotlinx.coroutines.flow.Flow
@@ -22,4 +19,10 @@ abstract class DeleteDao {
 
     @Query("SELECT * FROM deleted_routes")
     abstract fun getDeletedRoutes(): Flow<List<DeletedRoutesEntity>>
+
+    @Query("DELETE FROM deleted_points")
+    abstract fun clearDeletedPointsTable()
+
+    @Query("DELETE FROM deleted_routes")
+    abstract fun clearDeletedRoutesTable()
 }

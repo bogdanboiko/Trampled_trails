@@ -8,6 +8,8 @@ interface TravelDatasource {
     interface Local {
         suspend fun addDeletedPoint(point: DeletedPointDomain)
         suspend fun addDeletedRoute(route: DeletedRouteDomain)
+        suspend fun clearDeletedPointsTable()
+        suspend fun clearDeletedRoutesTable()
         fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>>
         fun getDeletedPoints(): Flow<List<DeletedPointDomain>>
 

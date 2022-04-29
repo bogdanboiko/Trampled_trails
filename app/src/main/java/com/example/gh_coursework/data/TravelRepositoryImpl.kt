@@ -20,6 +20,14 @@ class TravelRepositoryImpl(
         localDataSrcIml.addDeletedRoute(route)
     }
 
+    override suspend fun clearDeletedPointsTable() {
+        localDataSrcIml.clearDeletedPointsTable()
+    }
+
+    override suspend fun clearDeletedRoutesTable() {
+        localDataSrcIml.clearDeletedRoutesTable()
+    }
+
     override fun getDeletedPoints() = localDataSrcIml.getDeletedPoints()
 
     override fun getDeletedRoutes() = localDataSrcIml.getDeletedRoutes()

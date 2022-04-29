@@ -51,6 +51,14 @@ class LocalDataSrcIml(
         deleteDao.addDeletedRoute(mapDeletedRouteDomainToEntity(route))
     }
 
+    override suspend fun clearDeletedPointsTable() {
+        deleteDao.clearDeletedPointsTable()
+    }
+
+    override suspend fun clearDeletedRoutesTable() {
+        deleteDao.clearDeletedRoutesTable()
+    }
+
     override fun getDeletedPoints(): Flow<List<DeletedPointDomain>> {
         return deleteDao.getDeletedPoints().map {
             it.map(::mapDeletedPointEntityToDomain)

@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 interface TravelRepository {
     suspend fun addDeletedPoint(point: DeletedPointDomain)
     suspend fun addDeletedRoute(route: DeletedRouteDomain)
+    suspend fun clearDeletedPointsTable()
+    suspend fun clearDeletedRoutesTable()
     fun getDeletedPoints(): Flow<List<DeletedPointDomain>>
     fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>>
 
