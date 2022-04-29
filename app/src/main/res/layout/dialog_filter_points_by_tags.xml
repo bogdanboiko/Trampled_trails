@@ -5,44 +5,6 @@
     android:layout_height="wrap_content"
     android:background="@color/white">
 
-    <EditText
-        android:id="@+id/addTagEditText"
-        android:layout_width="0dp"
-        android:textColor="@color/black"
-        android:textColorHint="@color/black"
-        android:layout_height="wrap_content"
-        android:hint="set tag name"
-        android:maxLines="1"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/addTagButton"
-        app:layout_constraintBottom_toTopOf="@+id/tagRecycler"/>
-    <ImageButton
-        app:layout_constraintStart_toEndOf="@+id/addTagEditText"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tagRecycler"
-        app:layout_constraintEnd_toStartOf="@id/cancelTagAddingButton"
-        android:id="@+id/addTagButton"
-        android:layout_width="50dp"
-        android:background="@color/white"
-        android:layout_height="0dp"
-        android:padding="10dp"
-        android:src="@drawable/ic_confirm"
-        />
-    <ImageButton
-        app:layout_constraintStart_toEndOf="@+id/addTagButton"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/tagRecycler"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:id="@+id/cancelTagAddingButton"
-        android:layout_width="50dp"
-        android:background="@color/white"
-        android:layout_height="0dp"
-        android:visibility="gone"
-        android:padding="10dp"
-        android:src="@drawable/ic_close"
-        />
-
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tagRecycler"
         android:layout_width="0dp"

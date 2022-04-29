@@ -8,9 +8,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class PointTagDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    abstract fun addTag(tag: PointTagEntity)
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun addTagToPoint(pointTag: PointsTagsEntity)
 
     @Query("SELECT * FROM point_tag")
@@ -21,7 +18,4 @@ abstract class PointTagDao {
 
     @Delete
     abstract fun deleteTagsFromPoint(pointsTagsList: List<PointsTagsEntity>)
-
-    @Delete
-    abstract fun deleteTag(tag: PointTagEntity)
 }

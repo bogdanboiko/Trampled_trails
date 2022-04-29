@@ -5,10 +5,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gh_coursework.databinding.ItemRouteTagBinding
+import com.example.gh_coursework.databinding.ItemTagBinding
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
-import com.example.gh_coursework.ui.route_details.model.RouteTagModel
-import java.util.*
 
 class PointFilterTagAdapter :
     ListAdapter<PointTagModel, PointFilterTagAdapter.TagViewHolder>(Diff) {
@@ -20,7 +18,7 @@ class PointFilterTagAdapter :
         _filterByTagList = tags
     }
 
-    inner class TagViewHolder(private val binding: ItemRouteTagBinding) :
+    inner class TagViewHolder(private val binding: ItemTagBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(tagModel: PointTagModel) {
             binding.tagCheckbox.apply {
@@ -42,7 +40,7 @@ class PointFilterTagAdapter :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TagViewHolder {
         return TagViewHolder(
-            ItemRouteTagBinding.inflate(
+            ItemTagBinding.inflate(
                 LayoutInflater.from(parent.context),
                 parent,
                 false

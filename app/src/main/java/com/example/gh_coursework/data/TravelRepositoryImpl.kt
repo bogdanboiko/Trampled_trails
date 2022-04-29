@@ -79,20 +79,12 @@ class TravelRepositoryImpl(
     override fun getPointImages(pointId: String) = localDataSrcIml.getPointImages(pointId)
 
     //PointTag
-    override suspend fun addPointTag(tag: PointTagDomain) {
-        localDataSrcIml.addPointTag(tag)
-    }
-
     override suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
         localDataSrcIml.addPointsTagsList(pointsTagsList)
     }
 
     override suspend fun deletePoint(pointId: String) {
         localDataSrcIml.deletePoint(pointId)
-    }
-
-    override suspend fun deletePointTag(tag: PointTagDomain) {
-        localDataSrcIml.deletePointTag(tag)
     }
 
     override fun getPointTagList() = localDataSrcIml.getPointTagList()
@@ -154,6 +146,7 @@ class TravelRepositoryImpl(
 
     override fun getRouteTags() = localDataSrcIml.getRouteTags()
 
+    //Public
     override suspend fun publishRoute(
         route: RouteDomain,
         routePoints: List<RoutePointDomain>,

@@ -14,23 +14,15 @@ import kotlinx.coroutines.launch
 
 class TagDialogViewModel(
     private val pointId: String,
-    private val addPointTagUseCase: AddPointTagUseCase,
     private val getPointTagListUseCase: GetPointTagListUseCase,
     private val addPointsTagsListUseCase: AddPointsTagsListUseCase,
     private val removePointsTagsListUseCase: RemovePointsTagsListUseCase,
-    private val deletePointTagUseCase: DeletePointTagUseCase,
     private val getPointTagsUseCase: GetPointTagsUseCase
 ) : ViewModel() {
     val tags =
         getPointTagListUseCase.invoke().map { tagList -> tagList.map(::mapPointTagDomainToModel) }
 
     val pointTags = getPointTagsUseCase.invoke(pointId).map { it.map(::mapPointTagDomainToModel) }
-
-    fun addTag(tag: PointTagModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            addPointTagUseCase.invoke(mapPointTagModelToDomain(tag))
-        }
-    }
 
     fun addTagsToPoint(tags: List<PointsTagsModel>) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -41,12 +33,6 @@ class TagDialogViewModel(
     fun removeTagsToPoint(tags: List<PointsTagsModel>) {
         viewModelScope.launch(Dispatchers.IO) {
             removePointsTagsListUseCase.invoke(tags.map(::mapPointsTagsModelToDomain))
-        }
-    }
-
-    fun deletePointTag(tag: PointTagModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            deletePointTagUseCase.invoke(mapPointTagModelToDomain(tag))
         }
     }
 }

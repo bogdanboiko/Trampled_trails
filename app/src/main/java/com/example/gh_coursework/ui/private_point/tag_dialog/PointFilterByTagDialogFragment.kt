@@ -1,11 +1,9 @@
 package com.example.gh_coursework.ui.private_point.tag_dialog
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
@@ -13,15 +11,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gh_coursework.databinding.DialogFilterPointsByTagsBinding
-import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.private_point.adapter.PointFilterTagAdapter
-import com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class PointFilterByTagDialogFragment : DialogFragment() {
     companion object {
-        val REQUEST_KEY = "point_filter_by_tag_dialog_fragment"
+        const val REQUEST_KEY = "point_filter_by_tag_dialog_fragment"
     }
 
     private lateinit var binding: DialogFilterPointsByTagsBinding
@@ -76,43 +72,6 @@ class PointFilterByTagDialogFragment : DialogFragment() {
             filterByTagsButton.setOnClickListener {
                 setFragmentResult(REQUEST_KEY, bundleOf("tags" to tagAdapter.filterByTagList.toTypedArray()))
                 dismiss()
-            }
-
-            addTagEditText.setOnFocusChangeListener { view, b ->
-                if (b) {
-                    tagRecycler.visibility = View.GONE
-                    filterByTagsButton.visibility = View.GONE
-                    clearTagsDialogButton.visibility = View.GONE
-                    cancelTagAddingButton.visibility = View.VISIBLE
-                } else {
-                    tagRecycler.visibility = View.VISIBLE
-                    filterByTagsButton.visibility = View.VISIBLE
-                    clearTagsDialogButton.visibility = View.VISIBLE
-                    cancelTagAddingButton.visibility = View.GONE
-
-                    val inputManager =
-                        context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    inputManager.hideSoftInputFromWindow(
-                        view.windowToken, 0
-                    )
-                }
-            }
-
-            cancelTagAddingButton.setOnClickListener {
-                addTagEditText.clearFocus()
-                addTagEditText.text.clear()
-            }
-
-            addTagButton.setOnClickListener {
-                addTagEditText.clearFocus()
-
-                val tagName = addTagEditText.text.toString()
-
-                if (tagName.isNotBlank() && tagName.isNotEmpty()) {
-                    viewModelFilterBy.addTag(PointTagModel(null, tagName))
-                }
-
-                addTagEditText.text.clear()
             }
         }
     }

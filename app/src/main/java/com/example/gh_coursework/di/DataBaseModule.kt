@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.gh_coursework.data.database.TravelDatabase
+import com.example.gh_coursework.ui.helper.pointTags
 import com.example.gh_coursework.ui.helper.routeTags
 import org.koin.dsl.module
 
@@ -25,6 +26,11 @@ val localDataBaseModule = module {
 
                     routeTags.forEachIndexed { index, s ->
                         db.execSQL("INSERT OR REPLACE INTO route_tag VALUES " +
+                                "(${index + 1}, \"${s}\")")
+                    }
+
+                    pointTags.forEachIndexed { index, s ->
+                        db.execSQL("INSERT OR REPLACE INTO point_tag VALUES " +
                                 "(${index + 1}, \"${s}\")")
                     }
 
