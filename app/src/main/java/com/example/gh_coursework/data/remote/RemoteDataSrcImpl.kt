@@ -46,9 +46,9 @@ class RemoteDataSrcImpl(
             }
     }
 
-    override suspend fun publishRoute(
+    override suspend fun uploadRouteToFirebase(
         route: RouteDomain,
-        routePoints: List<RoutePointDomain>,
+        routePoints: List<PointDomain>,
         currentUser: String
     ) {
         val routeDocRef = db.collection("routes").document(route.routeId)
@@ -60,12 +60,14 @@ class RemoteDataSrcImpl(
             )
         )
 
+        uploadPointsToFirebase(routePoints)
         saveRouteImages(route.imageList.filter { !it.isUploaded }, route.routeId)
+    }
 
-        routePoints.forEachIndexed { index, point ->
+    override suspend fun uploadPointsToFirebase(points: List<PointDomain>) {
+        points.forEachIndexed { index, point ->
             val routePointDocRef =
-                db.collection("routes").document(routeDocRef.id).collection("points")
-                    .document(point.pointId)
+                db.collection("points").document(point.pointId)
             routePointDocRef.set(
                 mapRoutePointDomainToPublicRoutePointEntity(
                     point,
@@ -76,16 +78,14 @@ class RemoteDataSrcImpl(
 
             savePointImages(
                 point.imageList.filter { !it.isUploaded },
-                point.pointId,
-                route.routeId
+                point.pointId
             )
         }
     }
 
     override suspend fun savePointImages(
         imageList: List<PointImageDomain>,
-        pointId: String,
-        routeId: String
+        pointId: String
     ) {
         val routePointImageAddTasks = mutableListOf<StorageTask<UploadTask.TaskSnapshot>>()
         val routePointImageGetUriTasks = mutableListOf<Task<Uri>>()
@@ -103,13 +103,13 @@ class RemoteDataSrcImpl(
 
         Tasks.await(Tasks.whenAllSuccess<UploadTask.TaskSnapshot>(routePointImageAddTasks))
         val uriList = Tasks.await(Tasks.whenAllSuccess<Uri>(routePointImageGetUriTasks))
-        db.collection("routes").document(routeId).collection("points")
-            .document(pointId)
+        db.collection("points").document(pointId)
             .update(
                 "imageList",
                 FieldValue.arrayUnion(*uriList.map { imageUrl -> imageUrl.toString() }
                     .toTypedArray())
             )
+
         imageList.forEach { image ->
             if (Uri.parse(image.image).toFile().exists()) {
                 Uri.parse(image.image).toFile().delete()
@@ -150,9 +150,7 @@ class RemoteDataSrcImpl(
 
     override fun fetchRoutePoints(routeId: String) = flow {
         val points = Tasks.await(
-            db.collection("routes")
-                .document(routeId)
-                .collection("points")
+            db.collection("points").whereEqualTo("routeId", routeId)
                 .get()
         )
         val data = mutableListOf<PublicRoutePointResponseEntity>()
@@ -166,6 +164,7 @@ class RemoteDataSrcImpl(
                     (it.get("imageList") ?: emptyList<String>()) as List<String>,
                     it.getDouble("x")!!,
                     it.getDouble("y")!!,
+                    it.getString("routeId"),
                     it.getBoolean("routePoint")!!,
                     it.getLong("position")!!
                 )

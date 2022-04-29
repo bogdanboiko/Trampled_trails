@@ -1,6 +1,6 @@
 package com.example.gh_coursework.domain.entity
 
-data class RoutePointDomain(
+data class PointDomain(
     val pointId: String,
     val caption: String,
     val description: String,

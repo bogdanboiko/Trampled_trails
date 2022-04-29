@@ -13,16 +13,6 @@ val localDataBaseModule = module {
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onOpen(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-                    db.execSQL(
-                        """
-                            CREATE TRIGGER IF NOT EXISTS delete_point
-                            AFTER DELETE ON routes_points
-                            BEGIN 
-                            DELETE FROM point_coordinates WHERE pointId = OLD.pointId; 
-                            END
-                        """.trimIndent()
-                    )
-
                     routeTags.forEachIndexed { index, s ->
                         db.execSQL("INSERT OR REPLACE INTO route_tag VALUES " +
                                 "(${index + 1}, \"${s}\")")

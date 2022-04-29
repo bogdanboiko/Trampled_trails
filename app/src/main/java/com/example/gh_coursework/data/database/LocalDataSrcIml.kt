@@ -12,7 +12,7 @@ import com.example.gh_coursework.data.database.mapper.images.mapRouteImageDomain
 import com.example.gh_coursework.data.database.mapper.images.mapRouteImageEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToDomain
-import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToPointCompleteDetailsDomain
+import com.example.gh_coursework.data.database.mapper.point_details.mapPointResponseToDomain
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
@@ -21,7 +21,6 @@ import com.example.gh_coursework.data.database.mapper.point_tag.mapTagDomainToEn
 import com.example.gh_coursework.data.database.mapper.public.mapPublicRouteDomainToEntity
 import com.example.gh_coursework.data.database.mapper.route_details.mapRoutePointsImagesResponseToDomain
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteDomainToEntity
-import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRouteResponseToDomain
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagEntityToDomain
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagsDomainToEntity
@@ -75,9 +74,9 @@ class LocalDataSrcIml(
         pointDetailsDao.insertPointCoordinatesAndCreateDetails(mapPointDomainToEntity(poi))
     }
 
-    override fun getAllPointsDetails(): Flow<List<PointCompleteDetailsDomain>> {
+    override fun getAllPointsDetails(): Flow<List<PointDomain>> {
         return pointDetailsDao.getAllPointsDetails()
-            .map { it.map(::mapPointDetailsEntityToPointCompleteDetailsDomain) }
+            .map { it.map(::mapPointResponseToDomain) }
     }
 
     override suspend fun deleteAllPoints() {
@@ -194,8 +193,8 @@ class LocalDataSrcIml(
         return routeDao.getPublicRoutesResponse().map{ it.map(::mapRouteResponseToDomain) }
     }
 
-    override fun getRoutePointsList(routeId: String): Flow<List<RoutePointDomain>> {
-        return routeDao.getRoutePoints(routeId).map { it.map(::mapRoutePointEntityToDomain) }
+    override fun getRoutePointsList(routeId: String): Flow<List<PointDomain>> {
+        return routeDao.getRoutePoints(routeId).map { it.map(::mapPointResponseToDomain) }
     }
 
     override suspend fun updateRoute(route: RouteDomain) {

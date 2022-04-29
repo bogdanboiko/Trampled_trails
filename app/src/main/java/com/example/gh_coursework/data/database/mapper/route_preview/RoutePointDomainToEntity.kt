@@ -1,9 +1,9 @@
 package com.example.gh_coursework.data.database.mapper.route_preview
 
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
-import com.example.gh_coursework.domain.entity.RoutePointDomain
+import com.example.gh_coursework.domain.entity.PointDomain
 
-fun mapRoutePointDomainToEntity(point: RoutePointDomain): PointCoordinatesEntity {
+fun mapRoutePointDomainToEntity(point: PointDomain): PointCoordinatesEntity {
     with(point) {
         return PointCoordinatesEntity(
             pointId,
