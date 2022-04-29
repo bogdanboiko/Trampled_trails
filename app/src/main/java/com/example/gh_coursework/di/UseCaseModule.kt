@@ -58,7 +58,7 @@ val pointUseCasesModule = module {
     }
 
     //Point details
-    single<AddPointDetailsUseCase> {
+    single<UpdatePointDetailsUseCase> {
         AddPointDetailsUseCaseImpl(get())
     }
 

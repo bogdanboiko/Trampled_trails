@@ -41,7 +41,7 @@ class TravelRepositoryImpl(
     }
 
     //PointPreview
-    override suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain) {
+    override suspend fun addPointCoordinatesWithDetails(poi: PointPreviewDomain) {
         localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
@@ -50,7 +50,7 @@ class TravelRepositoryImpl(
     }
 
     //PointDetails
-    override suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain) {
+    override suspend fun updatePointDetails(poi: PointDetailsDomain) {
         localDataSrcIml.updatePointOfInterestDetails(poi)
     }
 

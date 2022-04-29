@@ -11,8 +11,8 @@ interface TravelRepository {
     fun getDeletedPoints(): Flow<List<DeletedPointDomain>>
     fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>>
 
-    suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
-    suspend fun addPointOfInterestCoordinatesWithDetails(poi: PointPreviewDomain)
+    suspend fun updatePointDetails(poi: PointDetailsDomain)
+    suspend fun addPointCoordinatesWithDetails(poi: PointPreviewDomain)
     suspend fun deleteAllPoints()
     suspend fun deletePoint(pointId: String)
 
