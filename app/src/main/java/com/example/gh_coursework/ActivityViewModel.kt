@@ -3,11 +3,8 @@ package com.example.gh_coursework
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.deleted.*
-import com.example.gh_coursework.domain.usecase.public.FetchRoutePointsFromRemoteUseCase
-import com.example.gh_coursework.domain.usecase.public.GetUserRouteListUseCase
-import com.example.gh_coursework.domain.usecase.public.UploadRouteToFirebaseUseCase
-import com.example.gh_coursework.domain.usecase.public.SavePublicRouteToPrivateUseCase
-import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
+import com.example.gh_coursework.domain.usecase.point_preview.GetAllPointsUseCase
+import com.example.gh_coursework.domain.usecase.public.*
 import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -21,11 +18,13 @@ class ActivityViewModel(
     private val getDeletedRoutesUseCase: GetDeletedRoutesUseCase,
     private val getDeletedPointsUseCase: GetDeletedPointsUseCase,
     private val getRoutesListUseCase: GetRoutesListUseCase,
-    private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
+    private val getPointsListUseCase: GetAllPointsUseCase,
+    private val getUserPointsListUseCase: GetUserPointsListUseCase,
     private val getUserRouteListUseCase: GetUserRouteListUseCase,
-    private val publishRouteUseCase: UploadRouteToFirebaseUseCase,
-    private val fetchRoutePointsFromRemoteUseCase: FetchRoutePointsFromRemoteUseCase,
-    private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase
+    private val uploadRouteUseCase: UploadRouteToFirebaseUseCase,
+    private val uploadPointsUseCase: UploadPointsToFirebaseUseCase,
+    private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase,
+    private val savePublicPointsToPrivateUseCase: SavePublicPointsToPrivateUseCase
 ) : ViewModel() {
 
     private val deletedRoutes = getDeletedRoutesUseCase.invoke()
@@ -45,9 +44,11 @@ class ActivityViewModel(
 
             viewModelScope.launch(Dispatchers.IO) {
                 viewModelScope.launch(Dispatchers.IO) {
-                    publishRoutes(id)
+                    uploadPoints(id)
+                    uploadRoute(id)
                 }.invokeOnCompletion {
                     viewModelScope.launch(Dispatchers.IO) {
+                        fetchPoints(id)
                         fetchRoutes(id)
                     }
                 }
@@ -71,29 +72,33 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun publishRoutes(id: String) {
+    private suspend fun uploadRoute(id: String) {
         getRoutesListUseCase.invoke().first().forEach { route ->
-            publishRouteUseCase.invoke(
+            uploadRouteUseCase.invoke(
                 route,
-                getRoutePointsListUseCase.invoke(route.routeId).first(),
                 id
             )
         }
     }
 
+    private suspend fun uploadPoints(id: String) {
+        uploadPointsUseCase.invoke(getPointsListUseCase.invoke().first(), id)
+    }
+
     private suspend fun fetchRoutes(id: String) {
         getUserRouteListUseCase.invoke(id).collect { routesToSave ->
             routesToSave.forEach { route ->
-                viewModelScope.launch(Dispatchers.IO) {
-                    fetchRoutePointsFromRemoteUseCase.invoke(route.routeId)
-                        .collect { routePoints ->
-                            savePublicRouteToPrivateUseCase.invoke(
-                                route,
-                                routePoints
-                            )
-                        }
-                }
+                savePublicRouteToPrivateUseCase.invoke(
+                    route,
+                    id
+                )
             }
+        }
+    }
+
+    private suspend fun fetchPoints(id: String) {
+        getUserPointsListUseCase.invoke(id).collect { pointsToSave ->
+            savePublicPointsToPrivateUseCase.invoke(pointsToSave)
         }
     }
 }
