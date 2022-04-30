@@ -16,7 +16,8 @@ fun mapRoutePointModelToDomain(point: RoutePointModel): PointDomain {
             x,
             y,
             routeId,
-            isRoutePoint
+            isRoutePoint,
+            position
         )
     }
 }

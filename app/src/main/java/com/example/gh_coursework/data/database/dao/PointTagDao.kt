@@ -10,11 +10,11 @@ abstract class PointTagDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     abstract fun addTagToPoint(pointTag: PointsTagsEntity)
 
-    @Query("SELECT * FROM point_tag")
-    abstract fun getPointTags(): Flow<List<PointTagEntity>>
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun addTagsToPoint(pointsTagsList: List<PointsTagsEntity>)
+
+    @Query("SELECT * FROM point_tag")
+    abstract fun getPointTags(): Flow<List<PointTagEntity>>
 
     @Delete
     abstract fun deleteTagsFromPoint(pointsTagsList: List<PointsTagsEntity>)

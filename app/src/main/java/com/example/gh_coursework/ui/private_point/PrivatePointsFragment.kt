@@ -1,12 +1,14 @@
 package com.example.gh_coursework.ui.private_point
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -21,6 +23,7 @@ import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
+import com.example.gh_coursework.ui.helper.InternetCheckCallback
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
@@ -53,7 +56,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
-
 class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private lateinit var pointsFetchingJob: Job
     private lateinit var imagesPreviewAdapter: ImagesPreviewAdapter
@@ -70,6 +72,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private var mapState: MapState = MapState.PRESENTATION
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private lateinit var theme: MyAppTheme
+    private var internetCheckCallback: InternetCheckCallback? = null
 
     private val onMapClickListener = OnMapClickListener { point ->
         val result = pointAnnotationManager.annotations.find {
@@ -99,6 +102,18 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         eraseCameraToPoint(annotation.point.longitude(), annotation.point.latitude())
 
         true
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        internetCheckCallback = context as? InternetCheckCallback
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        internetCheckCallback = null
     }
 
     override fun onCreateView(
@@ -208,9 +223,13 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private fun configBottomNavBar() {
         binding.bottomNavigationView.menu.getItem(2).isChecked = true
         binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            findNavController().navigate(
-                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment("point")
-            )
+            if (internetCheckCallback?.isInternetAvailable() == true) {
+                findNavController().navigate(
+                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment("point")
+                )
+            } else {
+                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            }
 
             return@setOnMenuItemClickListener true
         }

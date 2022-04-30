@@ -2,10 +2,10 @@ package com.example.gh_coursework.ui.point_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.point_details.UpdatePointDetailsUseCase
+import com.example.gh_coursework.domain.usecase.point_details.AddPointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.image.AddPointImageListUseCase
 import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCase
-import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
 import com.example.gh_coursework.ui.point_details.mapper.*
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class PointDetailsViewModel(
     private val pointId: String,
-    private val updatePointDetailsUseCase: UpdatePointDetailsUseCase,
+    private val addPointDetailsUseCase: AddPointDetailsUseCase,
     private val getPointDetailsUseCase: GetPointDetailsUseCase,
     private val addPointImageListUseCase: AddPointImageListUseCase
 ) : ViewModel() {
@@ -23,7 +23,7 @@ class PointDetailsViewModel(
 
     fun addPointDetails(details: PointDetailsModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            updatePointDetailsUseCase.invoke(mapPointDetailsModelToDomain(details))
+            addPointDetailsUseCase.invoke(mapPointDetailsModelToDomain(details))
         }
     }
 

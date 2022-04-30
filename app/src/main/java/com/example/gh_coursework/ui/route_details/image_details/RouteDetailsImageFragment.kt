@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentImageDetailsBinding
-import com.example.gh_coursework.ui.model.ImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel

@@ -1,6 +1,7 @@
 package com.example.gh_coursework.ui.private_route
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.ColorStateList
 import android.location.Location
 import android.os.Bundle
@@ -23,11 +24,8 @@ import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
-import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
-import com.example.gh_coursework.ui.helper.createAnnotationPoint
-import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
-import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.model.ImageModel
+import com.example.gh_coursework.ui.helper.*
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
@@ -90,22 +88,24 @@ class PrivateRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
-    private var filteredTags = emptyList<RouteTagModel>()
-    private lateinit var routesFetchingJob: Job
+    private lateinit var binding: FragmentPrivateRouteBinding
     private lateinit var theme: MyAppTheme
+
+    private lateinit var routesFetchingJob: Job
     private lateinit var routeImagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointImagesPreviewAdapter: ImagesPreviewAdapter
-
     private lateinit var pointImageLayoutManager: LinearLayoutManager
     private lateinit var routeImageLayoutManager: LinearLayoutManager
-    private lateinit var binding: FragmentPrivateRouteBinding
 
-    private val viewModel: RouteViewModel by viewModel()
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
+    private val viewModel: RouteViewModel by viewModel()
+    private var internetCheckCallback: InternetCheckCallback? = null
+
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
+    private var filteredTags = emptyList<RouteTagModel>()
     private var creatingRouteId: String? = null
     private var previousRouteId: String? = null
     private lateinit var focusedRoute: RouteModel
@@ -137,7 +137,8 @@ class PrivateRoutesFragment :
                 point.longitude(),
                 point.latitude(),
                 it,
-                true
+                true,
+                (currentRoutePointsList.size - 1).toLong()
             )
         }
         if (newPoint != null) {
@@ -166,7 +167,8 @@ class PrivateRoutesFragment :
                     point.longitude(),
                     point.latitude(),
                     it,
-                    false
+                    false,
+                    (currentRoutePointsList.size - 1).toLong()
                 )
             }
 
@@ -247,6 +249,18 @@ class PrivateRoutesFragment :
                 mapAnimationOptions
             )
         }
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        internetCheckCallback = context as? InternetCheckCallback
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        internetCheckCallback = null
     }
 
     override fun onCreateView(
@@ -524,9 +538,13 @@ class PrivateRoutesFragment :
     private fun configBottomNavBar() {
         binding.bottomNavigationView.menu.getItem(2).isChecked = true
         binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            findNavController().navigate(
-                PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment("route")
-            )
+            if (internetCheckCallback?.isInternetAvailable() == true) {
+                findNavController().navigate(
+                    PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment("route")
+                )
+            } else {
+                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            }
 
             return@setOnMenuItemClickListener true
         }

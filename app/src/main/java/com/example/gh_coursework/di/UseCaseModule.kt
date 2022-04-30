@@ -36,6 +36,10 @@ val pointUseCasesModule = module {
         DeleteAllUseCaseImpl(get())
     }
 
+    single<DeleteRemotePointUseCase> {
+        DeleteRemotePointUseCaseImpl(get())
+    }
+
     single<DeleteRemoteRouteUseCase> {
         DeleteRemoteRouteUseCaseImpl(get())
     }
@@ -53,12 +57,16 @@ val pointUseCasesModule = module {
         AddPointPreviewWithDetailsUseCaseImpl(get())
     }
 
+    single<GetAllPointsUseCase> {
+        GetAllPointsUseCaseImpl(get())
+    }
+
     single<DeletePointUseCase> {
         DeletePointUseCaseImpl(get())
     }
 
     //Point details
-    single<UpdatePointDetailsUseCase> {
+    single<AddPointDetailsUseCase> {
         AddPointDetailsUseCaseImpl(get())
     }
 
@@ -66,8 +74,8 @@ val pointUseCasesModule = module {
         GetPointDetailsUseCaseImpl(get())
     }
 
-    single<GetAllPointsUseCase> {
-        GetAllPointsUseCaseImpl(get())
+    single<GetAllPointsDetailsUseCase> {
+        GetAllPointsDetailsUseCaseImpl(get())
     }
 
     //Point images
@@ -105,21 +113,26 @@ val pointUseCasesModule = module {
         AddRouteUseCaseImpl(get())
     }
 
-    single<GetRoutesListUseCase> {
-        GetRoutesListUseCaseImpl(get())
-    }
-
     single<DeleteRouteUseCase> {
         DeleteRouteUseCaseImpl(get())
     }
 
-    //RouteDetails
-    single<GetRouteDetailsUseCase> {
-        GetRouteDetailsUseCaseImpl(get())
+    single<GetRoutesListUseCase> {
+        GetRoutesListUseCaseImpl(get())
     }
 
+    //RoutePoints
     single<GetRoutePointsListUseCase> {
         GetRoutePointsListUseCaseImpl(get())
+    }
+
+    //RouteDetails
+    single<GetPublicRouteListUseCase> {
+        GetPublicRouteListUseCaseImpl(get())
+    }
+
+    single<GetRouteDetailsUseCase> {
+        GetRouteDetailsUseCaseImpl(get())
     }
 
     single<GetRoutePointsImagesUseCase> {
@@ -157,20 +170,12 @@ val pointUseCasesModule = module {
     }
 
     //Public
-    single<UploadRouteToFirebaseUseCase> {
-        UploadRouteToFirebaseUseCaseImpl(get())
-    }
-
     single<FetchRoutePointsFromRemoteUseCase> {
         FetchRoutePointsFromRemoteUseCaseImpl(get())
     }
 
-    single<SavePublicRouteToPrivateUseCase> {
-        SavePublicRouteToPrivateUseCaseImpl(get())
-    }
-
-    single<GetPublicRouteListUseCase> {
-        GetPublicRouteListUseCaseImpl(get())
+    single<GetUserPointsListUseCase> {
+        GetUserPointsListUseCaseImpl(get())
     }
 
     single<GetUserRouteListUseCase> {
@@ -179,5 +184,21 @@ val pointUseCasesModule = module {
 
     single<MakePrivateRoutePublicUseCase> {
         MakePrivateRoutePublicUseCaseImpl(get())
+    }
+
+    single<SavePublicPointsToPrivateUseCase> {
+        SavePublicPointsToPrivateUseCaseImpl(get())
+    }
+
+    single<SavePublicRouteToPrivateUseCase> {
+        SavePublicRouteToPrivateUseCaseImpl(get())
+    }
+
+    single<UploadPointsToFirebaseUseCase> {
+        UploadPointsToFirebaseUseCaseImpl(get())
+    }
+
+    single<UploadRouteToFirebaseUseCase> {
+        UploadRouteToFirebaseUseCaseImpl(get())
     }
 }

@@ -19,14 +19,14 @@ abstract class ImageDao {
     @Query("SELECT * FROM route_image WHERE routeId =:routeId")
     abstract fun getRouteImages(routeId: String): Flow<List<RouteImageEntity>>
 
-    @Delete
-    abstract fun deletePointImage(image: PointImageEntity)
+    @Query("DELETE FROM point_image WHERE pointId = :pointId AND isUploaded = 0")
+    abstract fun deleteAllPointLocalStoredImages(pointId: String)
 
     @Query("DELETE FROM route_image WHERE routeId = :routeId AND isUploaded = 0")
     abstract fun deleteAllRouteLocalStoredImages(routeId: String)
 
-    @Query("DELETE FROM point_image WHERE pointId = :pointId AND isUploaded = 0")
-    abstract fun deleteAllPointLocalStoredImages(pointId: String)
+    @Delete
+    abstract fun deletePointImage(image: PointImageEntity)
 
     @Delete
     abstract fun deleteRouteImage(image: RouteImageEntity)

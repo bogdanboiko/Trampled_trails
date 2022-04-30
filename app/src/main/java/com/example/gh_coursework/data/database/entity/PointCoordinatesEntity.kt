@@ -22,5 +22,7 @@ data class PointCoordinatesEntity(
     @ColumnInfo(name = "routeId")
     val routeId: String?,
     @ColumnInfo(name = "isRoutePoint")
-    val isRoutePoint: Boolean
+    val isRoutePoint: Boolean,
+    @ColumnInfo(name = "position")
+    val position: Long?
 )

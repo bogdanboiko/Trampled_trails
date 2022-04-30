@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.image.DeletePointImageUseCase
 import com.example.gh_coursework.domain.usecase.image.GetPointImagesUseCase
-import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
 import com.example.gh_coursework.ui.point_details.mapper.mapPointImageDomainToModel
 import com.example.gh_coursework.ui.point_details.mapper.mapPointImageModelToDomain
 import kotlinx.coroutines.Dispatchers

@@ -1,6 +1,6 @@
 package com.example.gh_coursework.ui.route_details.model
 
-import com.example.gh_coursework.ui.model.ImageModel.RouteImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel.RouteImageModel
 
 data class RouteDetailsModel(
     val routeId: String,

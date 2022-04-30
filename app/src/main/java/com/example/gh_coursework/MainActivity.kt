@@ -1,6 +1,7 @@
 package com.example.gh_coursework
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
@@ -15,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeActivity
 import com.example.gh_coursework.databinding.ActivityMainBinding
+import com.example.gh_coursework.ui.helper.InternetCheckCallback
 import com.example.gh_coursework.ui.homepage.LoginCallback
 import com.example.gh_coursework.ui.themes.DarkTheme
 import com.example.gh_coursework.ui.themes.LightTheme
@@ -27,7 +29,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class MainActivity :
     ThemeActivity(),
     PermissionsListener,
-    LoginCallback {
+    LoginCallback,
+    InternetCheckCallback {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: ActivityViewModel by viewModel()
@@ -44,36 +47,43 @@ class MainActivity :
             permissionsManager.requestLocationPermissions(this)
         }
 
-        uploadData()
+        syncData()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        syncData()
     }
 
     override fun onSuccessLogin() {
-        uploadData()
+        syncData()
     }
 
     override fun onSuccessLogOut() {
         lifecycleScope.launch {
-            uploadData()
+            syncData()
         }.invokeOnCompletion {
             viewModel.deleteAll()
         }
     }
 
-    private fun uploadData() {
+    private fun syncData() {
         if (isInternetAvailable()) {
-            getUserid()?.let { viewModel.uploadActualRoutesToFirebase(it) }
+            getUserid()?.let { viewModel.syncDataWithFirebase(it) }
         }
     }
 
+    @SuppressLint("HardwareIds")
     private fun getUserid(): String? {
         return if (FirebaseAuth.getInstance().currentUser == null) {
-            Settings.Secure.ANDROID_ID
+            Settings.Secure.getString(this.contentResolver,
+                Settings.Secure.ANDROID_ID)
         } else {
             FirebaseAuth.getInstance().currentUser?.uid
         }
     }
 
-    private fun isInternetAvailable(): Boolean {
+    override fun isInternetAvailable(): Boolean {
         val connectivityManager: ConnectivityManager =
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 

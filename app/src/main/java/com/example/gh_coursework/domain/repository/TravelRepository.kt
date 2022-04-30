@@ -11,10 +11,11 @@ interface TravelRepository {
     fun getDeletedPoints(): Flow<List<DeletedPointDomain>>
     fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>>
 
-    suspend fun updatePointDetails(poi: PointDetailsDomain)
     suspend fun addPointCoordinatesWithDetails(poi: PointPreviewDomain)
+    suspend fun updatePointDetails(poi: PointDetailsDomain)
     suspend fun deleteAllPoints()
     suspend fun deletePoint(pointId: String)
+    fun getAllPoints(): Flow<List<PointDomain>>
 
     suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>)
     suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>)
@@ -32,6 +33,7 @@ interface TravelRepository {
     suspend fun addRouteTagsList(routeTagsList: List<RouteTagsDomain>)
     suspend fun deleteTagsFromRoute(routeTagsList: List<RouteTagsDomain>)
 
+    fun getAllPointsDetails(): Flow<List<PointDomain>>
     fun getPointsTagsList(pointId: String): Flow<List<PointTagDomain>>
     fun getPointOfInterestDetails(id: String): Flow<PointDetailsDomain?>
     fun getPointTagList(): Flow<List<PointTagDomain>>
@@ -50,14 +52,19 @@ interface TravelRepository {
     suspend fun deleteRemotePoint(pointId: String)
     suspend fun deleteRemoteRoute(routeId: String)
 
-    suspend fun uploadRouteToFirebase(route: RouteDomain, routePoints: List<PointDomain>, currentUser: String)
+    suspend fun uploadRouteToFirebase(route: RouteDomain, currentUser: String)
+    suspend fun uploadPointsToFirebase(points: List<PointDomain>, currentUser: String)
 
-    suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain, points: List<PublicRoutePointDomain>)
+    suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain)
+    suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>)
+
     suspend fun saveRouteImagesToFirebase(imageList: List<RouteImageDomain>, routeId: String)
     suspend fun savePointImagesToFirebase(imageList: List<PointImageDomain>, pointId: String)
 
-    fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
-    fun getAllPointsDetails(): Flow<List<PointDomain>>
+    fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>>
+
     fun getUserRoutes(userId: String): Flow<List<PublicRouteDomain>>
-    fun makePrivateRoutePublic(routeId: String)
+    fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>
+
+    suspend fun makePrivateRoutePublic(routeId: String)
 }

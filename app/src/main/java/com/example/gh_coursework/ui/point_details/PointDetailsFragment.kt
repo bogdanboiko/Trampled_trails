@@ -23,7 +23,7 @@ import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesInDetailsAdapter
-import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
 import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.themes.MyAppTheme
 import kotlinx.coroutines.launch

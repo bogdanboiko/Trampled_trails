@@ -2,7 +2,6 @@ package com.example.gh_coursework.ui.private_image_details.adapter
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,7 +13,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.databinding.ItemImagesPreviewBinding
-import com.example.gh_coursework.ui.model.ImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 
 class ImagesPreviewAdapter(private val onItemCLick: View.OnClickListener) :
     ListAdapter<ImageModel, ImagesPreviewAdapter.ImageViewHolder>(Diff) {

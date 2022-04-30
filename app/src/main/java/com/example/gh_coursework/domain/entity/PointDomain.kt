@@ -4,10 +4,11 @@ data class PointDomain(
     val pointId: String,
     val caption: String,
     val description: String,
-    val tagList: List<PointTagDomain>,
+    val tagsList: List<PointTagDomain>,
     val imageList: List<PointImageDomain>,
     val x: Double,
     val y: Double,
     val routeId: String?,
-    val isRoutePoint: Boolean
+    val isRoutePoint: Boolean,
+    val position: Long?
 )

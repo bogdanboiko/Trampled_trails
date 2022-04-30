@@ -45,6 +45,14 @@ class TravelRepositoryImpl(
         localDataSrcIml.addPointOfInterestCoordinates(poi)
     }
 
+    override fun getAllPoints(): Flow<List<PointDomain>> {
+        return localDataSrcIml.getAllPoints()
+    }
+
+    override suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>) {
+        localDataSrcIml.saveFirebasePointsToLocal(points)
+    }
+
     override suspend fun deleteAllPoints() {
         localDataSrcIml.deleteAllPoints()
     }
@@ -55,13 +63,6 @@ class TravelRepositoryImpl(
     }
 
     override fun getAllPointsDetails() = localDataSrcIml.getAllPointsDetails()
-
-    override suspend fun saveFirebaseRouteToLocal(
-        route: PublicRouteDomain,
-        points: List<PublicRoutePointDomain>
-    ) {
-        localDataSrcIml.saveFirebaseRouteToLocal(route, points)
-    }
 
     override fun getUserRoutes(userId: String) = remoteDataSrcImpl.getUserRoutes(userId)
 
@@ -103,6 +104,12 @@ class TravelRepositoryImpl(
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 
     override fun getPublicRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getPublicRoutesList()
+
+    override suspend fun saveFirebaseRouteToLocal(
+        route: PublicRouteDomain
+    ) {
+        localDataSrcIml.saveFirebaseRouteToLocal(route)
+    }
 
     override suspend fun deleteAllRoutes() {
         localDataSrcIml.deleteAllRoutes()
@@ -147,16 +154,19 @@ class TravelRepositoryImpl(
     override fun getRouteTags() = localDataSrcIml.getRouteTags()
 
     //Public
-    override suspend fun uploadRouteToFirebase(
-        dev
-        route: RouteDomain,
-        routePoints: List<PointDomain>,
-        currentUser: String
-    ) {
-        remoteDataSrcImpl.uploadRouteToFirebase(route, routePoints, currentUser)
+    override fun getUserPoints(userId: String): Flow<List<PublicPointDomain>> {
+        return remoteDataSrcImpl.getUserPoints(userId)
     }
 
-    override fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>> {
+    override suspend fun uploadRouteToFirebase(route: RouteDomain, currentUser: String) {
+        remoteDataSrcImpl.uploadRouteToFirebase(route, currentUser)
+    }
+
+    override suspend fun uploadPointsToFirebase(points: List<PointDomain>, currentUser: String) {
+        remoteDataSrcImpl.uploadPointsToFirebase(points, currentUser)
+    }
+
+    override fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>> {
         return remoteDataSrcImpl.fetchRoutePoints(routeId)
     }
 
@@ -168,7 +178,7 @@ class TravelRepositoryImpl(
         remoteDataSrcImpl.savePointImages(imageList, pointId)
     }
 
-    override fun makePrivateRoutePublic(routeId: String) {
+    override suspend fun makePrivateRoutePublic(routeId: String) {
         remoteDataSrcImpl.makePrivateRoutePublic(routeId)
         localDataSrcIml.makePrivateRoutePublic(routeId)
     }

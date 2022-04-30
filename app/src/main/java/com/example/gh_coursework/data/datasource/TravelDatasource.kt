@@ -17,6 +17,7 @@ interface TravelDatasource {
         suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
         suspend fun deletePoint(pointId: String)
         suspend fun deleteAllPoints()
+        fun getAllPoints(): Flow<List<PointDomain>>
 
         suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>)
         suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>)
@@ -50,25 +51,25 @@ interface TravelDatasource {
         fun getRouteTags(): Flow<List<RouteTagDomain>>
 
         fun makePrivateRoutePublic(routeId: String)
-        suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain, points: List<PublicRoutePointDomain>)
+        suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>)
+        suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain)
     }
 
     interface Remote {
         suspend fun deletePoint(pointId: String)
         suspend fun deleteRoute(routeId: String)
 
-        suspend fun uploadRouteToFirebase(
-            route: RouteDomain,
-            routePoints: List<PointDomain>,
-            currentUser: String
-        )
+        suspend fun uploadRouteToFirebase(route: RouteDomain, currentUser: String)
+        suspend fun uploadPointsToFirebase(points: List<PointDomain>, currentUser: String)
 
-        suspend fun uploadPointsToFirebase(points: List<PointDomain>)
         suspend fun savePointImages(imageList: List<PointImageDomain>, pointId: String)
         suspend fun saveRouteImages(imageList: List<RouteImageDomain>, routeId: String)
 
-        fun fetchRoutePoints(routeId: String): Flow<List<PublicRoutePointDomain>>
+        fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>>
+
         fun getUserRoutes(userId: String): Flow<List<PublicRouteDomain>>
+        fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>
+
         fun makePrivateRoutePublic(routeId: String)
     }
 }
