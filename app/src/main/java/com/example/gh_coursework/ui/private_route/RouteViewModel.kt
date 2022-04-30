@@ -58,9 +58,9 @@ class RouteViewModel(
         }
     }
 
-    fun publishRoute(
-        routeId: String
-    ) {
-        makePrivateRoutePublicUseCase.invoke(routeId)
+    fun publishRoute(routeId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            makePrivateRoutePublicUseCase.invoke(routeId)
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.example.gh_coursework.ui.public_route
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.content.res.ColorStateList
@@ -11,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.DrawableCompat
@@ -26,6 +28,7 @@ import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
+import com.example.gh_coursework.ui.helper.InternetCheckCallback
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
@@ -83,26 +86,27 @@ class PublicRoutesFragment :
     RoutesListAdapterCallback,
     RoutePointsListCallback {
 
-    private var savedPublicRoutesList = emptyList<RouteModel>()
+    private lateinit var binding: FragmentPublicRouteBinding
+    private lateinit var theme: MyAppTheme
+
+    private lateinit var routePointsJob: Job
     private lateinit var routesFetchingJob: Job
     private lateinit var routeImagesPreviewAdapter: PublicImageAdapter
     private lateinit var pointImagesPreviewAdapter: PublicImageAdapter
-
-    private lateinit var theme: MyAppTheme
-
     private lateinit var pointImageLayoutManager: LinearLayoutManager
     private lateinit var routeImageLayoutManager: LinearLayoutManager
-    private lateinit var binding: FragmentPublicRouteBinding
 
     private val viewModelPublic: PublicRouteViewModel by viewModel()
     private val arguments by navArgs<PublicRoutesFragmentArgs>()
+    private var internetCheckCallback: InternetCheckCallback? = null
+
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
-    private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private var tagsFilter = emptyList<String>()
+    private var savedPublicRoutesList = emptyList<RouteModel>()
+    private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private lateinit var focusedPublicRoute: PublicRouteModel
-    private lateinit var routePointsJob: Job
 
     private lateinit var routesDialogBehavior: BottomSheetBehavior<LinearLayout>
     private lateinit var routePointsDialogBehavior: BottomSheetBehavior<LinearLayout>
@@ -116,12 +120,15 @@ class PublicRoutesFragment :
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private val navigationLocationProvider = NavigationLocationProvider()
 
-
     private val onAnnotatedPointClickEvent = OnPointAnnotationClickListener { annotation ->
-        if (annotation.getData()?.isJsonNull == false) {
-            getPointDetailsDialog(annotation)
-        } else if (annotation.getData()?.isJsonNull == true) {
-            getRouteDetailsDialog()
+        if (internetCheckCallback?.isInternetAvailable() == true) {
+            if (annotation.getData()?.isJsonNull == false) {
+                getPointDetailsDialog(annotation)
+            } else if (annotation.getData()?.isJsonNull == true) {
+                getRouteDetailsDialog()
+            }
+        } else {
+            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
         }
 
         true
@@ -184,6 +191,18 @@ class PublicRoutesFragment :
         }
     }
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        internetCheckCallback = context as? InternetCheckCallback
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        internetCheckCallback = null
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -205,7 +224,7 @@ class PublicRoutesFragment :
         initMapboxNavigation()
         initRouteLine()
 
-        if (this::focusedPublicRoute.isInitialized) {
+        if (this::focusedPublicRoute.isInitialized && internetCheckCallback?.isInternetAvailable() == true) {
             rebuildRoute(focusedPublicRoute)
         }
 
@@ -325,10 +344,14 @@ class PublicRoutesFragment :
     }
 
     private fun fetchSavedPublicRoutes() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModelPublic.fetchPublicRouteList().collect {
-                savedPublicRoutesList = it
+        if (internetCheckCallback?.isInternetAvailable() == true) {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModelPublic.fetchPublicRouteList().collect {
+                    savedPublicRoutesList = it
+                }
             }
+        } else {
+            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -510,21 +533,29 @@ class PublicRoutesFragment :
     }
 
     private fun fetchRoutes() {
-        if (this::routesFetchingJob.isInitialized) {
-            routesFetchingJob.cancel()
-        }
-
-        routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModelPublic.fetchRoutes(tagsFilter).collect { route ->
-                routesListAdapter.submitData(route)
+        if (internetCheckCallback?.isInternetAvailable() == true) {
+            if (this::routesFetchingJob.isInitialized) {
+                routesFetchingJob.cancel()
             }
+
+            routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
+                viewModelPublic.fetchRoutes(tagsFilter).collect { route ->
+                    routesListAdapter.submitData(route)
+                }
+            }
+        } else {
+            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onRouteItemClick(publicRoute: PublicRouteModel) {
-        rebuildRoute(publicRoute)
-        focusedPublicRoute = publicRoute
-        routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        if (internetCheckCallback?.isInternetAvailable() == true) {
+            rebuildRoute(publicRoute)
+            focusedPublicRoute = publicRoute
+            routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        } else {
+            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun rebuildRoute(publicRoute: PublicRouteModel) {
@@ -704,12 +735,16 @@ class PublicRoutesFragment :
     }
 
     override fun onPointItemClick(pointId: String) {
-        val pointPreview = currentRoutePointsList.find {
-            it.pointId == pointId
-        }
+        if (internetCheckCallback?.isInternetAvailable() == true) {
+            val pointPreview = currentRoutePointsList.find {
+                it.pointId == pointId
+            }
 
-        pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
-        routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
+            routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        } else {
+            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun loadAnnotatedPointData(annotation: PointAnnotation) {
@@ -717,13 +752,12 @@ class PublicRoutesFragment :
             val point = currentRoutePointsList.find { it.pointId == pointId }
 
             if (point != null) {
-                preparePointDetailsDialog(annotation, point)
+                preparePointDetailsDialog(point)
             }
         }
     }
 
     private fun preparePointDetailsDialog(
-        pointAnnotation: PointAnnotation,
         point: RoutePointModel
     ) {
         binding.bottomSheetDialogPointDetails.apply {
@@ -798,7 +832,11 @@ class PublicRoutesFragment :
             routeImagesPreviewAdapter.submitList(publicRoute.imageList)
 
             routeDetailsAddToFavouriteButton.setOnClickListener {
-                //
+                if (internetCheckCallback?.isInternetAvailable() == true) {
+                    //add to favourite
+                } else {
+                    Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
