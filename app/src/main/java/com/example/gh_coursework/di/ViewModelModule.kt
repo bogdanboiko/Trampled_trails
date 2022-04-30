@@ -61,6 +61,6 @@ val viewModelModule = module {
     }
 
     viewModel {
-        ActivityViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
+        ActivityViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
     }
 }

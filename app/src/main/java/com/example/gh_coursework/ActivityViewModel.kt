@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 
 class ActivityViewModel(
     private val deleteAllUseCase: DeleteAllUseCase,
+    private val deleteRemotePointUseCase: DeleteRemotePointUseCase,
     private val deleteRemoteRouteUseCase: DeleteRemoteRouteUseCase,
     private val clearDeletedPointsTableUseCase: ClearDeletedPointsTableUseCase,
     private val clearDeletesRoutesTableUseCase: ClearDeletedRoutesTableUseCase,
@@ -28,7 +29,7 @@ class ActivityViewModel(
 ) : ViewModel() {
 
     private val deletedRoutes = getDeletedRoutesUseCase.invoke()
-    val deletedPoints = getDeletedPointsUseCase.invoke()
+    private val deletedPoints = getDeletedPointsUseCase.invoke()
 
     fun deleteAll() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -38,8 +39,10 @@ class ActivityViewModel(
 
     fun uploadActualRoutesToFirebase(id: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteRemoteRoute()
+            deleteRemotePoints()
+            deleteRemoteRoutes()
         }.invokeOnCompletion {
+            clearDeletedPointsTable()
             clearDeletedRoutesTable()
 
             viewModelScope.launch(Dispatchers.IO) {
@@ -56,13 +59,29 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun deleteRemoteRoute() {
+    private suspend fun deleteRemotePoints() {
+        val deletedPoints = deletedPoints.first()
+
+        if (deletedPoints.isNotEmpty()) {
+            deletedPoints.forEach {
+                deleteRemotePointUseCase.invoke(it.pointId)
+            }
+        }
+    }
+
+    private suspend fun deleteRemoteRoutes() {
         val deletedRoutes = deletedRoutes.first()
 
         if (deletedRoutes.isNotEmpty()) {
             deletedRoutes.forEach {
                 deleteRemoteRouteUseCase.invoke(it.routeId)
             }
+        }
+    }
+
+    private fun clearDeletedPointsTable() {
+        viewModelScope.launch(Dispatchers.IO) {
+            clearDeletedPointsTableUseCase.invoke()
         }
     }
 

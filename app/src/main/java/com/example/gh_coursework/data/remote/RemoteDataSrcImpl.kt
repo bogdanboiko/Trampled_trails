@@ -38,7 +38,6 @@ class RemoteDataSrcImpl(
     }
 
     override suspend fun deleteRoute(routeId: String) {
-        db.collection("routes").document(routeId).collection("points")
         db.collection("routes").document(routeId)
             .delete()
             .addOnFailureListener {

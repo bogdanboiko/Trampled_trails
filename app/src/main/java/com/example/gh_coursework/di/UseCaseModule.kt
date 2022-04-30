@@ -36,6 +36,10 @@ val pointUseCasesModule = module {
         DeleteAllUseCaseImpl(get())
     }
 
+    single<DeleteRemotePointUseCase> {
+        DeleteRemotePointUseCaseImpl(get())
+    }
+
     single<DeleteRemoteRouteUseCase> {
         DeleteRemoteRouteUseCaseImpl(get())
     }
