@@ -7,7 +7,6 @@ import android.content.res.ColorStateList
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,7 +16,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.core.net.toUri
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -28,8 +26,6 @@ import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
-import com.example.gh_coursework.domain.entity.PublicRouteDomain
-import com.example.gh_coursework.domain.entity.PublicRoutePointDomain
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
@@ -73,9 +69,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -804,48 +798,7 @@ class PublicRoutesFragment :
             routeImagesPreviewAdapter.submitList(publicRoute.imageList)
 
             routeDetailsAddToFavouriteButton.setOnClickListener {
-                routeDetailsAddToFavouriteButton.visibility = View.INVISIBLE
-                viewLifecycleOwner.lifecycleScope.launch(Dispatchers.IO) {
-                    val newRouteImageUriList = mutableListOf<String>()
-                    val pointList = mutableListOf<PublicRoutePointDomain>()
-
-                    publicRoute.imageList.forEach {
-                        newRouteImageUriList.add(createRouteImageModel(URL(it)))
-                    }
-
-                    currentRoutePointsList.forEach {
-                        val newPointImageUriList = mutableListOf<String>()
-
-                        it.imageList.forEach { link ->
-                            newPointImageUriList.add(createRouteImageModel(URL(link)))
-                        }
-
-                        pointList.add(
-                            PublicRoutePointDomain(
-                                it.pointId,
-                                it.caption,
-                                it.description,
-                                newPointImageUriList,
-                                it.x,
-                                it.y,
-                                it.isRoutePoint
-                            )
-                        )
-                    }
-
-                    with(publicRoute) {
-                        val route = PublicRouteDomain(
-                            routeId,
-                            name,
-                            description,
-                            tagsList,
-                            newRouteImageUriList,
-                            true
-                        )
-
-                        viewModelPublic.savePublicRouteToPrivate(route, pointList)
-                    }
-                }
+                //
             }
         }
     }

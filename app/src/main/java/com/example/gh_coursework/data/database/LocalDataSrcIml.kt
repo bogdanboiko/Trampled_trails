@@ -87,21 +87,18 @@ class LocalDataSrcIml(
         pointDetailsDao.deletePoint(pointId)
     }
 
+    override suspend fun addPointImages(images: List<PointImageDomain>) {
+        imageDao.addPointImages(images.map(::mapPointImageDomainToEntity))
+    }
+
     //PointDetails
     override suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain) {
         pointDetailsDao.updatePointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
-    override fun makePrivateRoutePublic(routeId: String) {
-        routeDao.makePrivateRoutePublic(routeId)
-    }
-
-    override suspend fun addPointImages(images: List<PointImageDomain>) {
-        imageDao.addPointImages(images.map(::mapPointImageDomainToEntity))
-    }
-
-    override suspend fun deletePointImage(image: PointImageDomain) {
-        imageDao.deletePointImage(mapPointImageDomainToEntity(image))
+    override fun getAllPointsDetails(): Flow<List<PointDomain>> {
+        return pointDetailsDao.getAllPointsDetails()
+            .map { it.map(::mapPointResponseToDomain) }
     }
 
     override fun getPointOfInterestDetails(id: String): Flow<PointDetailsDomain> {
@@ -110,6 +107,10 @@ class LocalDataSrcIml(
 
     override fun getPointImages(pointId: String): Flow<List<PointImageDomain>> {
         return imageDao.getPointImages(pointId).map { it.map(::mapPointImageEntityToDomain) }
+    }
+
+    override suspend fun deletePointImage(image: PointImageDomain) {
+        imageDao.deletePointImage(mapPointImageDomainToEntity(image))
     }
 
     //PointTag
@@ -156,6 +157,10 @@ class LocalDataSrcIml(
 
     override fun getRoutePointsList(routeId: String): Flow<List<PointDomain>> {
         return routeDao.getRoutePoints(routeId).map { it.map(::mapPointResponseToDomain) }
+    }
+
+    override fun makePrivateRoutePublic(routeId: String) {
+        routeDao.makePrivateRoutePublic(routeId)
     }
 
     override suspend fun updateRoute(route: RouteDomain) {

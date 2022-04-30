@@ -11,7 +11,7 @@ fun mapRoutePointDomainToModel(point: PointDomain): RoutePointModel {
             pointId,
             caption,
             description,
-            tagList.map(::mapPointTagDomainToModel),
+            tagsList.map(::mapPointTagDomainToModel),
             imageList.map(::mapPointImageDomainToModel),
             x,
             y,
