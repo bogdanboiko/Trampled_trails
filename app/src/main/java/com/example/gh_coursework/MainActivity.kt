@@ -45,24 +45,29 @@ class MainActivity :
             permissionsManager.requestLocationPermissions(this)
         }
 
-        uploadData()
+        syncData()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        syncData()
     }
 
     override fun onSuccessLogin() {
-        uploadData()
+        syncData()
     }
 
     override fun onSuccessLogOut() {
         lifecycleScope.launch {
-            uploadData()
+            syncData()
         }.invokeOnCompletion {
             viewModel.deleteAll()
         }
     }
 
-    private fun uploadData() {
+    private fun syncData() {
         if (isInternetAvailable()) {
-            getUserid()?.let { viewModel.uploadActualRoutesToFirebase(it) }
+            getUserid()?.let { viewModel.syncDataWithFirebase(it) }
         }
     }
 

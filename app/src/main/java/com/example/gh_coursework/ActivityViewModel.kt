@@ -37,7 +37,7 @@ class ActivityViewModel(
         }
     }
 
-    fun uploadActualRoutesToFirebase(userId: String) {
+    fun syncDataWithFirebase(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             deleteRemotePoints()
             deleteRemoteRoutes()
