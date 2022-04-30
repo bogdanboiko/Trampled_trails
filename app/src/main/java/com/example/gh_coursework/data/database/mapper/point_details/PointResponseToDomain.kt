@@ -16,7 +16,8 @@ fun mapPointResponseToDomain(point: PointResponse): PointDomain {
             coordinate.x,
             coordinate.y,
             coordinate.routeId,
-            coordinate.isRoutePoint
+            coordinate.isRoutePoint,
+            coordinate.position
         )
     }
 }

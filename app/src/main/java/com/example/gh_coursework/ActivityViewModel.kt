@@ -88,10 +88,7 @@ class ActivityViewModel(
     private suspend fun fetchRoutes(id: String) {
         getUserRouteListUseCase.invoke(id).collect { routesToSave ->
             routesToSave.forEach { route ->
-                savePublicRouteToPrivateUseCase.invoke(
-                    route,
-                    id
-                )
+                savePublicRouteToPrivateUseCase.invoke(route)
             }
         }
     }

@@ -6,7 +6,7 @@ import com.example.gh_coursework.domain.usecase.image.AddRouteImageListUseCase
 import com.example.gh_coursework.domain.usecase.route_details.GetRouteDetailsUseCase
 import com.example.gh_coursework.domain.usecase.route_details.GetRoutePointsImagesUseCase
 import com.example.gh_coursework.domain.usecase.route_details.UpdateRouteDetailsUseCase
-import com.example.gh_coursework.ui.model.ImageModel.RouteImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel.RouteImageModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteDetailsDomainToModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteDetailsModelToDomain
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageModelToDomain

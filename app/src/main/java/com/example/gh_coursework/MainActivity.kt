@@ -1,6 +1,7 @@
 package com.example.gh_coursework
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
@@ -65,9 +66,11 @@ class MainActivity :
         }
     }
 
+    @SuppressLint("HardwareIds")
     private fun getUserid(): String? {
         return if (FirebaseAuth.getInstance().currentUser == null) {
-            Settings.Secure.ANDROID_ID
+            Settings.Secure.getString(this.contentResolver,
+                Settings.Secure.ANDROID_ID)
         } else {
             FirebaseAuth.getInstance().currentUser?.uid
         }

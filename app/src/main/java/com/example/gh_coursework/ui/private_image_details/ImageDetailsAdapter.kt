@@ -4,13 +4,12 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.net.toFile
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gh_coursework.databinding.ItemImageDetailsBinding
-import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
 
 class ImageDetailsAdapter :
     ListAdapter<PointImageModel, ImageDetailsAdapter.ImageViewHolder>(Diff) {

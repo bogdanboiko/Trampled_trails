@@ -27,7 +27,7 @@ import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
-import com.example.gh_coursework.ui.model.ImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
@@ -137,7 +137,8 @@ class PrivateRoutesFragment :
                 point.longitude(),
                 point.latitude(),
                 it,
-                true
+                true,
+                (currentRoutePointsList.size - 1).toLong()
             )
         }
         if (newPoint != null) {
@@ -166,7 +167,8 @@ class PrivateRoutesFragment :
                     point.longitude(),
                     point.latitude(),
                     it,
-                    false
+                    false,
+                    (currentRoutePointsList.size - 1).toLong()
                 )
             }
 

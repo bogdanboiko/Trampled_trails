@@ -1,6 +1,6 @@
-package com.example.gh_coursework.ui.model
+package com.example.gh_coursework.ui.private_image_details.model
 
-sealed class ImageModel() {
+sealed class ImageModel {
     abstract val image: String
     abstract val isUploaded: Boolean
 

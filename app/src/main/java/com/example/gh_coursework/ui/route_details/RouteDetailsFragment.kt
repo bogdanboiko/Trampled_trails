@@ -22,8 +22,8 @@ import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentRouteDetailsBinding
-import com.example.gh_coursework.ui.model.ImageModel
-import com.example.gh_coursework.ui.model.ImageModel.RouteImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel.RouteImageModel
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.route_details.model.RouteCompleteModel
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel

@@ -14,7 +14,7 @@ import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.databinding.ItemImagesTopbarDetailsBinding
-import com.example.gh_coursework.ui.model.ImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 
 class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
     ListAdapter<ImageModel, ImagesInDetailsAdapter.ImageViewHolder>(Diff) {

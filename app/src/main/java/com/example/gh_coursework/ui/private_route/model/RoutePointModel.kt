@@ -1,7 +1,7 @@
 package com.example.gh_coursework.ui.private_route.model
 
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
-import com.example.gh_coursework.ui.model.ImageModel.PointImageModel
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
 
 
 data class RoutePointModel(
@@ -13,5 +13,6 @@ data class RoutePointModel(
     val x: Double,
     val y: Double,
     val routeId: String?,
-    val isRoutePoint: Boolean
+    val isRoutePoint: Boolean,
+    val position: Long?
 )
