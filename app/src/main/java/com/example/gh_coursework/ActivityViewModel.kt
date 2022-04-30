@@ -37,7 +37,7 @@ class ActivityViewModel(
         }
     }
 
-    fun uploadActualRoutesToFirebase(id: String) {
+    fun uploadActualRoutesToFirebase(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             deleteRemotePoints()
             deleteRemoteRoutes()
@@ -47,12 +47,15 @@ class ActivityViewModel(
 
             viewModelScope.launch(Dispatchers.IO) {
                 viewModelScope.launch(Dispatchers.IO) {
-                    uploadPoints(id)
-                    uploadRoute(id)
+                    uploadRoute(userId)
+                    uploadPoints(userId)
                 }.invokeOnCompletion {
                     viewModelScope.launch(Dispatchers.IO) {
-                        fetchPoints(id)
-                        fetchRoutes(id)
+                        fetchRoutes(userId)
+                    }.invokeOnCompletion {
+                        viewModelScope.launch(Dispatchers.IO) {
+                            fetchPoints(userId)
+                        }
                     }
                 }
             }
@@ -100,8 +103,8 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun uploadPoints(id: String) {
-        uploadPointsUseCase.invoke(getPointsListUseCase.invoke().first(), id)
+    private suspend fun uploadPoints(userId: String) {
+        uploadPointsUseCase.invoke(getPointsListUseCase.invoke().first(), userId)
     }
 
     private suspend fun fetchRoutes(id: String) {
@@ -112,8 +115,8 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun fetchPoints(id: String) {
-        getUserPointsListUseCase.invoke(id).collect { pointsToSave ->
+    private suspend fun fetchPoints(userId: String) {
+        getUserPointsListUseCase.invoke(userId).collect { pointsToSave ->
             savePublicPointsToPrivateUseCase.invoke(pointsToSave)
         }
     }

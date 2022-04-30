@@ -6,11 +6,14 @@ import androidx.core.net.toFile
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.data.remote.entity.PublicPointResponseEntity
 import com.example.gh_coursework.data.remote.entity.PublicRouteResponseEntity
+import com.example.gh_coursework.data.remote.mapper.mapPointDomainToPublicPointEntity
 import com.example.gh_coursework.data.remote.mapper.mapPublicPointResponseEntityToPublicDomain
 import com.example.gh_coursework.data.remote.mapper.mapPublicRouteResponseToDomain
 import com.example.gh_coursework.data.remote.mapper.mapRouteDomainToPublicRouteEntity
-import com.example.gh_coursework.data.remote.mapper.mapPointDomainToPublicPointEntity
-import com.example.gh_coursework.domain.entity.*
+import com.example.gh_coursework.domain.entity.PointDomain
+import com.example.gh_coursework.domain.entity.PointImageDomain
+import com.example.gh_coursework.domain.entity.RouteDomain
+import com.example.gh_coursework.domain.entity.RouteImageDomain
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FieldValue

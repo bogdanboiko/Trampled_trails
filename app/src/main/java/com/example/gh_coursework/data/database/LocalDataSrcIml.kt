@@ -215,6 +215,7 @@ class LocalDataSrcIml(
     //Public
     override suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>) {
         points.forEachIndexed { _, point ->
+
             pointDetailsDao.insertPointCoordinatesAndCreateDetails(
                 PointCoordinatesEntity(
                     point.pointId,
