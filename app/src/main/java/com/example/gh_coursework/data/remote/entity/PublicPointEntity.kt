@@ -8,6 +8,7 @@ data class PublicPointEntity(
     val x: Double,
     val y: Double,
     val routeId: String?,
+    val userId: String,
     val isRoutePoint: Boolean,
     val position: Int
 )

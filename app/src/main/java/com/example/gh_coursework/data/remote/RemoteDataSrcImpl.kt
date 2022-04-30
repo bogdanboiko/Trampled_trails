@@ -4,12 +4,12 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.net.toFile
 import com.example.gh_coursework.data.datasource.TravelDatasource
-import com.example.gh_coursework.data.remote.entity.PublicRoutePointResponseEntity
+import com.example.gh_coursework.data.remote.entity.PublicPointResponseEntity
 import com.example.gh_coursework.data.remote.entity.PublicRouteResponseEntity
-import com.example.gh_coursework.data.remote.mapper.mapPublicRoutePointResponseEntityToDomain
+import com.example.gh_coursework.data.remote.mapper.mapPublicPointResponseEntityToPublicDomain
 import com.example.gh_coursework.data.remote.mapper.mapPublicRouteResponseToDomain
 import com.example.gh_coursework.data.remote.mapper.mapRouteDomainToPublicRouteEntity
-import com.example.gh_coursework.data.remote.mapper.mapRoutePointDomainToPublicRoutePointEntity
+import com.example.gh_coursework.data.remote.mapper.mapPointDomainToPublicPointEntity
 import com.example.gh_coursework.domain.entity.*
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -48,7 +48,6 @@ class RemoteDataSrcImpl(
 
     override suspend fun uploadRouteToFirebase(
         route: RouteDomain,
-        routePoints: List<PointDomain>,
         currentUser: String
     ) {
         val routeDocRef = db.collection("routes").document(route.routeId)
@@ -60,26 +59,26 @@ class RemoteDataSrcImpl(
             )
         )
 
-        uploadPointsToFirebase(routePoints)
         saveRouteImages(route.imageList.filter { !it.isUploaded }, route.routeId)
     }
 
-    override suspend fun uploadPointsToFirebase(points: List<PointDomain>) {
+    override suspend fun uploadPointsToFirebase(
+        points: List<PointDomain>,
+        currentUser: String
+    ) {
         points.forEachIndexed { index, point ->
-            val routePointDocRef =
+            val pointDocRef =
                 db.collection("points").document(point.pointId)
-            routePointDocRef.set(
-                mapRoutePointDomainToPublicRoutePointEntity(
+            pointDocRef.set(
+                mapPointDomainToPublicPointEntity(
                     point,
                     point.imageList.filter { it.isUploaded }.map { it.image },
+                    currentUser,
                     index
                 )
             )
 
-            savePointImages(
-                point.imageList.filter { !it.isUploaded },
-                point.pointId
-            )
+            savePointImages(point.imageList.filter { !it.isUploaded }, point.pointId)
         }
     }
 
@@ -153,14 +152,15 @@ class RemoteDataSrcImpl(
             db.collection("points").whereEqualTo("routeId", routeId)
                 .get()
         )
-        val data = mutableListOf<PublicRoutePointResponseEntity>()
+        val data = mutableListOf<PublicPointResponseEntity>()
 
         points.documents.forEach {
             data.add(
-                PublicRoutePointResponseEntity(
+                PublicPointResponseEntity(
                     it.id,
                     it.getString("caption")!!,
                     it.getString("description")!!,
+                    (it.get("tagsList") ?: emptyList<String>()) as List<String>,
                     (it.get("imageList") ?: emptyList<String>()) as List<String>,
                     it.getDouble("x")!!,
                     it.getDouble("y")!!,
@@ -173,7 +173,32 @@ class RemoteDataSrcImpl(
 
         data.sortBy { it.position }
 
-        emit(data.map(::mapPublicRoutePointResponseEntityToDomain))
+        emit(data.map(::mapPublicPointResponseEntityToPublicDomain))
+    }.flowOn(Dispatchers.IO)
+
+    override fun getUserPoints(userId: String) = flow {
+        val points = Tasks.await(db.collection("points").whereEqualTo("userId", userId).get())
+
+        val data = mutableListOf<PublicPointResponseEntity>()
+
+        points.documents.forEach {
+            data.add(
+                PublicPointResponseEntity(
+                    it.id,
+                    it.getString("caption")!!,
+                    it.getString("description")!!,
+                    (it.get("tagsList") ?: emptyList<String>()) as List<String>,
+                    (it.get("imageList") ?: emptyList<String>()) as List<String>,
+                    it.getDouble("x")!!,
+                    it.getDouble("y")!!,
+                    it.getString("routeId"),
+                    it.getBoolean("routePoint")!!,
+                    it.getLong("position")!!
+                )
+            )
+        }
+
+        emit(data.map(::mapPublicPointResponseEntityToPublicDomain))
     }.flowOn(Dispatchers.IO)
 
     override fun getUserRoutes(userId: String) = flow {

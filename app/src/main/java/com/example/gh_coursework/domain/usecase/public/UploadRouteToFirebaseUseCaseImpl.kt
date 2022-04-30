@@ -6,9 +6,8 @@ import com.example.gh_coursework.domain.repository.TravelRepository
 class UploadRouteToFirebaseUseCaseImpl(private val repository: TravelRepository): UploadRouteToFirebaseUseCase {
     override suspend fun invoke(
         route: RouteDomain,
-        routePoints: List<PointDomain>,
         currentUser: String
     ) {
-        repository.uploadRouteToFirebase(route, routePoints, currentUser)
+        repository.uploadRouteToFirebase(route, currentUser)
     }
 }

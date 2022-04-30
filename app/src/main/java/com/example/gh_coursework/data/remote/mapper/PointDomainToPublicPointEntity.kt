@@ -6,6 +6,7 @@ import com.example.gh_coursework.domain.entity.PointDomain
 fun mapPointDomainToPublicPointEntity(
     point: PointDomain,
     imageList: List<String>,
+    uid: String,
     position: Int
 ): PublicPointEntity {
     return PublicPointEntity(
@@ -16,6 +17,7 @@ fun mapPointDomainToPublicPointEntity(
         point.x,
         point.y,
         point.routeId,
+        uid,
         point.isRoutePoint,
         position
     )
