@@ -49,7 +49,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        PublicRouteViewModel(get(), get(), get(), get())
+        PublicRouteViewModel(get(), get(), get())
     }
 
     viewModel {
@@ -61,6 +61,6 @@ val viewModelModule = module {
     }
 
     viewModel {
-        ActivityViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
+        ActivityViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get(), get())
     }
 }
