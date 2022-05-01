@@ -50,9 +50,9 @@ class MainActivity :
         syncData()
     }
 
-    override fun onStop() {
-        super.onStop()
+    override fun onPause() {
         uploadData()
+        super.onPause()
     }
 
     override fun onSuccessLogin() {
