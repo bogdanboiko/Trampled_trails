@@ -25,8 +25,8 @@ import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.ui.helper.*
-import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewAdapter
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -416,11 +416,17 @@ class PrivateRoutesFragment :
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogRouteDetails.routePublishButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(requireContext())
+            )
 
             bottomSheetDialogPointDetails.pointDetailsDeleteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogPointDetails.pointDetailsEditButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogPointDetails.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(requireContext())
+            )
         }
     }
 
@@ -1199,6 +1205,7 @@ class PrivateRoutesFragment :
     private fun loadAnnotatedPointData(annotation: PointAnnotation) {
         annotation.getData()?.asString?.let { pointId ->
             val point = currentRoutePointsList.find { it.pointId == pointId }
+            point?.x?.let { eraseCameraToPoint(it, point.y) }
 
             if (point != null) {
                 preparePointDetailsDialog(annotation, point)
