@@ -215,6 +215,8 @@ class RemoteDataSrcImpl(
             )
         }
 
+        data.sortBy { it.position }
+
         emit(data.map(::mapPublicPointResponseEntityToPublicDomain))
     }.flowOn(Dispatchers.IO)
 

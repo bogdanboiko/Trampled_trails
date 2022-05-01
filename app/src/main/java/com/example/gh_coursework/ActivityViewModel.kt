@@ -41,21 +41,12 @@ class ActivityViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             deleteRemotePoints()
             deleteRemoteRoutes()
-        }.invokeOnCompletion {
             clearDeletedPointsTable()
             clearDeletedRoutesTable()
-
-            viewModelScope.launch(Dispatchers.IO) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    uploadRoute(userId)
-                    uploadPoints(userId)
-                }.invokeOnCompletion {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        fetchRoutes(userId)
-                        fetchPoints(userId)
-                    }
-                }
-            }
+            uploadRoute(userId)
+            uploadPoints(userId)
+            fetchRoutes(userId)
+            fetchPoints(userId)
         }
     }
 
@@ -63,14 +54,10 @@ class ActivityViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             deleteRemotePoints()
             deleteRemoteRoutes()
-        }.invokeOnCompletion {
             clearDeletedPointsTable()
             clearDeletedRoutesTable()
-
-            viewModelScope.launch(Dispatchers.IO) {
-                uploadRoute(userId)
-                uploadPoints(userId)
-            }
+            uploadRoute(userId)
+            uploadPoints(userId)
         }
     }
 
