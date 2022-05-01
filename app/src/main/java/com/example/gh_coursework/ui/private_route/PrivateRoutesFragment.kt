@@ -410,6 +410,8 @@ class PrivateRoutesFragment :
                 )
             )
 
+            bottomSheetDialogRouteDetails.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
             bottomSheetDialogRouteDetails.routeDetailsDeleteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogRouteDetails.routeDetailsEditButton.imageTintList =
@@ -420,6 +422,8 @@ class PrivateRoutesFragment :
                 theme.colorSecondaryVariant(requireContext())
             )
 
+            bottomSheetDialogPointDetails.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
             bottomSheetDialogPointDetails.pointDetailsDeleteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogPointDetails.pointDetailsEditButton.imageTintList =
