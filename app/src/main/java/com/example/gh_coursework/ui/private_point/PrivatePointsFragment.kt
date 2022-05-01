@@ -57,22 +57,28 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
+    private lateinit var binding: FragmentPrivatePointsBinding
+    private lateinit var theme: MyAppTheme
+
     private lateinit var pointsFetchingJob: Job
+
     private lateinit var imagesPreviewAdapter: ImagesPreviewAdapter
     private lateinit var pointDetailsImagesLayoutManager: LinearLayoutManager
     private lateinit var pointsLayoutManager: LinearLayoutManager
-    private val viewModel: PointViewModel by viewModel()
-    private var pointCoordinates = emptyList<PrivatePointDetailsModel>()
     private val pointListAdapter = PointsListAdapter(this)
-    private lateinit var mapboxMap: MapboxMap
-    private lateinit var binding: FragmentPrivatePointsBinding
-    private var checkedTagList = emptyList<PointTagModel>()
-    private lateinit var pointDetailsSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var pointListBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
-    private var mapState: MapState = MapState.PRESENTATION
-    private lateinit var pointAnnotationManager: PointAnnotationManager
-    private lateinit var theme: MyAppTheme
+
+    private val viewModel: PointViewModel by viewModel()
     private var internetCheckCallback: InternetCheckCallback? = null
+
+    private var pointCoordinates = emptyList<PrivatePointDetailsModel>()
+    private var checkedTagList = emptyList<PointTagModel>()
+
+    private lateinit var pointDetailsBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private lateinit var pointsListBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+
+    private lateinit var mapboxMap: MapboxMap
+    private lateinit var pointAnnotationManager: PointAnnotationManager
+    private var mapState: MapState = MapState.PRESENTATION
 
     private val onMapClickListener = OnMapClickListener { point ->
         val result = pointAnnotationManager.annotations.find {
@@ -89,17 +95,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     }
 
     private val onPointClickEvent = OnPointAnnotationClickListener { annotation ->
-        viewLifecycleOwner.lifecycleScope.launch {
-
-            annotation.getData()?.asString?.let { pointId ->
-                pointCoordinates.find { it.pointId == pointId }
-                    ?.let { prepareDetailsDialog(annotation, it) }
-            }
-        }
-
-        pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-        eraseCameraToPoint(annotation.point.longitude(), annotation.point.latitude())
+        getPointDetailsDialog(annotation)
 
         true
     }
@@ -259,17 +255,17 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         PagerSnapHelper().attachToRecyclerView(binding.pointDetailsBottomSheetDialogLayout.imageRecycler)
         pointDetailsImagesLayoutManager =
             LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        pointDetailsSheetBehavior =
+        pointDetailsBottomSheetBehavior =
             BottomSheetBehavior.from(binding.pointDetailsBottomSheetDialogLayout.pointBottomSheetDialog)
 
-        pointDetailsSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+        pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        pointListBottomSheetBehavior =
+        pointsListBottomSheetBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
-        pointListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        pointListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        pointsListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         binding.bottomSheetDialogPoints.pointsRecyclerView.apply {
             adapter = pointListAdapter
@@ -282,6 +278,18 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
                     checkedTagList.toTypedArray()
                 )
             )
+        }
+    }
+
+    private fun getPointDetailsDialog(annotation: PointAnnotation) {
+
+        loadPointDetailsData(annotation)
+
+        pointsListBottomSheetBehavior.peekHeight = 0
+        pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+
+        if (pointDetailsBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -335,7 +343,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
     private fun configPointsButton() {
         binding.getPointsList.setOnClickListener {
-            pointListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -353,7 +361,6 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             pointsFetchingJob.cancel()
         }
 
-        pointAnnotationManager.deleteAll()
         pointsFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
             viewModel.points.collect { points ->
                 var filteredPoints = mutableListOf<PrivatePointDetailsModel>()
@@ -376,6 +383,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
                     filteredPoints = points.toMutableList()
                 }
 
+                pointAnnotationManager.deleteAll()
                 filteredPoints.forEach {
                     addAnnotationToMap(it)
                 }
@@ -427,26 +435,38 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     }
 
-    private fun prepareDetailsDialog(
+    private fun loadPointDetailsData(annotation: PointAnnotation) {
+        annotation.getData()?.asString?.let { pointId ->
+            val point = pointCoordinates.find { it.pointId == pointId }
+            point?.x?.let { eraseCameraToPoint(it, point.y) }
+
+            if (point != null) {
+                preparePointDetailsDialog(annotation, point)
+            }
+        }
+    }
+
+    private fun preparePointDetailsDialog(
         pointAnnotation: PointAnnotation,
-        details: PrivatePointDetailsModel
+        point: PrivatePointDetailsModel
     ) {
         binding.pointDetailsBottomSheetDialogLayout.apply {
-            pointCaptionText.text = details.caption
-            pointDescriptionText.text = details.description
-            if (details.tagList.isNotEmpty()) {
-                tagListTextView.text = details.tagList.joinToString(
+            if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
+                emptyDataPlaceholder.visibility = View.VISIBLE
+            } else {
+                pointCaptionText.text = point.caption
+                pointDescriptionText.text = point.description
+                tagListTextView.text = point.tagList.joinToString(
                     ",",
                     "Tags: "
                 ) { pointTagModel -> pointTagModel.name }
-            } else {
-                tagListTextView.text = ""
+                emptyDataPlaceholder.visibility = View.GONE
             }
 
             imagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPrivateImageDetails(
-                        details.pointId,
+                        point.pointId,
                         this@PrivatePointsFragment.pointDetailsImagesLayoutManager.findFirstVisibleItemPosition()
                     )
                 )
@@ -457,33 +477,27 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
                 layoutManager = this@PrivatePointsFragment.pointDetailsImagesLayoutManager
             }
 
-            imagesPreviewAdapter.submitList(details.imageList)
-
-            if (details.caption.isEmpty() && details.description.isEmpty()) {
-                emptyDataPlaceholder.visibility = View.VISIBLE
-            } else {
-                emptyDataPlaceholder.visibility = View.INVISIBLE
-            }
+            imagesPreviewAdapter.submitList(point.imageList)
 
             pointDetailsEditButton.setOnClickListener {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment(details.pointId)
+                        .actionPrivatePointsFragmentToPointDetailsFragment(point.pointId)
                 )
             }
 
             pointDetailsDeleteButton.setOnClickListener {
-                viewModel.deletePoint(details.pointId)
+                viewModel.deletePoint(point.pointId)
 
                 pointAnnotationManager.delete(pointAnnotation)
-                pointDetailsSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
     }
 
     override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
         eraseCameraToPoint(pointDetails.x, pointDetails.y)
-        pointListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
     private fun eraseCameraToPoint(x: Double, y: Double) {

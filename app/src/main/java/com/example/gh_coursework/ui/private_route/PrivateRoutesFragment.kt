@@ -25,8 +25,8 @@ import com.example.gh_coursework.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.ui.helper.*
-import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewAdapter
+import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
@@ -187,7 +187,7 @@ class PrivateRoutesFragment :
     private val onAnnotatedPointClickEvent = OnPointAnnotationClickListener { annotation ->
         if (annotation.getData()?.isJsonNull == false) {
             getPointDetailsDialog(annotation)
-        } else if (annotation.getData()?.isJsonNull == true) {
+        } else  {
             getRouteDetailsDialog()
         }
 
@@ -410,17 +410,27 @@ class PrivateRoutesFragment :
                 )
             )
 
+            bottomSheetDialogRouteDetails.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
             bottomSheetDialogRouteDetails.routeDetailsDeleteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogRouteDetails.routeDetailsEditButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogRouteDetails.routePublishButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(requireContext())
+            )
 
+            bottomSheetDialogPointDetails.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
             bottomSheetDialogPointDetails.pointDetailsDeleteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogPointDetails.pointDetailsEditButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogPointDetails.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(requireContext())
+            )
         }
     }
 
@@ -804,8 +814,6 @@ class PrivateRoutesFragment :
 
             if (routePointsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            } else {
-                routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
     }
@@ -825,8 +833,6 @@ class PrivateRoutesFragment :
 
         if (routeDetailsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
             routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        } else {
-            routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -845,10 +851,6 @@ class PrivateRoutesFragment :
         pointDetailsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
 
         if (pointDetailsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            loadAnnotatedPointData(annotation)
-            pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        } else {
-            loadAnnotatedPointData(annotation)
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
@@ -1199,6 +1201,7 @@ class PrivateRoutesFragment :
     private fun loadAnnotatedPointData(annotation: PointAnnotation) {
         annotation.getData()?.asString?.let { pointId ->
             val point = currentRoutePointsList.find { it.pointId == pointId }
+            point?.x?.let { eraseCameraToPoint(it, point.y) }
 
             if (point != null) {
                 preparePointDetailsDialog(annotation, point)

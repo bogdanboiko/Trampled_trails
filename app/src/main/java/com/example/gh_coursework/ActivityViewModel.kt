@@ -41,24 +41,23 @@ class ActivityViewModel(
         viewModelScope.launch(Dispatchers.IO) {
             deleteRemotePoints()
             deleteRemoteRoutes()
-        }.invokeOnCompletion {
             clearDeletedPointsTable()
             clearDeletedRoutesTable()
+            uploadRoute(userId)
+            uploadPoints(userId)
+            fetchRoutes(userId)
+            fetchPoints(userId)
+        }
+    }
 
-            viewModelScope.launch(Dispatchers.IO) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    uploadRoute(userId)
-                    uploadPoints(userId)
-                }.invokeOnCompletion {
-                    viewModelScope.launch(Dispatchers.IO) {
-                        fetchRoutes(userId)
-                    }.invokeOnCompletion {
-                        viewModelScope.launch(Dispatchers.IO) {
-                            fetchPoints(userId)
-                        }
-                    }
-                }
-            }
+    fun uploadDataToFirebase(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteRemotePoints()
+            deleteRemoteRoutes()
+            clearDeletedPointsTable()
+            clearDeletedRoutesTable()
+            uploadRoute(userId)
+            uploadPoints(userId)
         }
     }
 
@@ -94,17 +93,23 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun uploadRoute(id: String) {
+    private suspend fun uploadPoints(userId: String) {
+        uploadPointsUseCase.invoke(getPointsListUseCase.invoke().first(), userId)
+    }
+
+    private suspend fun uploadRoute(userId: String) {
         getRoutesListUseCase.invoke().first().forEach { route ->
             uploadRouteUseCase.invoke(
                 route,
-                id
+                userId
             )
         }
     }
 
-    private suspend fun uploadPoints(userId: String) {
-        uploadPointsUseCase.invoke(getPointsListUseCase.invoke().first(), userId)
+    private suspend fun fetchPoints(userId: String) {
+        getUserPointsListUseCase.invoke(userId).collect { pointsToSave ->
+            savePublicPointsToPrivateUseCase.invoke(pointsToSave)
+        }
     }
 
     private suspend fun fetchRoutes(id: String) {
@@ -112,12 +117,6 @@ class ActivityViewModel(
             routesToSave.forEach { route ->
                 savePublicRouteToPrivateUseCase.invoke(route)
             }
-        }
-    }
-
-    private suspend fun fetchPoints(userId: String) {
-        getUserPointsListUseCase.invoke(userId).collect { pointsToSave ->
-            savePublicPointsToPrivateUseCase.invoke(pointsToSave)
         }
     }
 }
