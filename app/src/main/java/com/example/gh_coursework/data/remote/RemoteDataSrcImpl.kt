@@ -35,14 +35,29 @@ class RemoteDataSrcImpl(
     override suspend fun deletePoint(pointId: String) {
         db.collection("points").document(pointId)
             .delete()
+            .addOnSuccessListener {
+                Log.e("Point deleted", "successful")
+            }
             .addOnFailureListener {
                 Log.e("Error deleting point ", it.toString())
             }
     }
 
     override suspend fun deleteRoute(routeId: String) {
+        val points = Tasks.await(
+            db.collection("points").whereEqualTo("routeId", routeId)
+                .get()
+        )
+
+        points.documents.forEach {
+            deletePoint(it.id)
+        }
+
         db.collection("routes").document(routeId)
             .delete()
+            .addOnSuccessListener {
+                Log.e("Route deleted", "successful")
+            }
             .addOnFailureListener {
                 Log.e("Error deleting route ", it.toString())
             }
