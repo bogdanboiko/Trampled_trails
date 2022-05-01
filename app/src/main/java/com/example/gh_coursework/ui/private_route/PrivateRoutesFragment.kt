@@ -187,7 +187,7 @@ class PrivateRoutesFragment :
     private val onAnnotatedPointClickEvent = OnPointAnnotationClickListener { annotation ->
         if (annotation.getData()?.isJsonNull == false) {
             getPointDetailsDialog(annotation)
-        } else if (annotation.getData()?.isJsonNull == true) {
+        } else  {
             getRouteDetailsDialog()
         }
 
@@ -814,8 +814,6 @@ class PrivateRoutesFragment :
 
             if (routePointsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            } else {
-                routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
         }
     }
@@ -835,8 +833,6 @@ class PrivateRoutesFragment :
 
         if (routeDetailsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
             routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        } else {
-            routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -855,10 +851,6 @@ class PrivateRoutesFragment :
         pointDetailsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
 
         if (pointDetailsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            loadAnnotatedPointData(annotation)
-            pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-        } else {
-            loadAnnotatedPointData(annotation)
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
