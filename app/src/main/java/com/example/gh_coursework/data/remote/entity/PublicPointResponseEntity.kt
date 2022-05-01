@@ -1,7 +1,7 @@
 package com.example.gh_coursework.data.remote.entity
 
 data class PublicPointResponseEntity(
-    val pointDocumentId: String,
+    val pointId: String,
     val caption: String,
     val description: String,
     val tagsList: List<String>,

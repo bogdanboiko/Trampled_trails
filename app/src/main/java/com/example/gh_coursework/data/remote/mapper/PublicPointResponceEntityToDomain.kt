@@ -5,7 +5,7 @@ import com.example.gh_coursework.domain.entity.PublicPointDomain
 
 fun mapPublicPointResponseEntityToPublicDomain(point: PublicPointResponseEntity): PublicPointDomain {
     return PublicPointDomain(
-        point.pointDocumentId,
+        point.pointId,
         point.caption,
         point.description,
         point.tagsList,
