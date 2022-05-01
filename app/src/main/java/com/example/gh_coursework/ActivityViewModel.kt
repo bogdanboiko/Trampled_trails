@@ -62,6 +62,23 @@ class ActivityViewModel(
         }
     }
 
+    fun uploadDataToFirebase(userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteRemotePoints()
+            deleteRemoteRoutes()
+        }.invokeOnCompletion {
+            clearDeletedPointsTable()
+            clearDeletedRoutesTable()
+
+            viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch(Dispatchers.IO) {
+                    uploadRoute(userId)
+                    uploadPoints(userId)
+                }
+            }
+        }
+    }
+
     private suspend fun deleteRemotePoints() {
         val deletedPoints = deletedPoints.first()
 

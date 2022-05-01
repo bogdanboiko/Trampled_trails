@@ -52,7 +52,7 @@ class MainActivity :
 
     override fun onDestroy() {
         super.onDestroy()
-        syncData()
+        uploadData()
     }
 
     override fun onSuccessLogin() {
@@ -70,6 +70,12 @@ class MainActivity :
     private fun syncData() {
         if (isInternetAvailable()) {
             getUserid()?.let { viewModel.syncDataWithFirebase(it) }
+        }
+    }
+
+    private fun uploadData() {
+        if (isInternetAvailable()) {
+            getUserid()?.let { viewModel.uploadDataToFirebase(it) }
         }
     }
 
