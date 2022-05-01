@@ -111,11 +111,11 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun uploadRoute(id: String) {
+    private suspend fun uploadRoute(userId: String) {
         getRoutesListUseCase.invoke().first().forEach { route ->
             uploadRouteUseCase.invoke(
                 route,
-                id
+                userId
             )
         }
     }
