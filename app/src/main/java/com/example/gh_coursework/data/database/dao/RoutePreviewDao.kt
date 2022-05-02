@@ -30,7 +30,7 @@ abstract class RoutePreviewDao {
     @Query("SELECT * FROM point_coordinates WHERE routeId = :routeId")
     abstract fun getRoutePointsImages(routeId: String): Flow<List<RoutePointImageResponse>>
 
-    @Query("UPDATE route_details SET isPublic = isPublic WHERE routeId = :routeId")
+    @Query("UPDATE route_details SET isPublic = :isPublic WHERE routeId = :routeId")
     abstract fun changeRouteAccess(routeId: String, isPublic: Boolean)
 
     @Query("DELETE FROM route_details")

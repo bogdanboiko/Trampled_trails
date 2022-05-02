@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-class RouteViewModel(
+class PrivateRouteViewModel(
     getRoutesListUseCase: GetRoutesListUseCase,
     private val addRouteUseCase: AddRouteUseCase,
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,

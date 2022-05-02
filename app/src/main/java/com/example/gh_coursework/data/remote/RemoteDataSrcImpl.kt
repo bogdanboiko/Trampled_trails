@@ -277,7 +277,7 @@ class RemoteDataSrcImpl(
         val favouritesDocRef = getFavouriteRoutes(routeId)
 
         db.runBatch { batch ->
-            batch.update(routeDocRef, "public", false)
+            batch.update(routeDocRef, "public", isPublic)
 
             if (favouritesDocRef.isNotEmpty()) {
                 for (docRef in favouritesDocRef) {

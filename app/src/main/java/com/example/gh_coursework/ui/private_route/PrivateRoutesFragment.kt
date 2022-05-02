@@ -100,7 +100,7 @@ class PrivateRoutesFragment :
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
-    private val viewModel: RouteViewModel by viewModel()
+    private val viewModelPrivate: PrivateRouteViewModel by viewModel()
     private var internetCheckCallback: InternetCheckCallback? = null
 
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
@@ -656,7 +656,7 @@ class PrivateRoutesFragment :
             }
 
             if (route != null) {
-                viewModel.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
+                viewModelPrivate.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
             }
             creatingRouteCoordinatesList.clear()
         }
@@ -878,7 +878,7 @@ class PrivateRoutesFragment :
         }
 
         routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.routes.collect { routes ->
+            viewModelPrivate.routes.collect { routes ->
                 var filteredRoutes = mutableListOf<RouteModel>()
 
                 if (filteredTags.isNotEmpty()) {
@@ -938,7 +938,7 @@ class PrivateRoutesFragment :
         }
 
         routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getRoutePointsList(route.routeId)
+            viewModelPrivate.getRoutePointsList(route.routeId)
                 .distinctUntilChanged()
                 .collect { pointsList ->
                     if (pointsList.isNotEmpty()) {
@@ -1258,7 +1258,7 @@ class PrivateRoutesFragment :
                     deleteRoute(focusedRoute)
                 } else {
                     pointAnnotation.getData()?.asString?.let { pointId ->
-                        viewModel.deletePoint(pointId)
+                        viewModelPrivate.deletePoint(pointId)
                         pointAnnotationManager.delete(pointAnnotation)
 
                         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
@@ -1309,7 +1309,7 @@ class PrivateRoutesFragment :
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        viewModel.publishRoute(route.routeId)
+                        viewModelPrivate.publishRoute(route.routeId)
                         routePublishButton.visibility = View.GONE
                     }
                 } else {
@@ -1352,7 +1352,7 @@ class PrivateRoutesFragment :
 
     private fun deleteRoute(route: RouteModel) {
         resetCurrentRoute()
-        viewModel.deleteRoute(route)
+        viewModelPrivate.deleteRoute(route)
     }
 
     private fun eraseCameraToPoint(x: Double, y: Double) {

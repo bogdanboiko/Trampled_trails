@@ -6,7 +6,7 @@ import com.example.gh_coursework.ui.private_image_details.ImageDetailsViewModel
 import com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogViewModel
 import com.example.gh_coursework.ui.private_point.PointViewModel
 import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogViewModel
-import com.example.gh_coursework.ui.private_route.RouteViewModel
+import com.example.gh_coursework.ui.private_route.PrivateRouteViewModel
 import com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogViewModel
 import com.example.gh_coursework.ui.public_route.PublicRouteViewModel
 import com.example.gh_coursework.ui.route_details.RouteDetailsViewModel
@@ -21,7 +21,7 @@ val viewModelModule = module {
     }
 
     viewModel {
-        RouteViewModel(get(), get(), get(), get(), get(), get())
+        PrivateRouteViewModel(get(), get(), get(), get(), get(), get())
     }
 
     viewModel { parameters ->
