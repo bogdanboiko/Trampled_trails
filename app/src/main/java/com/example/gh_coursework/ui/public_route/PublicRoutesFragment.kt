@@ -2,13 +2,9 @@ package com.example.gh_coursework.ui.public_route
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.content.res.ColorStateList
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,8 +13,6 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.net.toUri
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -74,10 +68,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
-import java.util.*
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PublicRoutesFragment :
@@ -815,24 +805,21 @@ class PublicRoutesFragment :
 
             routeDetailsAddToFavouriteButton.setOnClickListener {
                 if (isRouteFavourite) {
-                    Log.e("", "remove")
                     viewModelPublic.removeRouteFromFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
                     routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
                     isRouteFavourite = false
                 } else {
-                    Log.e("", "add")
                     viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
-                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow)
+                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
                     isRouteFavourite = true
                 }
-                Log.e("isFav", isRouteFavourite.toString())
             }
 
             if (isUsersRoute != null) {
                 routeDetailsArchiveButton.visibility = View.VISIBLE
 
                 routeDetailsArchiveButton.setOnClickListener {
-                    viewModelPublic.archiveRoute(publicRoute.routeId)
+                    viewModelPublic.changeRouteAccess(publicRoute.routeId)
                     routeDetailsArchiveButton.visibility = View.GONE
                 }
             }

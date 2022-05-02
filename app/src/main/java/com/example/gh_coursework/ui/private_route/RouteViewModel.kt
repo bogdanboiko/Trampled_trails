@@ -3,7 +3,7 @@ package com.example.gh_coursework.ui.private_route
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
-import com.example.gh_coursework.domain.usecase.public.MakePrivateRoutePublicUseCase
+import com.example.gh_coursework.domain.usecase.public.ChangeRouteAccessUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.AddRouteUseCase
 import com.example.gh_coursework.domain.usecase.route_preview.DeleteRouteUseCase
@@ -25,7 +25,7 @@ class RouteViewModel(
     private val getRoutePointsListUseCase: GetRoutePointsListUseCase,
     private val deletePointUseCase: DeletePointUseCase,
     private val deleteRouteUseCase: DeleteRouteUseCase,
-    private val makePrivateRoutePublicUseCase: MakePrivateRoutePublicUseCase
+    private val changeRouteAccessUseCase: ChangeRouteAccessUseCase
 ) : ViewModel() {
 
     val routes = getRoutesListUseCase.invoke()
@@ -60,7 +60,7 @@ class RouteViewModel(
 
     fun publishRoute(routeId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            makePrivateRoutePublicUseCase.invoke(routeId)
+            changeRouteAccessUseCase.invoke(routeId, true)
         }
     }
 }

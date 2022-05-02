@@ -71,6 +71,5 @@ interface TravelRepository {
     fun getUserRoutes(userId: String): Flow<List<PublicRouteDomain>>
     fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>
 
-    suspend fun makePrivateRoutePublic(routeId: String)
-    suspend fun makePublicRoutePrivate(routeId: String)
+    suspend fun changeRouteAccess(routeId: String, isPublic: Boolean)
 }

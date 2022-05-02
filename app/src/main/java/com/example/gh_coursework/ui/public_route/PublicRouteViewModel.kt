@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
-
 class PublicRouteViewModel(
     private val query: Query,
     private val getAllFavouritesUseCase: GetAllFavouritesUseCase,
@@ -26,7 +25,7 @@ class PublicRouteViewModel(
     private val removeRouteFromFavouritesUseCase: RemoveRouteFromFavouritesUseCase,
     private val fetchRoutePointsUseCase: FetchRoutePointsFromRemoteUseCase,
     private val getPublicRouteListUseCase: GetPublicRouteListUseCase,
-    private val makePublicRoutePrivateUseCase: MakePublicRoutePrivateUseCase
+    private val changeRouteAccessUseCase: ChangeRouteAccessUseCase
 ) : ViewModel() {
 
     val favourites = getAllFavouritesUseCase.invoke()
@@ -57,9 +56,9 @@ class PublicRouteViewModel(
         return getPublicRouteListUseCase.invoke().map { it.map(::mapPublicRouteDomainToModel) }
     }
 
-    fun archiveRoute(routeId: String) {
+    fun changeRouteAccess(routeId: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            makePublicRoutePrivateUseCase.invoke(routeId)
+            changeRouteAccessUseCase.invoke(routeId, false)
         }
     }
 }

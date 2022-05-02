@@ -191,13 +191,8 @@ class TravelRepositoryImpl(
         remoteDataSrcImpl.savePointImages(imageList, pointId)
     }
 
-    override suspend fun makePrivateRoutePublic(routeId: String) {
-        remoteDataSrcImpl.makePrivateRoutePublic(routeId)
-        localDataSrcIml.makePrivateRoutePublic(routeId)
-    }
-
-    override suspend fun makePublicRoutePrivate(routeId: String) {
-        remoteDataSrcImpl.makePublicRoutePrivate(routeId)
-        localDataSrcIml.makePublicRoutePrivate(routeId)
+    override suspend fun changeRouteAccess(routeId: String, isPublic: Boolean) {
+        remoteDataSrcImpl.changeRouteAccess(routeId, isPublic)
+        localDataSrcIml.changeRouteAccess(routeId, isPublic)
     }
 }

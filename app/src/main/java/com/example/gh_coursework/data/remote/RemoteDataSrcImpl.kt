@@ -272,11 +272,7 @@ class RemoteDataSrcImpl(
         emit(data.map(::mapPublicRouteResponseToDomain))
     }.flowOn(Dispatchers.IO)
 
-    override fun makePrivateRoutePublic(routeId: String) {
-        db.collection("routes").document(routeId).update("public", true)
-    }
-
-    override fun makePublicRoutePrivate(routeId: String) {
+    override fun changeRouteAccess(routeId: String, isPublic: Boolean) {
         val routeDocRef = db.collection("routes").document(routeId)
         val favouritesDocRef = getFavouriteRoutes(routeId)
 
