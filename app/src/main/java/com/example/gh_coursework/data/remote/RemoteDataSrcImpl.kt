@@ -317,8 +317,7 @@ class RemoteDataSrcImpl(
 
         if (userFavouriteRoute != null) {
             for (fav in userFavouriteRoute) {
-                Log.e("fav", fav.id)
-                db.collection("favourite").document(fav.id).delete()
+                db.collection("favourites").document(fav.id).delete()
                     .addOnSuccessListener {
                         Log.e("Fav deleted", " successful")
                     }
