@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -18,6 +19,7 @@ import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentHomepageBinding
+import com.example.gh_coursework.ui.homepage.data.SyncingProgressState
 import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -25,10 +27,17 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 
 interface LoginCallback {
     fun onSuccessLogin()
     fun onSuccessLogOut()
+}
+
+interface GetSyncStateCallback {
+    fun getStateSubscribeTo(): SharedFlow<SyncingProgressState>
 }
 
 class HomepageFragment : ThemeFragment(), HomepageCallback {
@@ -38,7 +47,8 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
     private lateinit var homepageAdapter: HomepageAdapter
     private lateinit var theme: MyAppTheme
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
-    private var callback: LoginCallback? = null
+    private var loginCallback: LoginCallback? = null
+    private var syncStateCallback: GetSyncStateCallback? = null
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
@@ -49,13 +59,14 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
-        callback = context as? LoginCallback
+        loginCallback = context as? LoginCallback
+        syncStateCallback = context as? GetSyncStateCallback
     }
 
     override fun onDetach() {
         super.onDetach()
 
-        callback = null
+        loginCallback = null
     }
 
     override fun onCreateView(
@@ -138,10 +149,25 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
         if (result.resultCode == ComponentActivity.RESULT_OK) {
             firebaseUser = FirebaseAuth.getInstance().currentUser
             configHomepage()
-            callback?.onSuccessLogin()
+
+            lifecycleScope.launch {
+                syncStateCallback?.getStateSubscribeTo()?.collect { state ->
+                    when(state) {
+                        is SyncingProgressState.Loading -> switchSpinnerVisibility(View.VISIBLE)
+                        is SyncingProgressState.FinishedSync -> switchSpinnerVisibility(View.GONE)
+                        else -> switchSpinnerVisibility(View.GONE)
+                    }
+                }
+            }
+            loginCallback?.onSuccessLogin()
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }
+    }
+
+    private fun switchSpinnerVisibility(visibility: Int) {
+        binding.dataSyncProgressBar.visibility = visibility
+        binding.loadBackground.visibility = visibility
     }
 
     override fun onEditClick() {
@@ -190,7 +216,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
             val id = findNavController().currentDestination?.id
             findNavController().popBackStack(id!!, true)
             findNavController().navigate(id)
-            callback?.onSuccessLogOut()
+            loginCallback?.onSuccessLogOut()
         }
     }
 

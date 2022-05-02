@@ -1,12 +1,17 @@
 package com.example.gh_coursework
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.deleted.*
 import com.example.gh_coursework.domain.usecase.point_preview.GetAllPointsUseCase
 import com.example.gh_coursework.domain.usecase.public.*
 import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
+import com.example.gh_coursework.ui.homepage.data.SyncingProgressState
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -30,6 +35,8 @@ class ActivityViewModel(
 
     private val deletedRoutes = getDeletedRoutesUseCase.invoke()
     private val deletedPoints = getDeletedPointsUseCase.invoke()
+    private val _syncProgress = MutableSharedFlow<SyncingProgressState>(1)
+    val syncProgress: SharedFlow<SyncingProgressState> = _syncProgress
 
     fun deleteAll() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -39,6 +46,7 @@ class ActivityViewModel(
 
     fun syncDataWithFirebase(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
+            _syncProgress.emit(SyncingProgressState.Loading)
             deleteRemotePoints()
             deleteRemoteRoutes()
             clearDeletedPointsTable()
@@ -47,17 +55,7 @@ class ActivityViewModel(
             uploadPoints(userId)
             fetchRoutes(userId)
             fetchPoints(userId)
-        }
-    }
-
-    fun uploadDataToFirebase(userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            deleteRemotePoints()
-            deleteRemoteRoutes()
-            clearDeletedPointsTable()
-            clearDeletedRoutesTable()
-            uploadRoute(userId)
-            uploadPoints(userId)
+            _syncProgress.emit(SyncingProgressState.FinishedSync)
         }
     }
 

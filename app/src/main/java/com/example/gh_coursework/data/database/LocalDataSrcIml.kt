@@ -1,5 +1,6 @@
 package com.example.gh_coursework.data.database
 
+import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.PointDetailsEntity
@@ -254,6 +255,7 @@ class LocalDataSrcIml(
     ) {
         routeDao.insertRoute(mapPublicRouteDomainToEntity(route))
         imageDao.deleteAllRouteLocalStoredImages(route.routeId)
+        Log.e("e", "route fetched")
         addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it, true) })
         addRouteTagsList(route.tagsList.map {
             RouteTagsDomain(
