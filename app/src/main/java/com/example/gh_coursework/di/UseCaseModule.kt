@@ -170,8 +170,16 @@ val pointUseCasesModule = module {
     }
 
     //Public
+    single<AddRouteToFavouritesUseCase> {
+        AddRouteToFavouritesUseCaseImpl(get())
+    }
+
     single<FetchRoutePointsFromRemoteUseCase> {
         FetchRoutePointsFromRemoteUseCaseImpl(get())
+    }
+
+    single<GetAllFavouritesUseCase> {
+        GetAllFavouritesUseCaseImpl(get())
     }
 
     single<GetUserPointsListUseCase> {
@@ -184,6 +192,14 @@ val pointUseCasesModule = module {
 
     single<MakePrivateRoutePublicUseCase> {
         MakePrivateRoutePublicUseCaseImpl(get())
+    }
+
+    single<MakePublicRoutePrivateUseCase> {
+        MakePublicRoutePrivateUseCaseImpl(get())
+    }
+
+    single<RemoveRouteFromFavouritesUseCase> {
+        RemoveRouteFromFavouritesUseCaseImpl(get())
     }
 
     single<SavePublicPointsToPrivateUseCase> {
