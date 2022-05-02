@@ -2,6 +2,7 @@ package com.example.gh_coursework.data
 
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
+import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
@@ -168,6 +169,18 @@ class TravelRepositoryImpl(
 
     override fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>> {
         return remoteDataSrcImpl.fetchRoutePoints(routeId)
+    }
+
+    override fun getAllFavourites(): Flow<List<PublicFavouriteEntity>> {
+        return remoteDataSrcImpl.getAllFavouriteRoutes()
+    }
+
+    override suspend fun addRouteToFavourites(routeId: String, userId: String) {
+        remoteDataSrcImpl.addRouteToFavourites(routeId, userId)
+    }
+
+    override suspend fun removeRouteFromFavourites(routeId: String, userId: String) {
+        remoteDataSrcImpl.removeRouteFromFavourites(routeId, userId)
     }
 
     override suspend fun saveRouteImagesToFirebase(imageList: List<RouteImageDomain>, routeId: String) {

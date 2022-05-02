@@ -21,15 +21,33 @@ import kotlinx.coroutines.launch
 
 class PublicRouteViewModel(
     private val query: Query,
+    private val getAllFavouritesUseCase: GetAllFavouritesUseCase,
+    private val addRouteToFavouritesUseCase: AddRouteToFavouritesUseCase,
+    private val removeRouteFromFavouritesUseCase: RemoveRouteFromFavouritesUseCase,
     private val fetchRoutePointsUseCase: FetchRoutePointsFromRemoteUseCase,
     private val getPublicRouteListUseCase: GetPublicRouteListUseCase,
     private val makePublicRoutePrivateUseCase: MakePublicRoutePrivateUseCase
 ) : ViewModel() {
+
+    val favourites = getAllFavouritesUseCase.invoke()
+
     fun fetchRoutes(tagsFilter: List<String>) = Pager(
     PagingConfig(pageSize = 10)
     ) {
         FirestorePagingSource(query, tagsFilter)
     }.flow.cachedIn(viewModelScope)
+
+    fun addRouteToFavourites(routeId: String, userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            addRouteToFavouritesUseCase.invoke(routeId, userId)
+        }
+    }
+
+    fun removeRouteFromFavourites(routeId: String, userId: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            removeRouteFromFavouritesUseCase.invoke(routeId, userId)
+        }
+    }
 
     fun fetchRoutePoints(routeId: String): Flow<List<RoutePointModel>> {
         return fetchRoutePointsUseCase.invoke(routeId).map { it.map(::mapRoutePointDomainToModel) }

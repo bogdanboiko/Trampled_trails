@@ -68,6 +68,11 @@ interface TravelDatasource {
         suspend fun saveRouteImages(imageList: List<RouteImageDomain>, routeId: String)
 
         fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>>
+        fun getPublicRoutes(): Flow<List<PublicRouteDomain>>
+
+        fun getAllFavouriteRoutes(): Flow<List<PublicFavouriteEntity>>
+        suspend fun addRouteToFavourites(routeId: String, userId: String)
+        suspend fun removeRouteFromFavourites(routeId: String, userId: String)
 
         fun getUserRoutes(userId: String): Flow<List<PublicRouteDomain>>
         fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>

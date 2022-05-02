@@ -4,24 +4,24 @@ import android.net.Uri
 import android.util.Log
 import androidx.core.net.toFile
 import com.example.gh_coursework.data.datasource.TravelDatasource
+import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.data.remote.entity.PublicPointResponseEntity
 import com.example.gh_coursework.data.remote.entity.PublicRouteResponseEntity
 import com.example.gh_coursework.data.remote.mapper.mapPointDomainToPublicPointEntity
 import com.example.gh_coursework.data.remote.mapper.mapPublicPointResponseEntityToPublicDomain
 import com.example.gh_coursework.data.remote.mapper.mapPublicRouteResponseToDomain
 import com.example.gh_coursework.data.remote.mapper.mapRouteDomainToPublicRouteEntity
-import com.example.gh_coursework.domain.entity.PointDomain
-import com.example.gh_coursework.domain.entity.PointImageDomain
-import com.example.gh_coursework.domain.entity.RouteDomain
-import com.example.gh_coursework.domain.entity.RouteImageDomain
+import com.example.gh_coursework.domain.entity.*
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import java.util.*
@@ -67,14 +67,23 @@ class RemoteDataSrcImpl(
         route: RouteDomain,
         currentUser: String
     ) {
+
         val routeDocRef = db.collection("routes").document(route.routeId)
-        routeDocRef.set(
-            mapRouteDomainToPublicRouteEntity(
+        val favouritesDocRef = getFavouriteRoutes(route.routeId)
+
+        db.runBatch { batch ->
+            batch.set(routeDocRef, mapRouteDomainToPublicRouteEntity(
                 route,
                 route.imageList.filter { it.isUploaded }.map { it.image },
                 currentUser
-            )
-        )
+            ))
+
+            if (!route.isPublic && favouritesDocRef.isNotEmpty()) {
+                for (docRef in favouritesDocRef) {
+                    batch.delete(docRef)
+                }
+            }
+        }
 
         saveRouteImages(route.imageList.filter { !it.isUploaded }, route.routeId)
     }
@@ -193,6 +202,27 @@ class RemoteDataSrcImpl(
         emit(data.map(::mapPublicPointResponseEntityToPublicDomain))
     }.flowOn(Dispatchers.IO)
 
+    override fun getPublicRoutes() = flow {
+        val routes = Tasks.await(db.collection("routes").whereEqualTo("public", true).get())
+        val data = mutableListOf<PublicRouteResponseEntity>()
+
+        routes.documents.forEach {
+            data.add(
+                PublicRouteResponseEntity(
+                    it.id,
+                    it.getString("name")!!,
+                    it.getString("description")!!,
+                    (it.get("tagsList") ?: emptyList<String>()) as List<String>,
+                    (it.get("imageList") ?: emptyList<String>()) as List<String>,
+                    it.getString("userId")!!,
+                    it.getBoolean("public")!!
+                )
+            )
+        }
+
+        emit(data.map(::mapPublicRouteResponseToDomain))
+    }.flowOn(Dispatchers.IO)
+
     override fun getUserPoints(userId: String) = flow {
         val points = Tasks.await(db.collection("points").whereEqualTo("userId", userId).get())
 
@@ -233,6 +263,7 @@ class RemoteDataSrcImpl(
                     it.getString("description")!!,
                     (it.get("tagsList") ?: emptyList<String>()) as List<String>,
                     (it.get("imageList") ?: emptyList<String>()) as List<String>,
+                    it.getString("userId")!!,
                     it.getBoolean("public")!!
                 )
             )
@@ -243,5 +274,73 @@ class RemoteDataSrcImpl(
 
     override fun makePrivateRoutePublic(routeId: String) {
         db.collection("routes").document(routeId).update("public", true)
+    }
+
+    override fun makePublicRoutePrivate(routeId: String) {
+        val routeDocRef = db.collection("routes").document(routeId)
+        val favouritesDocRef = getFavouriteRoutes(routeId)
+
+        db.runBatch { batch ->
+            batch.update(routeDocRef, "public", false)
+
+            if (favouritesDocRef.isNotEmpty()) {
+                for (docRef in favouritesDocRef) {
+                    batch.delete(docRef)
+                }
+            }
+        }
+    }
+
+    override fun getAllFavouriteRoutes() = flow {
+        val favourites = Tasks.await(db.collection("favourites").get())
+        val data = mutableListOf<PublicFavouriteEntity>()
+
+        favourites.documents.forEach {
+            data.add(
+                PublicFavouriteEntity(it.getString("routeId")!!, it.getString("userId")!!)
+            )
+        }
+
+        emit(data)
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun addRouteToFavourites(routeId: String, userId: String) {
+        db.collection("favourites").document().set(PublicFavouriteEntity(routeId, userId))
+    }
+
+    override suspend fun removeRouteFromFavourites(routeId: String, userId: String) {
+        val userFavouriteRoute = Tasks.await(
+            db.collection("favourites")
+                .whereEqualTo("routeId", routeId)
+                .whereEqualTo("userId", userId)
+                .get())
+
+        if (userFavouriteRoute != null) {
+            for (fav in userFavouriteRoute) {
+                Log.e("fav", fav.id)
+                db.collection("favourite").document(fav.id).delete()
+                    .addOnSuccessListener {
+                        Log.e("Fav deleted", " successful")
+                    }
+                    .addOnFailureListener {
+                        Log.e("Fav deleted", " $it")
+                    }
+            }
+        }
+    }
+
+    private fun getFavouriteRoutes(routeId: String): List<DocumentReference> {
+        val routes = Tasks.await(
+            db.collection("favourites")
+                .whereEqualTo("routeId", routeId)
+                .get()
+        )
+        val favourites = mutableListOf<DocumentReference>()
+
+        for (favourite in routes) {
+            favourites.add(db.collection("favourites").document(favourite.id))
+        }
+
+        return favourites
     }
 }

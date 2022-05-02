@@ -1,5 +1,6 @@
 package com.example.gh_coursework.domain.repository
 
+import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
 
@@ -62,6 +63,10 @@ interface TravelRepository {
     suspend fun savePointImagesToFirebase(imageList: List<PointImageDomain>, pointId: String)
 
     fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>>
+
+    fun getAllFavourites(): Flow<List<PublicFavouriteEntity>>
+    suspend fun addRouteToFavourites(routeId: String, userId: String)
+    suspend fun removeRouteFromFavourites(routeId: String, userId: String)
 
     fun getUserRoutes(userId: String): Flow<List<PublicRouteDomain>>
     fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>

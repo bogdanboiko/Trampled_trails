@@ -8,6 +8,7 @@ import android.content.res.ColorStateList
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -27,12 +28,9 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
+import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
-import com.example.gh_coursework.ui.helper.InternetCheckCallback
-import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
-import com.example.gh_coursework.ui.helper.createAnnotationPoint
-import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
-import com.example.gh_coursework.ui.private_route.model.RouteModel
+import com.example.gh_coursework.ui.helper.*
 import com.example.gh_coursework.ui.public_route.adapter.*
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
@@ -73,6 +71,7 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.io.File
@@ -105,7 +104,9 @@ class PublicRoutesFragment :
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
     private var tagsFilter = emptyList<String>()
-    private var savedPublicRoutesList = emptyList<RouteModel>()
+    private var favourites = emptyList<PublicFavouriteEntity>()
+    private var isRouteFavourite = false
+    private var savedPublicRoutesList = emptyList<PublicRouteModel>()
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private lateinit var focusedPublicRoute: PublicRouteModel
 
@@ -352,6 +353,8 @@ class PublicRoutesFragment :
                 viewModelPublic.fetchPublicRouteList().collect {
                     savedPublicRoutesList = it
                 }
+
+                favourites = viewModelPublic.favourites.first()
             }
         } else {
             Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
@@ -790,19 +793,22 @@ class PublicRoutesFragment :
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun prepareRouteDetailsDialog(
         publicRoute: PublicRouteModel
     ) {
         binding.bottomSheetDialogRouteDetails.apply {
-            val savedRoute = savedPublicRoutesList.find {
+            val isFavourite = favourites.find {
                 return@find it.routeId == publicRoute.routeId
             }
             val isUsersRoute = savedPublicRoutesList.find {
                 return@find it.userId == getUserIdCallback?.getUserId().toString()
             }
 
-            if (savedRoute == null) {
-                routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
+            isRouteFavourite = isFavourite != null
+
+            if (isRouteFavourite) {
+                routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
             } else {
                 routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
             }
@@ -813,7 +819,7 @@ class PublicRoutesFragment :
                     viewModelPublic.removeRouteFromFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
                     routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
                     isRouteFavourite = false
-                } else if (!isRouteFavourite) {
+                } else {
                     Log.e("", "add")
                     viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
                     routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow)
