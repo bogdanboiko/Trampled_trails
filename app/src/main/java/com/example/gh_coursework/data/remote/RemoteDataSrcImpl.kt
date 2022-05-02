@@ -71,7 +71,7 @@ class RemoteDataSrcImpl(
         val routeDocRef = db.collection("routes").document(route.routeId)
         val favouritesDocRef = getFavouriteRoutes(route.routeId)
 
-        db.runBatch { batch ->
+        Tasks.await(db.runBatch { batch ->
             batch.set(routeDocRef, mapRouteDomainToPublicRouteEntity(
                 route,
                 route.imageList.filter { it.isUploaded }.map { it.image },
@@ -83,7 +83,7 @@ class RemoteDataSrcImpl(
                     batch.delete(docRef)
                 }
             }
-        }
+        })
 
         saveRouteImages(route.imageList.filter { !it.isUploaded }, route.routeId)
     }
@@ -95,14 +95,14 @@ class RemoteDataSrcImpl(
         points.forEachIndexed { index, point ->
             val pointDocRef =
                 db.collection("points").document(point.pointId)
-            pointDocRef.set(
+            Tasks.await(pointDocRef.set(
                 mapPointDomainToPublicPointEntity(
                     point,
                     point.imageList.filter { it.isUploaded }.map { it.image },
                     currentUser,
                     index
                 )
-            )
+            ))
 
             savePointImages(point.imageList.filter { !it.isUploaded }, point.pointId)
         }
@@ -146,7 +146,6 @@ class RemoteDataSrcImpl(
         val routeImagesAddTasks = mutableListOf<StorageTask<UploadTask.TaskSnapshot>>()
         val routeImagesGetUriTasks = mutableListOf<Task<Uri>>()
         val routeDocRef = db.collection("routes").document(routeId)
-
         imageList.forEach {
             if (Uri.parse(it.image).toFile().exists()) {
                 val generatedImageId = UUID.randomUUID().toString()

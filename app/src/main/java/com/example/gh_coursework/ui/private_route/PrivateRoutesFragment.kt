@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -878,7 +879,7 @@ class PrivateRoutesFragment :
         }
 
         routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModelPrivate.routes.collect { routes ->
+            viewModelPrivate.routes.distinctUntilChanged().collect { routes ->
                 var filteredRoutes = mutableListOf<RouteModel>()
 
                 if (filteredTags.isNotEmpty()) {

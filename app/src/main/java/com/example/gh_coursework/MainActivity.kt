@@ -18,12 +18,15 @@ import com.dolatkia.animatedThemeManager.ThemeActivity
 import com.example.gh_coursework.databinding.ActivityMainBinding
 import com.example.gh_coursework.ui.helper.GetUserIdCallback
 import com.example.gh_coursework.ui.helper.InternetCheckCallback
+import com.example.gh_coursework.ui.homepage.GetSyncStateCallback
 import com.example.gh_coursework.ui.homepage.LoginCallback
+import com.example.gh_coursework.ui.homepage.data.SyncingProgressState
 import com.example.gh_coursework.ui.themes.DarkTheme
 import com.example.gh_coursework.ui.themes.LightTheme
 import com.google.firebase.auth.FirebaseAuth
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -32,7 +35,8 @@ class MainActivity :
     PermissionsListener,
     LoginCallback,
     InternetCheckCallback,
-    GetUserIdCallback {
+    GetUserIdCallback,
+    GetSyncStateCallback {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: ActivityViewModel by viewModel()
@@ -52,32 +56,17 @@ class MainActivity :
         syncData()
     }
 
-    override fun onPause() {
-        uploadData()
-        super.onPause()
-    }
-
     override fun onSuccessLogin() {
         syncData()
     }
 
     override fun onSuccessLogOut() {
-        lifecycleScope.launch {
-            syncData()
-        }.invokeOnCompletion {
-            viewModel.deleteAll()
-        }
+        viewModel.deleteAll()
     }
 
     private fun syncData() {
         if (isInternetAvailable()) {
             viewModel.syncDataWithFirebase(getUserId())
-        }
-    }
-
-    private fun uploadData() {
-        if (isInternetAvailable()) {
-            viewModel.uploadDataToFirebase(getUserId())
         }
     }
 
@@ -172,6 +161,10 @@ class MainActivity :
 
     override fun syncTheme(appTheme: AppTheme) {
         // useless
+    }
+
+    override fun getStateSubscribeTo(): SharedFlow<SyncingProgressState> {
+        return viewModel.syncProgress
     }
 }
 
