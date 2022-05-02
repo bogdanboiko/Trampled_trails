@@ -416,7 +416,7 @@ class PrivateRoutesFragment :
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogRouteDetails.routeDetailsEditButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogRouteDetails.routePublishButton.imageTintList =
+            bottomSheetDialogRouteDetails.btnChangeRouteAccess.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
                 theme.colorSecondaryVariant(requireContext())
@@ -1275,6 +1275,7 @@ class PrivateRoutesFragment :
         route: RouteModel
     ) {
         val imageList = mutableListOf<ImageModel>()
+        var isPublic = route.isPublic
 
         binding.bottomSheetDialogRouteDetails.apply {
             if (route.name?.isEmpty() == true && route.description?.isEmpty() == true) {
@@ -1293,31 +1294,36 @@ class PrivateRoutesFragment :
                 )
             }
 
-            if (route.isPublic) {
-                routePublishButton.visibility = View.GONE
+            if (isPublic) {
+                btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
             } else {
-                routePublishButton.visibility = View.VISIBLE
+                btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
             }
 
-            routePublishButton.setOnClickListener {
-                val user = FirebaseAuth.getInstance().currentUser
-                if (user != null) {
-                    if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+            btnChangeRouteAccess.setOnClickListener {
+                if (route.isPublic) {
+                    viewModelPrivate.changeRouteAccess(route.routeId)
+                    isPublic = false
+                } else {
+                    val user = FirebaseAuth.getInstance().currentUser
+                    if (user != null) {
+                        if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+                            Toast.makeText(
+                                context,
+                                "Caption or details of publishing route are empty! Fill data before publishing",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            viewModelPrivate.changeRouteAccess(route.routeId)
+                            isPublic = true
+                        }
+                    } else {
                         Toast.makeText(
                             context,
-                            "Caption or details of publishing route are empty! Fill data before publishing",
+                            "Sign in pressing the homepage button before publishing route!",
                             Toast.LENGTH_SHORT
                         ).show()
-                    } else {
-                        viewModelPrivate.publishRoute(route.routeId)
-                        routePublishButton.visibility = View.GONE
                     }
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Sign in pressing the homepage button before publishing route!",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
 

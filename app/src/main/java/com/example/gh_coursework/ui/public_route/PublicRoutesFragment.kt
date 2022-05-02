@@ -312,9 +312,6 @@ class PublicRoutesFragment :
                 )
             )
 
-            bottomSheetDialogRouteDetails.routeDetailsArchiveButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-
             bottomSheetDialogPointDetails.pointDetailsAddToFavouriteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
         }
@@ -791,9 +788,6 @@ class PublicRoutesFragment :
             val isFavourite = favourites.find {
                 return@find it.routeId == publicRoute.routeId
             }
-            val isUsersRoute = savedPublicRoutesList.find {
-                return@find it.userId == getUserIdCallback?.getUserId().toString()
-            }
 
             isRouteFavourite = isFavourite != null
 
@@ -812,15 +806,6 @@ class PublicRoutesFragment :
                     viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
                     routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
                     isRouteFavourite = true
-                }
-            }
-
-            if (isUsersRoute != null) {
-                routeDetailsArchiveButton.visibility = View.VISIBLE
-
-                routeDetailsArchiveButton.setOnClickListener {
-                    viewModelPublic.changeRouteAccess(publicRoute.routeId)
-                    routeDetailsArchiveButton.visibility = View.GONE
                 }
             }
 

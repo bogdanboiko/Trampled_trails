@@ -24,8 +24,7 @@ class PublicRouteViewModel(
     private val addRouteToFavouritesUseCase: AddRouteToFavouritesUseCase,
     private val removeRouteFromFavouritesUseCase: RemoveRouteFromFavouritesUseCase,
     private val fetchRoutePointsUseCase: FetchRoutePointsFromRemoteUseCase,
-    private val getPublicRouteListUseCase: GetPublicRouteListUseCase,
-    private val changeRouteAccessUseCase: ChangeRouteAccessUseCase
+    private val getPublicRouteListUseCase: GetPublicRouteListUseCase
 ) : ViewModel() {
 
     val favourites = getAllFavouritesUseCase.invoke()
@@ -54,11 +53,5 @@ class PublicRouteViewModel(
 
     fun fetchPublicRouteList(): Flow<List<PublicRouteModel>>  {
         return getPublicRouteListUseCase.invoke().map { it.map(::mapPublicRouteDomainToModel) }
-    }
-
-    fun changeRouteAccess(routeId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            changeRouteAccessUseCase.invoke(routeId, false)
-        }
     }
 }
