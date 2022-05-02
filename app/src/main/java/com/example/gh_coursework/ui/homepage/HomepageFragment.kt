@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -49,6 +50,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
     private var firebaseUser: FirebaseUser? = FirebaseAuth.getInstance().currentUser
     private var loginCallback: LoginCallback? = null
     private var syncStateCallback: GetSyncStateCallback? = null
+    private var syncState: SyncingProgressState = SyncingProgressState.FinishedSync
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
@@ -82,9 +84,19 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setUpRecycler()
         configHomepage()
+
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+               when (syncState) {
+                   is SyncingProgressState.FinishedSync -> findNavController().popBackStack()
+                   else -> return
+               }
+            }
+        }
+
+        activity?.onBackPressedDispatcher?.addCallback(viewLifecycleOwner, callback)
     }
 
     private fun setUpRecycler() {
@@ -152,10 +164,11 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
             lifecycleScope.launch {
                 syncStateCallback?.getStateSubscribeTo()?.collect { state ->
+                    syncState = state
                     when(state) {
-                        is SyncingProgressState.Loading -> switchSpinnerVisibility(View.VISIBLE)
+                        is SyncingProgressState.Loading -> {switchSpinnerVisibility(View.VISIBLE)
+                            }
                         is SyncingProgressState.FinishedSync -> switchSpinnerVisibility(View.GONE)
-                        else -> switchSpinnerVisibility(View.GONE)
                     }
                 }
             }
