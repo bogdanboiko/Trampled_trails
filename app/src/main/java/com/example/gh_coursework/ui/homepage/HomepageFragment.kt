@@ -226,9 +226,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
     override fun onLogOutClick() {
         AuthUI.getInstance().signOut(requireContext()).addOnSuccessListener {
-            val id = findNavController().currentDestination?.id
-            findNavController().popBackStack(id!!, true)
-            findNavController().navigate(id)
+            findNavController().popBackStack()
             loginCallback?.onSuccessLogOut()
         }
     }
