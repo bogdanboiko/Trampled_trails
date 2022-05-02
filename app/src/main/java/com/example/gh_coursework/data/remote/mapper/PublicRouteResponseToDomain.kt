@@ -5,6 +5,6 @@ import com.example.gh_coursework.domain.entity.PublicRouteDomain
 
 fun mapPublicRouteResponseToDomain(publicRouteResponseEntity: PublicRouteResponseEntity): PublicRouteDomain  {
     with(publicRouteResponseEntity) {
-        return PublicRouteDomain(routeId, name, description, tagsList, imageList, isPublic)
+        return PublicRouteDomain(routeId, name, description, tagsList, imageList, userId, isPublic)
     }
 }

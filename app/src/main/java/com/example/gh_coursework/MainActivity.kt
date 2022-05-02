@@ -16,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeActivity
 import com.example.gh_coursework.databinding.ActivityMainBinding
+import com.example.gh_coursework.ui.helper.GetUserIdCallback
 import com.example.gh_coursework.ui.helper.InternetCheckCallback
 import com.example.gh_coursework.ui.homepage.LoginCallback
 import com.example.gh_coursework.ui.themes.DarkTheme
@@ -30,7 +31,8 @@ class MainActivity :
     ThemeActivity(),
     PermissionsListener,
     LoginCallback,
-    InternetCheckCallback {
+    InternetCheckCallback,
+    GetUserIdCallback {
 
     private lateinit var binding: ActivityMainBinding
     private val viewModel: ActivityViewModel by viewModel()
@@ -69,23 +71,23 @@ class MainActivity :
 
     private fun syncData() {
         if (isInternetAvailable()) {
-            getUserid()?.let { viewModel.syncDataWithFirebase(it) }
+            viewModel.syncDataWithFirebase(getUserId())
         }
     }
 
     private fun uploadData() {
         if (isInternetAvailable()) {
-            getUserid()?.let { viewModel.uploadDataToFirebase(it) }
+            viewModel.uploadDataToFirebase(getUserId())
         }
     }
 
     @SuppressLint("HardwareIds")
-    private fun getUserid(): String? {
+    override fun getUserId(): String {
         return if (FirebaseAuth.getInstance().currentUser == null) {
             Settings.Secure.getString(this.contentResolver,
                 Settings.Secure.ANDROID_ID)
         } else {
-            FirebaseAuth.getInstance().currentUser?.uid
+            FirebaseAuth.getInstance().currentUser?.uid.toString()
         }
     }
 

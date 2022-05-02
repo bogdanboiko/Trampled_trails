@@ -2,11 +2,8 @@ package com.example.gh_coursework.ui.public_route
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
 import android.content.res.ColorStateList
 import android.location.Location
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,8 +13,6 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.graphics.drawable.toBitmap
-import androidx.core.net.toUri
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -27,12 +22,9 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
+import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
-import com.example.gh_coursework.ui.helper.InternetCheckCallback
-import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
-import com.example.gh_coursework.ui.helper.createAnnotationPoint
-import com.example.gh_coursework.ui.helper.createFlagAnnotationPoint
-import com.example.gh_coursework.ui.private_route.model.RouteModel
+import com.example.gh_coursework.ui.helper.*
 import com.example.gh_coursework.ui.public_route.adapter.*
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
@@ -73,12 +65,9 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
-import java.util.*
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PublicRoutesFragment :
@@ -99,12 +88,15 @@ class PublicRoutesFragment :
     private val viewModelPublic: PublicRouteViewModel by viewModel()
     private val arguments by navArgs<PublicRoutesFragmentArgs>()
     private var internetCheckCallback: InternetCheckCallback? = null
+    private var getUserIdCallback: GetUserIdCallback? = null
 
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
     private var tagsFilter = emptyList<String>()
-    private var savedPublicRoutesList = emptyList<RouteModel>()
+    private var favourites = emptyList<PublicFavouriteEntity>()
+    private var isRouteFavourite = false
+    private var savedPublicRoutesList = emptyList<PublicRouteModel>()
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private lateinit var focusedPublicRoute: PublicRouteModel
 
@@ -195,12 +187,14 @@ class PublicRoutesFragment :
         super.onAttach(context)
 
         internetCheckCallback = context as? InternetCheckCallback
+        getUserIdCallback = context as? GetUserIdCallback
     }
 
     override fun onDetach() {
         super.onDetach()
 
         internetCheckCallback = null
+        getUserIdCallback = null
     }
 
     override fun onCreateView(
@@ -230,7 +224,7 @@ class PublicRoutesFragment :
 
         fetchRoutes()
 
-        setFragmentResultListener(PublicRouteFilterByTagFragment.REQUEST_KEY) { key, bundle ->
+        setFragmentResultListener(PublicRouteFilterByTagFragment.REQUEST_KEY) { _, bundle ->
             val tagArray = bundle.getStringArray("tags")
             if (tagArray != null) {
                 tagsFilter = tagArray.toList()
@@ -318,9 +312,6 @@ class PublicRoutesFragment :
                 )
             )
 
-            bottomSheetDialogRouteDetails.routeDetailsAddToFavouriteButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-
             bottomSheetDialogPointDetails.pointDetailsAddToFavouriteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
         }
@@ -349,6 +340,8 @@ class PublicRoutesFragment :
                 viewModelPublic.fetchPublicRouteList().collect {
                     savedPublicRoutesList = it
                 }
+
+                favourites = viewModelPublic.favourites.first()
             }
         } else {
             Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
@@ -787,18 +780,33 @@ class PublicRoutesFragment :
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun prepareRouteDetailsDialog(
         publicRoute: PublicRouteModel
     ) {
         binding.bottomSheetDialogRouteDetails.apply {
-            val savedRoute = savedPublicRoutesList.find {
+            val isFavourite = favourites.find {
                 return@find it.routeId == publicRoute.routeId
             }
 
-            if (savedRoute == null) {
-                routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
+            isRouteFavourite = isFavourite != null
+
+            if (isRouteFavourite) {
+                routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
             } else {
-                routeDetailsAddToFavouriteButton.visibility = View.INVISIBLE
+                routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
+            }
+
+            routeDetailsAddToFavouriteButton.setOnClickListener {
+                if (isRouteFavourite) {
+                    viewModelPublic.removeRouteFromFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
+                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
+                    isRouteFavourite = false
+                } else {
+                    viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
+                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
+                    isRouteFavourite = true
+                }
             }
 
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {
@@ -830,47 +838,7 @@ class PublicRoutesFragment :
             }
 
             routeImagesPreviewAdapter.submitList(publicRoute.imageList)
-
-            routeDetailsAddToFavouriteButton.setOnClickListener {
-                if (internetCheckCallback?.isInternetAvailable() == true) {
-                    //add to favourite
-                } else {
-                    Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
-                }
-            }
         }
-    }
-
-    private fun createRouteImageModel(imageUrl: URL): String {
-        imageUrl.openStream().use {
-            val image = Drawable.createFromStream(it, imageUrl.ref)
-
-            return saveToCacheAndGetUri(
-                image.toBitmap(),
-                Date().time.toString()
-            ).toString()
-        }
-    }
-
-    private fun saveToCacheAndGetUri(bitmap: Bitmap, name: String): Uri {
-        val file = saveImgToCache(bitmap, name)
-        return getImageUri(file, name)
-    }
-
-    private fun saveImgToCache(bitmap: Bitmap, name: String): File {
-        val fileName: String = name
-        val cachePath = File(context?.cacheDir, "/images")
-        cachePath.mkdirs()
-        FileOutputStream("$cachePath/$fileName.jpeg").use {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-        }
-
-        return cachePath
-    }
-
-    private fun getImageUri(fileDir: File, name: String): Uri {
-        val newFile = File(fileDir, "$name.jpeg")
-        return newFile.toUri()
     }
 
     private fun eraseCameraToPoint(x: Double, y: Double) {

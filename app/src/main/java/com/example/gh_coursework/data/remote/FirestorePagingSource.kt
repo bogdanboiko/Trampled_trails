@@ -64,9 +64,9 @@ class FirestorePagingSource(
                             it.id,
                             it.getString("name")!!,
                             it.getString("description")!!,
-                            0.0,
                             (it.get("tagsList") ?: emptyList<String>()) as List<String>,
                             (it.get("imageList") ?: emptyList<String>()) as List<String>,
+                            it.getString("userId")!!,
                             true
                         )
                     )

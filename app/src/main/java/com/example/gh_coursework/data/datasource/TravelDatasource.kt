@@ -1,6 +1,7 @@
 package com.example.gh_coursework.data.datasource
 
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
+import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
 
@@ -43,14 +44,14 @@ interface TravelDatasource {
         fun getPointImages(pointId: String): Flow<List<PointImageDomain>>
         fun getRouteImages(routeId: String): Flow<List<RouteImageDomain>>
 
-        fun getPublicRoutesList(): Flow<List<RouteDomain>>
         fun getRoutesList(): Flow<List<RouteDomain>>
         fun getRouteDetails(routeId: String): Flow<RouteDomain>
         fun getRoutePointsList(routeId: String): Flow<List<PointDomain>>
         fun getRoutePointsImagesList(routeId: String): Flow<List<RoutePointsImagesDomain>>
         fun getRouteTags(): Flow<List<RouteTagDomain>>
 
-        fun makePrivateRoutePublic(routeId: String)
+        fun changeRouteAccess(routeId: String, isPublic: Boolean)
+
         suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>)
         suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain)
     }
@@ -66,10 +67,15 @@ interface TravelDatasource {
         suspend fun saveRouteImages(imageList: List<RouteImageDomain>, routeId: String)
 
         fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>>
+        fun getPublicRoutes(): Flow<List<PublicRouteDomain>>
+
+        fun getAllFavouriteRoutes(): Flow<List<PublicFavouriteEntity>>
+        suspend fun addRouteToFavourites(routeId: String, userId: String)
+        suspend fun removeRouteFromFavourites(routeId: String, userId: String)
 
         fun getUserRoutes(userId: String): Flow<List<PublicRouteDomain>>
         fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>
 
-        fun makePrivateRoutePublic(routeId: String)
+        fun changeRouteAccess(routeId: String, isPublic: Boolean)
     }
 }

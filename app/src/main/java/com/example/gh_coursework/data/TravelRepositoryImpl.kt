@@ -2,6 +2,7 @@ package com.example.gh_coursework.data
 
 import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
+import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.domain.entity.*
 import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
@@ -103,8 +104,6 @@ class TravelRepositoryImpl(
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 
-    override fun getPublicRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getPublicRoutesList()
-
     override suspend fun saveFirebaseRouteToLocal(
         route: PublicRouteDomain
     ) {
@@ -158,6 +157,8 @@ class TravelRepositoryImpl(
         return remoteDataSrcImpl.getUserPoints(userId)
     }
 
+    override fun getPublicRoutesList(): Flow<List<PublicRouteDomain>> = remoteDataSrcImpl.getPublicRoutes()
+
     override suspend fun uploadRouteToFirebase(route: RouteDomain, currentUser: String) {
         remoteDataSrcImpl.uploadRouteToFirebase(route, currentUser)
     }
@@ -170,6 +171,18 @@ class TravelRepositoryImpl(
         return remoteDataSrcImpl.fetchRoutePoints(routeId)
     }
 
+    override fun getAllFavourites(): Flow<List<PublicFavouriteEntity>> {
+        return remoteDataSrcImpl.getAllFavouriteRoutes()
+    }
+
+    override suspend fun addRouteToFavourites(routeId: String, userId: String) {
+        remoteDataSrcImpl.addRouteToFavourites(routeId, userId)
+    }
+
+    override suspend fun removeRouteFromFavourites(routeId: String, userId: String) {
+        remoteDataSrcImpl.removeRouteFromFavourites(routeId, userId)
+    }
+
     override suspend fun saveRouteImagesToFirebase(imageList: List<RouteImageDomain>, routeId: String) {
         remoteDataSrcImpl.saveRouteImages(imageList, routeId)
     }
@@ -178,8 +191,8 @@ class TravelRepositoryImpl(
         remoteDataSrcImpl.savePointImages(imageList, pointId)
     }
 
-    override suspend fun makePrivateRoutePublic(routeId: String) {
-        remoteDataSrcImpl.makePrivateRoutePublic(routeId)
-        localDataSrcIml.makePrivateRoutePublic(routeId)
+    override suspend fun changeRouteAccess(routeId: String, isPublic: Boolean) {
+        remoteDataSrcImpl.changeRouteAccess(routeId, isPublic)
+        localDataSrcIml.changeRouteAccess(routeId, isPublic)
     }
 }

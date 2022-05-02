@@ -100,7 +100,7 @@ class PrivateRoutesFragment :
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
-    private val viewModel: RouteViewModel by viewModel()
+    private val viewModelPrivate: PrivateRouteViewModel by viewModel()
     private var internetCheckCallback: InternetCheckCallback? = null
 
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
@@ -416,7 +416,7 @@ class PrivateRoutesFragment :
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogRouteDetails.routeDetailsEditButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogRouteDetails.routePublishButton.imageTintList =
+            bottomSheetDialogRouteDetails.btnChangeRouteAccess.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
             bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
                 theme.colorSecondaryVariant(requireContext())
@@ -656,7 +656,7 @@ class PrivateRoutesFragment :
             }
 
             if (route != null) {
-                viewModel.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
+                viewModelPrivate.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
             }
             creatingRouteCoordinatesList.clear()
         }
@@ -878,7 +878,7 @@ class PrivateRoutesFragment :
         }
 
         routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.routes.collect { routes ->
+            viewModelPrivate.routes.collect { routes ->
                 var filteredRoutes = mutableListOf<RouteModel>()
 
                 if (filteredTags.isNotEmpty()) {
@@ -938,7 +938,7 @@ class PrivateRoutesFragment :
         }
 
         routePointsJob = viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getRoutePointsList(route.routeId)
+            viewModelPrivate.getRoutePointsList(route.routeId)
                 .distinctUntilChanged()
                 .collect { pointsList ->
                     if (pointsList.isNotEmpty()) {
@@ -1258,7 +1258,7 @@ class PrivateRoutesFragment :
                     deleteRoute(focusedRoute)
                 } else {
                     pointAnnotation.getData()?.asString?.let { pointId ->
-                        viewModel.deletePoint(pointId)
+                        viewModelPrivate.deletePoint(pointId)
                         pointAnnotationManager.delete(pointAnnotation)
 
                         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
@@ -1275,6 +1275,7 @@ class PrivateRoutesFragment :
         route: RouteModel
     ) {
         val imageList = mutableListOf<ImageModel>()
+        var isPublic = route.isPublic
 
         binding.bottomSheetDialogRouteDetails.apply {
             if (route.name?.isEmpty() == true && route.description?.isEmpty() == true) {
@@ -1293,31 +1294,36 @@ class PrivateRoutesFragment :
                 )
             }
 
-            if (route.isPublic) {
-                routePublishButton.visibility = View.GONE
+            if (isPublic) {
+                btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
             } else {
-                routePublishButton.visibility = View.VISIBLE
+                btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
             }
 
-            routePublishButton.setOnClickListener {
-                val user = FirebaseAuth.getInstance().currentUser
-                if (user != null) {
-                    if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+            btnChangeRouteAccess.setOnClickListener {
+                if (route.isPublic) {
+                    viewModelPrivate.changeRouteAccess(route.routeId)
+                    isPublic = false
+                } else {
+                    val user = FirebaseAuth.getInstance().currentUser
+                    if (user != null) {
+                        if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+                            Toast.makeText(
+                                context,
+                                "Caption or details of publishing route are empty! Fill data before publishing",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            viewModelPrivate.changeRouteAccess(route.routeId)
+                            isPublic = true
+                        }
+                    } else {
                         Toast.makeText(
                             context,
-                            "Caption or details of publishing route are empty! Fill data before publishing",
+                            "Sign in pressing the homepage button before publishing route!",
                             Toast.LENGTH_SHORT
                         ).show()
-                    } else {
-                        viewModel.publishRoute(route.routeId)
-                        routePublishButton.visibility = View.GONE
                     }
-                } else {
-                    Toast.makeText(
-                        context,
-                        "Sign in pressing the homepage button before publishing route!",
-                        Toast.LENGTH_SHORT
-                    ).show()
                 }
             }
 
@@ -1352,7 +1358,7 @@ class PrivateRoutesFragment :
 
     private fun deleteRoute(route: RouteModel) {
         resetCurrentRoute()
-        viewModel.deleteRoute(route)
+        viewModelPrivate.deleteRoute(route)
     }
 
     private fun eraseCameraToPoint(x: Double, y: Double) {
