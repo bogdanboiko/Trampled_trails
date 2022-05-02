@@ -33,6 +33,9 @@ abstract class RoutePreviewDao {
     @Query("UPDATE route_details SET isPublic = 1 WHERE routeId = :routeId")
     abstract fun makePrivateRoutePublic(routeId: String)
 
+    @Query("UPDATE route_details SET isPublic = 0 WHERE routeId = :routeId")
+    abstract fun makePublicRoutePrivate(routeId: String)
+
     @Query("DELETE FROM route_details")
     abstract fun deleteAllRoutes()
 

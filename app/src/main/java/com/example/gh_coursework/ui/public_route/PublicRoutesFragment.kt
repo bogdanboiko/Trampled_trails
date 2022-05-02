@@ -99,6 +99,7 @@ class PublicRoutesFragment :
     private val viewModelPublic: PublicRouteViewModel by viewModel()
     private val arguments by navArgs<PublicRoutesFragmentArgs>()
     private var internetCheckCallback: InternetCheckCallback? = null
+    private var getUserIdCallback: GetUserIdCallback? = null
 
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
@@ -195,12 +196,14 @@ class PublicRoutesFragment :
         super.onAttach(context)
 
         internetCheckCallback = context as? InternetCheckCallback
+        getUserIdCallback = context as? GetUserIdCallback
     }
 
     override fun onDetach() {
         super.onDetach()
 
         internetCheckCallback = null
+        getUserIdCallback = null
     }
 
     override fun onCreateView(
@@ -230,7 +233,7 @@ class PublicRoutesFragment :
 
         fetchRoutes()
 
-        setFragmentResultListener(PublicRouteFilterByTagFragment.REQUEST_KEY) { key, bundle ->
+        setFragmentResultListener(PublicRouteFilterByTagFragment.REQUEST_KEY) { _, bundle ->
             val tagArray = bundle.getStringArray("tags")
             if (tagArray != null) {
                 tagsFilter = tagArray.toList()
@@ -318,7 +321,7 @@ class PublicRoutesFragment :
                 )
             )
 
-            bottomSheetDialogRouteDetails.routeDetailsAddToFavouriteButton.imageTintList =
+            bottomSheetDialogRouteDetails.routeDetailsArchiveButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
 
             bottomSheetDialogPointDetails.pointDetailsAddToFavouriteButton.imageTintList =
@@ -794,11 +797,38 @@ class PublicRoutesFragment :
             val savedRoute = savedPublicRoutesList.find {
                 return@find it.routeId == publicRoute.routeId
             }
+            val isUsersRoute = savedPublicRoutesList.find {
+                return@find it.userId == getUserIdCallback?.getUserId().toString()
+            }
 
             if (savedRoute == null) {
                 routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
             } else {
-                routeDetailsAddToFavouriteButton.visibility = View.INVISIBLE
+                routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
+            }
+
+            routeDetailsAddToFavouriteButton.setOnClickListener {
+                if (isRouteFavourite) {
+                    Log.e("", "remove")
+                    viewModelPublic.removeRouteFromFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
+                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
+                    isRouteFavourite = false
+                } else if (!isRouteFavourite) {
+                    Log.e("", "add")
+                    viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
+                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow)
+                    isRouteFavourite = true
+                }
+                Log.e("isFav", isRouteFavourite.toString())
+            }
+
+            if (isUsersRoute != null) {
+                routeDetailsArchiveButton.visibility = View.VISIBLE
+
+                routeDetailsArchiveButton.setOnClickListener {
+                    viewModelPublic.archiveRoute(publicRoute.routeId)
+                    routeDetailsArchiveButton.visibility = View.GONE
+                }
             }
 
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {
@@ -830,47 +860,7 @@ class PublicRoutesFragment :
             }
 
             routeImagesPreviewAdapter.submitList(publicRoute.imageList)
-
-            routeDetailsAddToFavouriteButton.setOnClickListener {
-                if (internetCheckCallback?.isInternetAvailable() == true) {
-                    //add to favourite
-                } else {
-                    Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
-                }
-            }
         }
-    }
-
-    private fun createRouteImageModel(imageUrl: URL): String {
-        imageUrl.openStream().use {
-            val image = Drawable.createFromStream(it, imageUrl.ref)
-
-            return saveToCacheAndGetUri(
-                image.toBitmap(),
-                Date().time.toString()
-            ).toString()
-        }
-    }
-
-    private fun saveToCacheAndGetUri(bitmap: Bitmap, name: String): Uri {
-        val file = saveImgToCache(bitmap, name)
-        return getImageUri(file, name)
-    }
-
-    private fun saveImgToCache(bitmap: Bitmap, name: String): File {
-        val fileName: String = name
-        val cachePath = File(context?.cacheDir, "/images")
-        cachePath.mkdirs()
-        FileOutputStream("$cachePath/$fileName.jpeg").use {
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-        }
-
-        return cachePath
-    }
-
-    private fun getImageUri(fileDir: File, name: String): Uri {
-        val newFile = File(fileDir, "$name.jpeg")
-        return newFile.toUri()
     }
 
     private fun eraseCameraToPoint(x: Double, y: Double) {

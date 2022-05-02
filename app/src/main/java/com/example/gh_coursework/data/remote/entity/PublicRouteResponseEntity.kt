@@ -6,5 +6,6 @@ data class PublicRouteResponseEntity(
     val description: String,
     val tagsList: List<String>,
     val imageList: List<String>,
+    val userId: String,
     val isPublic: Boolean
 )

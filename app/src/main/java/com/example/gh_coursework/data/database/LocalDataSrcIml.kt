@@ -152,16 +152,16 @@ class LocalDataSrcIml(
         return routeDao.getRoutesResponse().map { it.map(::mapRouteResponseToDomain) }
     }
 
-    override fun getPublicRoutesList(): Flow<List<RouteDomain>> {
-        return routeDao.getPublicRoutesResponse().map{ it.map(::mapRouteResponseToDomain) }
-    }
-
     override fun getRoutePointsList(routeId: String): Flow<List<PointDomain>> {
         return routeDao.getRoutePoints(routeId).map { it.map(::mapPointResponseToDomain) }
     }
 
     override fun makePrivateRoutePublic(routeId: String) {
         routeDao.makePrivateRoutePublic(routeId)
+    }
+
+    override fun makePublicRoutePrivate(routeId: String) {
+        routeDao.makePublicRoutePrivate(routeId)
     }
 
     override suspend fun updateRoute(route: RouteDomain) {

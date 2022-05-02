@@ -42,7 +42,7 @@ interface TravelRepository {
     fun getRouteImages(routeId: String): Flow<List<RouteImageDomain>>
 
     fun getRoutesList(): Flow<List<RouteDomain>>
-    fun getPublicRoutesList(): Flow<List<RouteDomain>>
+    fun getPublicRoutesList(): Flow<List<PublicRouteDomain>>
     fun getRouteDetails(routeId: String): Flow<RouteDomain>
     fun getRoutePointsList(routeId: String): Flow<List<PointDomain>>
     fun getRoutePointsImagesList(routeId: String): Flow<List<RoutePointsImagesDomain>>
@@ -67,4 +67,5 @@ interface TravelRepository {
     fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>
 
     suspend fun makePrivateRoutePublic(routeId: String)
+    suspend fun makePublicRoutePrivate(routeId: String)
 }

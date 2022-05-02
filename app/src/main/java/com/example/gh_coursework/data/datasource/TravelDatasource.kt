@@ -1,6 +1,7 @@
 package com.example.gh_coursework.data.datasource
 
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
+import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
 
@@ -43,7 +44,6 @@ interface TravelDatasource {
         fun getPointImages(pointId: String): Flow<List<PointImageDomain>>
         fun getRouteImages(routeId: String): Flow<List<RouteImageDomain>>
 
-        fun getPublicRoutesList(): Flow<List<RouteDomain>>
         fun getRoutesList(): Flow<List<RouteDomain>>
         fun getRouteDetails(routeId: String): Flow<RouteDomain>
         fun getRoutePointsList(routeId: String): Flow<List<PointDomain>>
@@ -51,6 +51,8 @@ interface TravelDatasource {
         fun getRouteTags(): Flow<List<RouteTagDomain>>
 
         fun makePrivateRoutePublic(routeId: String)
+        fun makePublicRoutePrivate(routeId: String)
+
         suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>)
         suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain)
     }
@@ -71,5 +73,6 @@ interface TravelDatasource {
         fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>
 
         fun makePrivateRoutePublic(routeId: String)
+        fun makePublicRoutePrivate(routeId: String)
     }
 }

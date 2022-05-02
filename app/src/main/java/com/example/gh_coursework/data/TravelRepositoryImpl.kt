@@ -103,8 +103,6 @@ class TravelRepositoryImpl(
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
 
-    override fun getPublicRoutesList(): Flow<List<RouteDomain>> = localDataSrcIml.getPublicRoutesList()
-
     override suspend fun saveFirebaseRouteToLocal(
         route: PublicRouteDomain
     ) {
@@ -158,6 +156,8 @@ class TravelRepositoryImpl(
         return remoteDataSrcImpl.getUserPoints(userId)
     }
 
+    override fun getPublicRoutesList(): Flow<List<PublicRouteDomain>> = remoteDataSrcImpl.getPublicRoutes()
+
     override suspend fun uploadRouteToFirebase(route: RouteDomain, currentUser: String) {
         remoteDataSrcImpl.uploadRouteToFirebase(route, currentUser)
     }
@@ -181,5 +181,10 @@ class TravelRepositoryImpl(
     override suspend fun makePrivateRoutePublic(routeId: String) {
         remoteDataSrcImpl.makePrivateRoutePublic(routeId)
         localDataSrcIml.makePrivateRoutePublic(routeId)
+    }
+
+    override suspend fun makePublicRoutePrivate(routeId: String) {
+        remoteDataSrcImpl.makePublicRoutePrivate(routeId)
+        localDataSrcIml.makePublicRoutePrivate(routeId)
     }
 }
