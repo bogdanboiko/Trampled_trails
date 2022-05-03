@@ -90,7 +90,12 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
 
         if (result == null) {
-            val newPoint = PrivatePointPreviewModel(UUID.randomUUID().toString(), point.longitude(), point.latitude(), false)
+            val newPoint = PrivatePointPreviewModel(
+                UUID.randomUUID().toString(),
+                point.longitude(),
+                point.latitude(),
+                false
+            )
             viewModel.addPoint(newPoint)
         }
 
@@ -138,8 +143,10 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         viewLifecycleOwner.lifecycleScope.launch {
             syncStateCallback?.getStateSubscribeTo()?.collect { state ->
                 when (state) {
-                    is SyncingProgressState.Loading -> binding.progressBar.loadBackground.visibility = View.VISIBLE
-                    is SyncingProgressState.FinishedSync -> binding.progressBar.loadBackground.visibility = View.GONE
+                    is SyncingProgressState.Loading -> binding.progressBar.loadBackground.visibility =
+                        View.VISIBLE
+                    is SyncingProgressState.FinishedSync -> binding.progressBar.loadBackground.visibility =
+                        View.GONE
                 }
             }
         }
@@ -234,10 +241,13 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
             if (internetCheckCallback?.isInternetAvailable() == true) {
                 findNavController().navigate(
-                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment("point")
+                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment(
+                        "point"
+                    )
                 )
             } else {
-                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT)
+                    .show()
             }
 
             return@setOnMenuItemClickListener true
@@ -472,54 +482,59 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
             pointCaptionText.text = point.caption
             pointDescriptionText.text = point.description
-            tagListTextView.text = point.tagList.joinToString(
-                ",",
-                "Tags: "
-            ) { pointTagModel -> pointTagModel.name }
+            tagListTextView.text = if (point.tagList.isEmpty()) {
+                ""
+            } else {
+                point.tagList.joinToString(
+                    ",",
+                    "Tags: "
+                ) { pointTagModel -> pointTagModel.name }
+            }
 
-            imagesPreviewAdapter = ImagesPreviewAdapter {
-                findNavController().navigate(
-                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPrivateImageDetails(
-                        point.pointId,
-                        this@PrivatePointsFragment.pointDetailsImagesLayoutManager.findFirstVisibleItemPosition()
-                    )
+
+        imagesPreviewAdapter = ImagesPreviewAdapter {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPrivateImageDetails(
+                    point.pointId,
+                    this@PrivatePointsFragment.pointDetailsImagesLayoutManager.findFirstVisibleItemPosition()
                 )
-            }
+            )
+        }
 
-            imageRecycler.apply {
-                adapter = imagesPreviewAdapter
-                layoutManager = this@PrivatePointsFragment.pointDetailsImagesLayoutManager
-            }
+        imageRecycler.apply {
+            adapter = imagesPreviewAdapter
+            layoutManager = this@PrivatePointsFragment.pointDetailsImagesLayoutManager
+        }
 
-            imagesPreviewAdapter.submitList(point.imageList)
+        imagesPreviewAdapter.submitList(point.imageList)
 
-            pointDetailsEditButton.setOnClickListener {
-                findNavController().navigate(
-                    PrivatePointsFragmentDirections
-                        .actionPrivatePointsFragmentToPointDetailsFragment(point.pointId)
-                )
-            }
+        pointDetailsEditButton.setOnClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections
+                    .actionPrivatePointsFragmentToPointDetailsFragment(point.pointId)
+            )
+        }
 
-            pointDetailsDeleteButton.setOnClickListener {
-                viewModel.deletePoint(point)
+        pointDetailsDeleteButton.setOnClickListener {
+            viewModel.deletePoint(point)
 
-                pointAnnotationManager.delete(pointAnnotation)
-                pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            }
+            pointAnnotationManager.delete(pointAnnotation)
+            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
         }
     }
+}
 
-    override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
-        eraseCameraToPoint(pointDetails.x, pointDetails.y)
-        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
+override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
+    eraseCameraToPoint(pointDetails.x, pointDetails.y)
+    pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+}
 
-    private fun eraseCameraToPoint(x: Double, y: Double) {
-        binding.mapView.camera.easeTo(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(x, y))
-                .zoom(14.0)
-                .build()
-        )
-    }
+private fun eraseCameraToPoint(x: Double, y: Double) {
+    binding.mapView.camera.easeTo(
+        CameraOptions.Builder()
+            .center(Point.fromLngLat(x, y))
+            .zoom(14.0)
+            .build()
+    )
+}
 }
