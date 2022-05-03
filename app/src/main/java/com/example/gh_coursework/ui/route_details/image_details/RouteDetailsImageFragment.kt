@@ -45,10 +45,20 @@ class RouteDetailsImageFragment : Fragment(R.layout.fragment_image_details) {
         binding.deleteImageButton.setOnClickListener {
             val image = imageAdapter.currentList[layoutManager.findFirstVisibleItemPosition()]
 
-            if (image is ImageModel.PointImageModel) {
-                viewModel.deletePointImage(image)
-            } else if (image is ImageModel.RouteImageModel) {
-                viewModel.deleteRouteImage(image)
+            if (imageAdapter.currentList.size > 1) {
+                if (image is ImageModel.PointImageModel) {
+                    viewModel.deletePointImage(image)
+                } else if (image is ImageModel.RouteImageModel) {
+                    viewModel.deleteRouteImage(image)
+                }
+            } else {
+                if (image is ImageModel.PointImageModel) {
+                    viewModel.deletePointImage(image)
+                } else if (image is ImageModel.RouteImageModel) {
+                    viewModel.deleteRouteImage(image)
+                }
+
+                findNavController().popBackStack()
             }
         }
 
