@@ -2,6 +2,7 @@ package com.example.gh_coursework.ui.private_route
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.gh_coursework.data.remote.mapper.mapRoutePointModelToPointDetailsDomain
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
 import com.example.gh_coursework.domain.usecase.public.ChangeRouteAccessUseCase
 import com.example.gh_coursework.domain.usecase.route_points.GetRoutePointsListUseCase
@@ -46,9 +47,9 @@ class PrivateRouteViewModel(
         }
     }
 
-    fun deletePoint(pointId: String) {
+    fun deletePoint(point: RoutePointModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            deletePointUseCase.invoke(pointId)
+            deletePointUseCase.invoke(mapRoutePointModelToPointDetailsDomain(point))
         }
     }
 

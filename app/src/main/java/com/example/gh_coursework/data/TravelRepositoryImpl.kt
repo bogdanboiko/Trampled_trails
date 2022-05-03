@@ -88,8 +88,14 @@ class TravelRepositoryImpl(
         localDataSrcIml.addPointsTagsList(pointsTagsList)
     }
 
-    override suspend fun deletePoint(pointId: String) {
-        localDataSrcIml.deletePoint(pointId)
+    override suspend fun deletePoint(point: PointDetailsDomain) {
+        localDataSrcIml.deletePoint(point.pointId)
+
+        point.imageList.forEach {
+            if (it.isUploaded) {
+                localDataSrcIml.addImageToDelete(it.image)
+            }
+        }
     }
 
     override fun getPointTagList() = localDataSrcIml.getPointTagList()

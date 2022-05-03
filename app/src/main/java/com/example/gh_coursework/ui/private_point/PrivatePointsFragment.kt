@@ -32,7 +32,7 @@ import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewA
 import com.example.gh_coursework.ui.private_point.adapter.PointsListAdapter
 import com.example.gh_coursework.ui.private_point.adapter.PointsListCallback
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
-import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
+import com.example.gh_coursework.ui.private_point.model.PrivatePointPreviewModel
 import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
 import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -87,7 +87,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
 
         if (result == null) {
-            val newPoint = PrivatePointModel(UUID.randomUUID().toString(), point.longitude(), point.latitude(), false)
+            val newPoint = PrivatePointPreviewModel(UUID.randomUUID().toString(), point.longitude(), point.latitude(), false)
             viewModel.addPoint(newPoint)
         }
 
@@ -487,7 +487,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             }
 
             pointDetailsDeleteButton.setOnClickListener {
-                viewModel.deletePoint(point.pointId)
+                viewModel.deletePoint(point)
 
                 pointAnnotationManager.delete(pointAnnotation)
                 pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
