@@ -467,14 +467,15 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                pointCaptionText.text = point.caption
-                pointDescriptionText.text = point.description
-                tagListTextView.text = point.tagList.joinToString(
-                    ",",
-                    "Tags: "
-                ) { pointTagModel -> pointTagModel.name }
                 emptyDataPlaceholder.visibility = View.GONE
             }
+
+            pointCaptionText.text = point.caption
+            pointDescriptionText.text = point.description
+            tagListTextView.text = point.tagList.joinToString(
+                ",",
+                "Tags: "
+            ) { pointTagModel -> pointTagModel.name }
 
             imagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
