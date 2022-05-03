@@ -1,6 +1,5 @@
 package com.example.gh_coursework
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.deleted.*
@@ -10,7 +9,6 @@ import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCa
 import com.example.gh_coursework.ui.homepage.data.SyncingProgressState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -19,6 +17,9 @@ class ActivityViewModel(
     private val deleteAllUseCase: DeleteAllUseCase,
     private val deleteRemotePointUseCase: DeleteRemotePointUseCase,
     private val deleteRemoteRouteUseCase: DeleteRemoteRouteUseCase,
+    private val deleteImagesFromFirestoreUseCase: DeleteImagesFromFirestoreUseCase,
+    private val getDeletedImagesUseCase: GetDeletedImagesUseCase,
+    private val clearDeletedImagesTableUseCase: ClearDeletedImagesTableUseCase,
     private val clearDeletedPointsTableUseCase: ClearDeletedPointsTableUseCase,
     private val clearDeletesRoutesTableUseCase: ClearDeletedRoutesTableUseCase,
     private val getDeletedRoutesUseCase: GetDeletedRoutesUseCase,
@@ -49,14 +50,24 @@ class ActivityViewModel(
             _syncProgress.emit(SyncingProgressState.Loading)
             deleteRemotePoints()
             deleteRemoteRoutes()
+            deleteImages()
             clearDeletedPointsTable()
             clearDeletedRoutesTable()
+            clearDeletedImagesTable()
             uploadRoute(userId)
             uploadPoints(userId)
             fetchRoutes(userId)
             fetchPoints(userId)
             _syncProgress.emit(SyncingProgressState.FinishedSync)
         }
+    }
+
+    private suspend fun clearDeletedImagesTable() {
+        clearDeletedImagesTableUseCase.invoke()
+    }
+
+    private suspend fun deleteImages() {
+        deleteImagesFromFirestoreUseCase(getDeletedImagesUseCase.invoke().first())
     }
 
     private suspend fun deleteRemotePoints() {

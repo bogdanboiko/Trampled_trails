@@ -27,12 +27,14 @@ import com.example.gh_coursework.ui.helper.InternetCheckCallback
 import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
 import com.example.gh_coursework.ui.helper.createAnnotationPoint
 import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.homepage.GetSyncStateCallback
+import com.example.gh_coursework.ui.homepage.data.SyncingProgressState
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.private_point.adapter.PointsListAdapter
 import com.example.gh_coursework.ui.private_point.adapter.PointsListCallback
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
-import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
+import com.example.gh_coursework.ui.private_point.model.PrivatePointPreviewModel
 import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
 import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -79,6 +81,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private var mapState: MapState = MapState.PRESENTATION
+    private var syncStateCallback: GetSyncStateCallback? = null
 
     private val onMapClickListener = OnMapClickListener { point ->
         val result = pointAnnotationManager.annotations.find {
@@ -87,7 +90,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
 
         if (result == null) {
-            val newPoint = PrivatePointModel(UUID.randomUUID().toString(), point.longitude(), point.latitude(), false)
+            val newPoint = PrivatePointPreviewModel(UUID.randomUUID().toString(), point.longitude(), point.latitude(), false)
             viewModel.addPoint(newPoint)
         }
 
@@ -104,6 +107,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         super.onAttach(context)
 
         internetCheckCallback = context as? InternetCheckCallback
+        syncStateCallback = context as? GetSyncStateCallback
     }
 
     override fun onDetach() {
@@ -130,6 +134,15 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         configBottomSheetDialog()
         onNavigateToHomepageButtonClickListener()
         fetchPoints()
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            syncStateCallback?.getStateSubscribeTo()?.collect { state ->
+                when (state) {
+                    is SyncingProgressState.Loading -> binding.progressBar.loadBackground.visibility = View.VISIBLE
+                    is SyncingProgressState.FinishedSync -> binding.progressBar.loadBackground.visibility = View.GONE
+                }
+            }
+        }
 
         setFragmentResultListener(PointFilterByTagDialogFragment.REQUEST_KEY) { key, bundle ->
             val tagArray = bundle.getParcelableArray("tags")
@@ -487,7 +500,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             }
 
             pointDetailsDeleteButton.setOnClickListener {
-                viewModel.deletePoint(point.pointId)
+                viewModel.deletePoint(point)
 
                 pointAnnotationManager.delete(pointAnnotation)
                 pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN

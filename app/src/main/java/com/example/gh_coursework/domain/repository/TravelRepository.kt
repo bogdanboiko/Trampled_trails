@@ -15,7 +15,7 @@ interface TravelRepository {
     suspend fun addPointCoordinatesWithDetails(poi: PointPreviewDomain)
     suspend fun updatePointDetails(poi: PointDetailsDomain)
     suspend fun deleteAllPoints()
-    suspend fun deletePoint(pointId: String)
+    suspend fun deletePoint(point: PointDetailsDomain)
     fun getAllPoints(): Flow<List<PointDomain>>
 
     suspend fun addPointsTagsList(pointsTagsList: List<PointsTagsDomain>)
@@ -72,4 +72,7 @@ interface TravelRepository {
     fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>
 
     suspend fun changeRouteAccess(routeId: String, isPublic: Boolean)
+    fun deleteImagesFromFirebase(images: List<String>)
+    fun getImageListToDelete(): Flow<List<String>>
+    suspend fun clearDeletedImagesTable()
 }

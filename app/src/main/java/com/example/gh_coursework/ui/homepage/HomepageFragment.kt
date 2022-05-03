@@ -166,9 +166,8 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
                 syncStateCallback?.getStateSubscribeTo()?.collect { state ->
                     syncState = state
                     when(state) {
-                        is SyncingProgressState.Loading -> {switchSpinnerVisibility(View.VISIBLE)
-                            }
-                        is SyncingProgressState.FinishedSync -> switchSpinnerVisibility(View.GONE)
+                        is SyncingProgressState.Loading -> binding.progressBar.loadBackground.visibility = View.VISIBLE
+                        is SyncingProgressState.FinishedSync -> binding.progressBar.loadBackground.visibility = View.GONE
                     }
                 }
             }
@@ -176,11 +175,6 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
         } else {
             Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
         }
-    }
-
-    private fun switchSpinnerVisibility(visibility: Int) {
-        binding.dataSyncProgressBar.visibility = visibility
-        binding.loadBackground.visibility = visibility
     }
 
     override fun onEditClick() {

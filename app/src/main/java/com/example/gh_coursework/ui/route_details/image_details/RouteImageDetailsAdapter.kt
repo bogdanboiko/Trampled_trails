@@ -18,14 +18,22 @@ class RouteImageDetailsAdapter : ListAdapter<ImageModel, RouteImageDetailsAdapte
     inner class ImageViewHolder(private val binding: ItemImageDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
-            val imageUri = Uri.parse(imageModel.image)
-            itemView.context?.contentResolver?.openInputStream(imageUri).use {
-                val image = Drawable.createFromStream(it, imageUri.toString())
-                if (image != null) {
-                    itemView.context?.let { it1 ->
-                        Glide.with(it1)
-                            .load(image)
-                            .into(binding.pointImage)
+            if (imageModel.isUploaded) {
+                itemView.context?.let { it1 ->
+                    Glide.with(it1)
+                        .load(imageModel.image)
+                        .into(binding.pointImage)
+                }
+            } else {
+                val imageUri = Uri.parse(imageModel.image)
+                itemView.context?.contentResolver?.openInputStream(imageUri).use {
+                    val image = Drawable.createFromStream(it, imageUri.toString())
+                    if (image != null) {
+                        itemView.context?.let { it1 ->
+                            Glide.with(it1)
+                                .load(image)
+                                .into(binding.pointImage)
+                        }
                     }
                 }
             }

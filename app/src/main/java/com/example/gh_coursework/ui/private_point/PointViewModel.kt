@@ -7,7 +7,9 @@ import com.example.gh_coursework.domain.usecase.point_preview.AddPointPreviewWit
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
 import com.example.gh_coursework.ui.private_point.mapper.mapPointDomainToModel
 import com.example.gh_coursework.ui.private_point.mapper.mapPointModelToDomain
-import com.example.gh_coursework.ui.private_point.model.PrivatePointModel
+import com.example.gh_coursework.ui.private_point.mapper.mapPrivatePointDetailsModelToPointDomain
+import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
+import com.example.gh_coursework.ui.private_point.model.PrivatePointPreviewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -20,15 +22,15 @@ class PointViewModel(
     val points =
         getAllPointsDetailsDetailsUseCase.invoke().map { pointList -> pointList.map(::mapPointDomainToModel) }
 
-    fun addPoint(point: PrivatePointModel) {
+    fun addPoint(point: PrivatePointPreviewModel) {
         viewModelScope.launch(Dispatchers.IO) {
             addPointPreviewWithDetailsUseCase.invoke(mapPointModelToDomain(point))
         }
     }
 
-    fun deletePoint(pointId: String) {
+    fun deletePoint(point: PrivatePointDetailsModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            deletePointUseCase.invoke(pointId)
+            deletePointUseCase.invoke(mapPrivatePointDetailsModelToPointDomain(point))
         }
     }
 }

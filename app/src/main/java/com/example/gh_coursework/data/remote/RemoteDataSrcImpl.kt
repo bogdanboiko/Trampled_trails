@@ -172,6 +172,14 @@ class RemoteDataSrcImpl(
         }
     }
 
+    override fun deleteImagesFromFirebase(images: List<String>) {
+        images.forEach {
+            storage.getReferenceFromUrl(it).delete().addOnSuccessListener {
+                Log.e("e", "Image deleted from remote")
+            }
+        }
+    }
+
     override fun fetchRoutePoints(routeId: String) = flow {
         val points = Tasks.await(
             db.collection("points").whereEqualTo("routeId", routeId)
