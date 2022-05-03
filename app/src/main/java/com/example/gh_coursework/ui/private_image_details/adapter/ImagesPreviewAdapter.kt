@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -23,11 +24,17 @@ class ImagesPreviewAdapter(private val onItemCLick: View.OnClickListener) :
         fun bind(imageModel: ImageModel) {
             itemView.setOnClickListener(onItemCLick)
 
+            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+            circularProgressDrawable.strokeWidth = 5f
+            circularProgressDrawable.centerRadius = 30f
+            circularProgressDrawable.start()
+
             if (imageModel.isUploaded) {
                 itemView.context?.let { it1 ->
                     Glide.with(it1)
                         .load(imageModel.image)
                         .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
+                        .placeholder(circularProgressDrawable)
                         .into(binding.pointImage)
                 }
             } else {
@@ -39,6 +46,7 @@ class ImagesPreviewAdapter(private val onItemCLick: View.OnClickListener) :
                             Glide.with(it1)
                                 .load(image)
                                 .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
+                                .placeholder(circularProgressDrawable)
                                 .into(binding.pointImage)
                         }
                     }
