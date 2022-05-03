@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.example.gh_coursework.databinding.ItemImageDetailsBinding
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel
@@ -18,10 +19,17 @@ class RouteImageDetailsAdapter : ListAdapter<ImageModel, RouteImageDetailsAdapte
     inner class ImageViewHolder(private val binding: ItemImageDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
+
+            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+            circularProgressDrawable.strokeWidth = 5f
+            circularProgressDrawable.centerRadius = 30f
+            circularProgressDrawable.start()
+
             if (imageModel.isUploaded) {
                 itemView.context?.let { it1 ->
                     Glide.with(it1)
                         .load(imageModel.image)
+                        .placeholder(circularProgressDrawable)
                         .into(binding.pointImage)
                 }
             } else {
@@ -32,6 +40,7 @@ class RouteImageDetailsAdapter : ListAdapter<ImageModel, RouteImageDetailsAdapte
                         itemView.context?.let { it1 ->
                             Glide.with(it1)
                                 .load(image)
+                                .placeholder(circularProgressDrawable)
                                 .into(binding.pointImage)
                         }
                     }

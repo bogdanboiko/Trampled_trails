@@ -12,6 +12,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -109,6 +110,11 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
     }
 
     private fun configHomepage() {
+        val circularProgressDrawable =  CircularProgressDrawable(binding.root.context)
+        circularProgressDrawable.strokeWidth = 5f
+        circularProgressDrawable.centerRadius = 30f
+        circularProgressDrawable.start()
+
         with(binding) {
             if (firebaseUser != null) {
                 txtUsername.visibility = View.VISIBLE
@@ -128,7 +134,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
             Glide.with(requireActivity())
                 .load(R.drawable.ic_user)
-                .placeholder(binding.imgUserIcon.drawable)
+                .placeholder(circularProgressDrawable)
                 .transform(MultiTransformation(CenterCrop(), CircleCrop()))
                 .into(binding.imgUserIcon)
         }
