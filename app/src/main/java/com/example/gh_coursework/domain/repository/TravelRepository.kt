@@ -72,4 +72,7 @@ interface TravelRepository {
     fun getUserPoints(userId: String): Flow<List<PublicPointDomain>>
 
     suspend fun changeRouteAccess(routeId: String, isPublic: Boolean)
+    fun deleteImagesFromFirebase(images: List<String>)
+    fun getImageListToDelete(): Flow<List<String>>
+    suspend fun clearDeletedImagesTable()
 }

@@ -2,6 +2,7 @@ package com.example.gh_coursework.data.database
 
 import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
+import com.example.gh_coursework.data.database.entity.DeletedImageEntity
 import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
 import com.example.gh_coursework.data.database.entity.PointDetailsEntity
 import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointDomainToEntity
@@ -263,5 +264,17 @@ class LocalDataSrcIml(
                 routeTags.indexOf(it).toLong() + 1
             )
         })
+    }
+
+    override fun getImageListToDelete(): Flow<List<String>> {
+        return deleteDao.getDeletedImages().map { it.map { image -> image.imageUrl } }
+    }
+
+    override fun addImageToDelete(imageUrl: String) {
+        deleteDao.addDeletedImage(DeletedImageEntity(imageUrl))
+    }
+
+    override suspend fun clearDeletedImagesTable() {
+        deleteDao.clearDeletedImagesTable()
     }
 }

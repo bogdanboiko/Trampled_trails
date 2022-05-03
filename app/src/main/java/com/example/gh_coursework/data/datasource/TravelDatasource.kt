@@ -11,6 +11,7 @@ interface TravelDatasource {
         suspend fun addDeletedRoute(route: DeletedRouteDomain)
         suspend fun clearDeletedPointsTable()
         suspend fun clearDeletedRoutesTable()
+        suspend fun clearDeletedImagesTable()
         fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>>
         fun getDeletedPoints(): Flow<List<DeletedPointDomain>>
 
@@ -54,6 +55,8 @@ interface TravelDatasource {
 
         suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>)
         suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain)
+        fun getImageListToDelete(): Flow<List<String>>
+        fun addImageToDelete(imageUrl: String)
     }
 
     interface Remote {
@@ -65,6 +68,7 @@ interface TravelDatasource {
 
         suspend fun savePointImages(imageList: List<PointImageDomain>, pointId: String)
         suspend fun saveRouteImages(imageList: List<RouteImageDomain>, routeId: String)
+        fun deleteImagesFromFirebase(images: List<String>)
 
         fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>>
         fun getPublicRoutes(): Flow<List<PublicRouteDomain>>

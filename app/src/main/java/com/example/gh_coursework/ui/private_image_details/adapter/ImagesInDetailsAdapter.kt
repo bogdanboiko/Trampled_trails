@@ -24,8 +24,8 @@ class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
         fun bind(imageModel: ImageModel) {
             itemView.setOnClickListener(onItemCLick)
 
-            val imageUri = Uri.parse(imageModel.image)
             if (!imageModel.isUploaded) {
+                val imageUri = Uri.parse(imageModel.image)
                 if (imageUri.toFile().exists()) {
                     itemView.context?.contentResolver?.openInputStream(imageUri).use {
                         val image = Drawable.createFromStream(it, imageUri.toString())
@@ -43,52 +43,52 @@ class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
                             }
                         }
                     }
-                } else {
-                    itemView.context?.let { it1 ->
-                        Glide.with(it1)
-                            .load(imageModel.image)
-                            .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
-                            .into(binding.pointImage)
-                    }
+                }
+            } else {
+                itemView.context?.let { it1 ->
+                    Glide.with(it1)
+                        .load(imageModel.image)
+                        .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
+                        .into(binding.pointImage)
                 }
             }
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
-        return ImageViewHolder(
-            ItemImagesTopbarDetailsBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageViewHolder {
+            return ImageViewHolder(
+                ItemImagesTopbarDetailsBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
             )
-        )
-    }
-
-    override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
-        holder.bind(currentList[position])
-    }
-
-    object Diff : DiffUtil.ItemCallback<ImageModel>() {
-        override fun areItemsTheSame(
-            oldItem: ImageModel,
-            newItem: ImageModel
-        ): Boolean {
-            return oldItem == newItem
         }
 
-        override fun areContentsTheSame(
-            oldItem: ImageModel,
-            newItem: ImageModel
-        ): Boolean {
-            return when (oldItem) {
-                is ImageModel.PointImageModel ->
-                    oldItem.pointId == (newItem as ImageModel.PointImageModel).pointId
-                            && oldItem.image == newItem.image
-                is ImageModel.RouteImageModel ->
-                    oldItem.routeId == (newItem as ImageModel.RouteImageModel).routeId
-                            && oldItem.image == newItem.image
+        override fun onBindViewHolder(holder: ImageViewHolder, position: Int) {
+            holder.bind(currentList[position])
+        }
+
+        object Diff : DiffUtil.ItemCallback<ImageModel>() {
+            override fun areItemsTheSame(
+                oldItem: ImageModel,
+                newItem: ImageModel
+            ): Boolean {
+                return oldItem == newItem
+            }
+
+            override fun areContentsTheSame(
+                oldItem: ImageModel,
+                newItem: ImageModel
+            ): Boolean {
+                return when (oldItem) {
+                    is ImageModel.PointImageModel ->
+                        oldItem.pointId == (newItem as ImageModel.PointImageModel).pointId
+                                && oldItem.image == newItem.image
+                    is ImageModel.RouteImageModel ->
+                        oldItem.routeId == (newItem as ImageModel.RouteImageModel).routeId
+                                && oldItem.image == newItem.image
+                }
             }
         }
     }
-}

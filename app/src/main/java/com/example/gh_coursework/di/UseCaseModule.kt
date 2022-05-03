@@ -36,6 +36,14 @@ val pointUseCasesModule = module {
         DeleteAllUseCaseImpl(get())
     }
 
+    single<ClearDeletedImagesTableUseCase> {
+        ClearDeletedImagesTableUseCaseImpl(get())
+    }
+
+    single<GetDeletedImagesUseCase> {
+        GetDeletedImagesUseCaseImpl(get())
+    }
+
     single<DeleteRemotePointUseCase> {
         DeleteRemotePointUseCaseImpl(get())
     }
@@ -212,5 +220,9 @@ val pointUseCasesModule = module {
 
     single<UploadRouteToFirebaseUseCase> {
         UploadRouteToFirebaseUseCaseImpl(get())
+    }
+
+    single<DeleteImagesFromFirestoreUseCase> {
+        DeleteImagesFromFirestoreUseCaseImpl(get())
     }
 }

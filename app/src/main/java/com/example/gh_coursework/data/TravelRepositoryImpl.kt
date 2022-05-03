@@ -67,13 +67,16 @@ class TravelRepositoryImpl(
 
     override fun getUserRoutes(userId: String) = remoteDataSrcImpl.getUserRoutes(userId)
 
-
     override suspend fun addPointImages(images: List<PointImageDomain>) {
         localDataSrcIml.addPointImages(images)
     }
 
     override suspend fun deletePointImage(image: PointImageDomain) {
         localDataSrcIml.deletePointImage(image)
+
+        if (image.isUploaded) {
+            localDataSrcIml.addImageToDelete(image.image)
+        }
     }
 
     override fun getPointOfInterestDetails(id: String) = localDataSrcIml.getPointOfInterestDetails(id)
@@ -116,6 +119,12 @@ class TravelRepositoryImpl(
 
     override suspend fun deleteRoute(route: RouteDomain) {
         localDataSrcIml.deleteRoute(route)
+
+        route.imageList.forEach {
+            if (it.isUploaded) {
+                localDataSrcIml.addImageToDelete(it.image)
+            }
+        }
     }
 
     //RouteDetails
@@ -134,6 +143,10 @@ class TravelRepositoryImpl(
 
     override suspend fun deleteRouteImage(image: RouteImageDomain) {
         localDataSrcIml.deleteRouteImage(image)
+
+        if (image.isUploaded) {
+            localDataSrcIml.addImageToDelete(image.image)
+        }
     }
 
     override fun getRouteImages(routeId: String) = localDataSrcIml.getRouteImages(routeId)
@@ -194,5 +207,17 @@ class TravelRepositoryImpl(
     override suspend fun changeRouteAccess(routeId: String, isPublic: Boolean) {
         remoteDataSrcImpl.changeRouteAccess(routeId, isPublic)
         localDataSrcIml.changeRouteAccess(routeId, isPublic)
+    }
+
+    override fun deleteImagesFromFirebase(images: List<String>) {
+        remoteDataSrcImpl.deleteImagesFromFirebase(images)
+    }
+
+    override fun getImageListToDelete(): Flow<List<String>> {
+        return localDataSrcIml.getImageListToDelete()
+    }
+
+    override suspend fun clearDeletedImagesTable() {
+        localDataSrcIml.clearDeletedImagesTable()
     }
 }
