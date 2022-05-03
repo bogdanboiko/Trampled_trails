@@ -465,17 +465,19 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     ) {
         binding.pointDetailsBottomSheetDialogLayout.apply {
             if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
+                pointCaptionText.visibility = View.GONE
+                pointDescriptionText.visibility = View.GONE
+                tagListTextView.visibility = View.GONE
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
+                pointCaptionText.text = point.caption
+                pointDescriptionText.text = point.description
+                tagListTextView.text = point.tagList.joinToString(
+                    ",",
+                    "Tags: "
+                ) { pointTagModel -> pointTagModel.name }
                 emptyDataPlaceholder.visibility = View.GONE
             }
-
-            pointCaptionText.text = point.caption
-            pointDescriptionText.text = point.description
-            tagListTextView.text = point.tagList.joinToString(
-                ",",
-                "Tags: "
-            ) { pointTagModel -> pointTagModel.name }
 
             imagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
