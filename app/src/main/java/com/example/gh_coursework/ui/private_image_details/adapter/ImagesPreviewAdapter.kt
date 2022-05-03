@@ -2,7 +2,6 @@ package com.example.gh_coursework.ui.private_image_details.adapter
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,6 @@ class ImagesPreviewAdapter(private val onItemCLick: View.OnClickListener) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
             itemView.setOnClickListener(onItemCLick)
-            Log.e("e", imageModel.toString())
 
             if (imageModel.isUploaded) {
                 itemView.context?.let { it1 ->

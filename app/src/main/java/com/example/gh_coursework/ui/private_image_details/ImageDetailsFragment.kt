@@ -58,10 +58,14 @@ class ImageDetailsFragment : ThemeFragment() {
             val imageData = imageAdapter.currentList[layoutManager.findFirstVisibleItemPosition()]
             val imageFile = File(URI.create(imageData.image))
 
-            if (imageFile.exists()) {
+            if (imageFile.exists() && imageAdapter.currentList.size > 1) {
                 imageFile.delete()
+                viewModel.deletePointImage(imageData)
+            } else {
+                imageFile.delete()
+                viewModel.deletePointImage(imageData)
+                findNavController().popBackStack()
             }
-            viewModel.deletePointImage(imageData)
         }
 
         binding.backImageButton.setOnClickListener {
