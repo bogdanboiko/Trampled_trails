@@ -17,6 +17,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.dolatkia.animatedThemeManager.AppTheme
@@ -48,6 +49,7 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
 import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
@@ -373,6 +375,8 @@ class PublicRoutesFragment :
             enabled = true
         }
 
+        binding.mapView.compass.enabled = false
+
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
     }
@@ -580,8 +584,15 @@ class PublicRoutesFragment :
                 getUserIdCallback?.getUserId()
                     ?.let { userId ->
                         viewModelPublic.getFavouriteRoutes(userId).collect {
-                            viewModelPublic.fetchFavouriteRoutes(it).collect { route ->
-                                routesListAdapter.submitData(route)
+                            if (it.isNotEmpty()) {
+                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
+                                viewModelPublic.fetchFavouriteRoutes(it).collect { route ->
+                                    routesListAdapter.submitData(route)
+                                }
+                            } else {
+                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.VISIBLE
+                                binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
+                                routesListAdapter.submitData(PagingData.empty())
                             }
                         }
                     }
@@ -869,8 +880,10 @@ class PublicRoutesFragment :
 
                     runBlocking {
                         fetchSavedPublicRoutes()
-                        delay(500)
-                        fetchFavouriteRoutes()
+                        if (isSortedByFavourites) {
+                            delay(500)
+                            fetchFavouriteRoutes()
+                        }
                     }
                 }
             } else {
