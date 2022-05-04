@@ -931,6 +931,7 @@ class PrivateRoutesFragment :
     }
 
     private fun rebuildRoute(route: RouteModel) {
+        previousRouteId = route.routeId
         focusedRoute = route
 
         if (this::routePointsJob.isInitialized) {
