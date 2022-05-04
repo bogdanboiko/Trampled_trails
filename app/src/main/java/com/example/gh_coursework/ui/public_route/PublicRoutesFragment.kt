@@ -318,8 +318,19 @@ class PublicRoutesFragment :
                 )
             )
 
-            bottomSheetDialogPointDetails.pointDetailsAddToFavouriteButton.imageTintList =
+            bottomSheetDialogRouteDetails.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogRouteDetails.routeDetailsAddToFavouriteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(requireContext())
+            )
+
+            bottomSheetDialogPointDetails.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogPointDetails.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(requireContext())
+            )
         }
     }
 

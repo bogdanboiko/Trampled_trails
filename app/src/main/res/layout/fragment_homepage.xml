@@ -82,7 +82,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
+    <!--Username edit end-->
+    <!--Spinner-->
     <include
         android:id="@+id/progressBar"
         android:layout_height="match_parent"
@@ -92,5 +93,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         layout="@layout/progress_bar"/>
-    <!--Username edit end-->
 </androidx.constraintlayout.widget.ConstraintLayout>

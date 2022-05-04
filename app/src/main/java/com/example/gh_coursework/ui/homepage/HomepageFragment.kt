@@ -2,6 +2,7 @@ package com.example.gh_coursework.ui.homepage
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,7 +30,6 @@ import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.UserProfileChangeRequest
-import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 
@@ -171,9 +171,11 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
             lifecycleScope.launch {
                 syncStateCallback?.getStateSubscribeTo()?.collect { state ->
                     syncState = state
-                    when(state) {
-                        is SyncingProgressState.Loading -> binding.progressBar.loadBackground.visibility = View.VISIBLE
-                        is SyncingProgressState.FinishedSync -> binding.progressBar.loadBackground.visibility = View.GONE
+                    when (state) {
+                        is SyncingProgressState.Loading -> binding.progressBar.loadBackground.visibility =
+                            View.VISIBLE
+                        is SyncingProgressState.FinishedSync -> binding.progressBar.loadBackground.visibility =
+                            View.GONE
                     }
                 }
             }
@@ -236,6 +238,9 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
         with(binding) {
             root.setBackgroundColor(theme.colorPrimary(requireContext()))
             txtUsername.setTextColor(theme.colorSecondaryVariant(requireContext()))
+            progressBar.dataSyncProgressBar.indeterminateTintList =
+                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
+            progressBar.txtProgressBar.setTextColor(theme.colorSecondaryVariant(requireContext()))
         }
     }
 }
