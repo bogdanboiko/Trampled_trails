@@ -436,22 +436,18 @@ class PublicRoutesFragment :
                 binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.VISIBLE
 
                 binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.setOnClickListener {
-                    if (FirebaseAuth.getInstance().currentUser == null) {
-                        Toast.makeText(requireContext(), "Log in to adding routes to favourites", Toast.LENGTH_SHORT).show()
+                    if (isFavouritesShowing) {
+                        binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.VISIBLE
+                        fetchRoutes()
+                        binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.black)
+                        isFavouritesShowing = false
                     } else {
-                        if (isFavouritesShowing) {
-                            binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.VISIBLE
-                            fetchRoutes()
-                            binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
-                                ColorStateList.valueOf(R.color.black)
-                            isFavouritesShowing = false
-                        } else {
-                            binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
-                            fetchFavouriteRoutes()
-                            binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
-                                ColorStateList.valueOf(R.color.yellow_dark)
-                            isFavouritesShowing = true
-                        }
+                        binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
+                        fetchFavouriteRoutes()
+                        binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.yellow_dark)
+                        isFavouritesShowing = true
                     }
                 }
             } else {
@@ -844,6 +840,12 @@ class PublicRoutesFragment :
             }
 
             isRouteFavourite = isFavourite != null
+
+            if (FirebaseAuth.getInstance().currentUser == null) {
+                routeDetailsAddToFavouriteButton.visibility = View.GONE
+            } else {
+                routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
+            }
 
             if (isRouteFavourite) {
                 routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)

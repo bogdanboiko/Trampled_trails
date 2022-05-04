@@ -1309,31 +1309,35 @@ class PrivateRoutesFragment :
 
 
             btnChangeRouteAccess.setOnClickListener {
-                if (route.isPublic) {
-                    viewModelPrivate.changeRouteAccess(route.routeId, false)
-                    btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
-                    isPublic = false
-                } else {
-                    btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
-                    val user = FirebaseAuth.getInstance().currentUser
-                    if (user != null) {
-                        if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+                if (internetCheckCallback?.isInternetAvailable() == true) {
+                    if (isPublic) {
+                        viewModelPrivate.changeRouteAccess(route.routeId, false)
+                        btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
+                        isPublic = false
+                    } else {
+                        btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
+                        val user = FirebaseAuth.getInstance().currentUser
+                        if (user != null) {
+                            if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    "Caption or details of publishing route are empty! Fill data before publishing",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                viewModelPrivate.changeRouteAccess(route.routeId, true)
+                                isPublic = true
+                            }
+                        } else {
                             Toast.makeText(
                                 context,
-                                "Caption or details of publishing route are empty! Fill data before publishing",
+                                "Sign in pressing the homepage button before publishing route!",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        } else {
-                            viewModelPrivate.changeRouteAccess(route.routeId, true)
-                            isPublic = true
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Sign in pressing the homepage button before publishing route!",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
+                } else {
+                    Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
                 }
             }
 
