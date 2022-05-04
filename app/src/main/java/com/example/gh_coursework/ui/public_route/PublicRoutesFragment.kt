@@ -282,9 +282,6 @@ class PublicRoutesFragment :
                 homepageButton.setImageResource(R.drawable.ic_home_dark)
             }
 
-            createButton.backgroundTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-
             DrawableCompat.wrap(getRoutesList.background)
                 .setTint(theme.colorOnPrimary(requireContext()))
             DrawableCompat.wrap(getRoutePointsList.background)
@@ -454,6 +451,7 @@ class PublicRoutesFragment :
 
                 binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.setOnClickListener {
                     if (isSortedByFavourites) {
+                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
                         binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.VISIBLE
                         fetchRoutes()
                         binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
@@ -601,6 +599,8 @@ class PublicRoutesFragment :
                                 }
                             } else {
                                 binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.VISIBLE
+                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
+                                    "You haven't any favourite routes yet"
                                 binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
                                 routesListAdapter.submitData(PagingData.empty())
                             }

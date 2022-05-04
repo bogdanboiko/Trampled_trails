@@ -509,32 +509,48 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         imagesPreviewAdapter.submitList(point.imageList)
 
         pointDetailsEditButton.setOnClickListener {
-            findNavController().navigate(
-                PrivatePointsFragmentDirections
-                    .actionPrivatePointsFragmentToPointDetailsFragment(point.pointId)
-            )
+            if (!point.routeId.isNullOrEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    "It's route point. You can edit it only from routes screen",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                findNavController().navigate(
+                    PrivatePointsFragmentDirections
+                        .actionPrivatePointsFragmentToPointDetailsFragment(point.pointId)
+                )
+            }
         }
 
         pointDetailsDeleteButton.setOnClickListener {
-            viewModel.deletePoint(point)
+            if (!point.routeId.isNullOrEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    "It's route point. You can delete it only from routes screen",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                viewModel.deletePoint(point)
 
-            pointAnnotationManager.delete(pointAnnotation)
-            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                pointAnnotationManager.delete(pointAnnotation)
+                pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            }
         }
     }
 }
 
-override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
-    eraseCameraToPoint(pointDetails.x, pointDetails.y)
-    pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-}
+    override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
+        eraseCameraToPoint(pointDetails.x, pointDetails.y)
+        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
 
-private fun eraseCameraToPoint(x: Double, y: Double) {
-    binding.mapView.camera.easeTo(
-        CameraOptions.Builder()
-            .center(Point.fromLngLat(x, y))
-            .zoom(14.0)
-            .build()
-    )
-}
+    private fun eraseCameraToPoint(x: Double, y: Double) {
+        binding.mapView.camera.easeTo(
+            CameraOptions.Builder()
+                .center(Point.fromLngLat(x, y))
+                .zoom(14.0)
+                .build()
+        )
+    }
 }

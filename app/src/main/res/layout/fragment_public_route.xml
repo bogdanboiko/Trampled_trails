@@ -96,17 +96,6 @@
                 app:menu="@menu/bottom_nav_menu" />
         </com.google.android.material.bottomappbar.BottomAppBar>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/createButton"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_add"
-            app:elevation="-2dp"
-            app:fabCustomSize="75dp"
-            app:layout_anchor="@id/bottomAppBar"
-            app:maxImageSize="35dp" />
-
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"

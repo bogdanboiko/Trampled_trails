@@ -103,6 +103,7 @@ class PrivateRoutesFragment :
     private val viewModelPrivate: PrivateRouteViewModel by viewModel()
     private var internetCheckCallback: InternetCheckCallback? = null
 
+    private var isPublic = false
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private var filteredTags = emptyList<RouteTagModel>()
@@ -1244,28 +1245,44 @@ class PrivateRoutesFragment :
             pointImagesPreviewAdapter.submitList(point.imageList)
 
             pointDetailsEditButton.setOnClickListener {
-                findNavController().navigate(
-                    PrivateRoutesFragmentDirections
-                        .actionPrivateRoutesFragmentToPointDetailsFragment(
-                            pointAnnotation.getData()?.asString!!
-                        )
-                )
+                if (isPublic) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Make your route private before editing it's point",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    findNavController().navigate(
+                        PrivateRoutesFragmentDirections
+                            .actionPrivateRoutesFragmentToPointDetailsFragment(
+                                pointAnnotation.getData()?.asString!!
+                            )
+                    )
+                }
             }
 
             pointDetailsDeleteButton.setOnClickListener {
-                binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.VISIBLE
-
-                if (currentRoutePointsList.size == 2) {
-                    deleteRoute(focusedRoute)
+                if (isPublic) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Make your route private before deleting it's point",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
+                    binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.VISIBLE
+
+                    if (currentRoutePointsList.size == 2) {
+                        deleteRoute(focusedRoute)
+                    } else {
                         viewModelPrivate.deletePoint(point)
                         pointAnnotationManager.delete(pointAnnotation)
 
                         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
                             View.GONE
-                }
+                    }
 
-                pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
             }
         }
     }
@@ -1274,7 +1291,7 @@ class PrivateRoutesFragment :
         route: RouteModel
     ) {
         val imageList = mutableListOf<ImageModel>()
-        var isPublic = route.isPublic
+        isPublic = route.isPublic
 
         binding.bottomSheetDialogRouteDetails.apply {
             if (route.name?.isEmpty() == true && route.description?.isEmpty() == true) {
@@ -1363,9 +1380,17 @@ class PrivateRoutesFragment :
             routeImagesPreviewAdapter.submitList(imageList)
 
             routeDetailsDeleteButton.setOnClickListener {
-                deleteRoute(route)
+                if (isPublic) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Make your route private before deleting it",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    deleteRoute(route)
 
-                routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
             }
         }
     }
