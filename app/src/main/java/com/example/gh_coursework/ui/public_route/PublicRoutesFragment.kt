@@ -462,7 +462,6 @@ class PublicRoutesFragment :
         }
 
         binding.bottomSheetDialogRoutes.routeFilterByTagButton.setOnClickListener {
-            binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.GONE
             findNavController().navigate(
                 PublicRoutesFragmentDirections.actionPublicRouteFragmentToPublicRouteFilterByTagsDialogFragment(
                     tagsFilter.toTypedArray()
