@@ -66,8 +66,10 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
@@ -95,8 +97,9 @@ class PublicRoutesFragment :
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
     private var tagsFilter = emptyList<String>()
-    private var favourites = emptyList<PublicFavouriteEntity>()
+    private var favourites = mutableListOf<PublicFavouriteEntity>()
     private var isRouteFavourite = false
+    private var isSortedByFavourites = false
     private var savedPublicRoutesList = emptyList<PublicRouteModel>()
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private lateinit var focusedPublicRoute: PublicRouteModel
@@ -342,7 +345,7 @@ class PublicRoutesFragment :
                     savedPublicRoutesList = it
                 }
 
-                favourites = viewModelPublic.favourites.first()
+                favourites = viewModelPublic.favourites.first() as MutableList<PublicFavouriteEntity>
             }
         } else {
             Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
@@ -413,7 +416,6 @@ class PublicRoutesFragment :
 
     @SuppressLint("ResourceAsColor")
     private fun getRoutesDialog() {
-        var isFavouritesShowing = false
 
         binding.getRoutesList.setOnClickListener {
             routePointsDialogBehavior.peekHeight = 0
@@ -432,22 +434,22 @@ class PublicRoutesFragment :
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
 
-            if (favourites.find { return@find it.userId == getUserIdCallback?.getUserId() } != null) {
+            if (FirebaseAuth.getInstance().currentUser != null) {
                 binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.VISIBLE
 
                 binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.setOnClickListener {
-                    if (isFavouritesShowing) {
+                    if (isSortedByFavourites) {
                         binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.VISIBLE
                         fetchRoutes()
                         binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
                             ColorStateList.valueOf(R.color.black)
-                        isFavouritesShowing = false
+                        isSortedByFavourites = false
                     } else {
                         binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
                         fetchFavouriteRoutes()
                         binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
                             ColorStateList.valueOf(R.color.yellow_dark)
-                        isFavouritesShowing = true
+                        isSortedByFavourites = true
                     }
                 }
             } else {
@@ -853,16 +855,26 @@ class PublicRoutesFragment :
                 routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
             }
 
-            routeDetailsAddToFavouriteButton.setOnClickListener {
-                if (isRouteFavourite) {
-                    viewModelPublic.removeRouteFromFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
-                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
-                    isRouteFavourite = false
-                } else {
-                    viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
-                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
-                    isRouteFavourite = true
+            if (internetCheckCallback?.isInternetAvailable() == true) {
+                routeDetailsAddToFavouriteButton.setOnClickListener {
+                    if (isRouteFavourite) {
+                        viewModelPublic.removeRouteFromFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
+                        routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
+                        isRouteFavourite = false
+                    } else {
+                        viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
+                        routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
+                        isRouteFavourite = true
+                    }
+
+                    runBlocking {
+                        fetchSavedPublicRoutes()
+                        delay(500)
+                        fetchFavouriteRoutes()
+                    }
                 }
+            } else {
+                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
             }
 
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {

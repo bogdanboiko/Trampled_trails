@@ -82,7 +82,11 @@ class PublicFavouritesPagingSource(
             }
         } catch (e: Exception) {
             Log.e("e", e.toString())
-            LoadResult.Error(e)
+            LoadResult.Page(
+                data = emptyList(),
+                prevKey = null,
+                nextKey = null
+            )
         }
     }
 }
