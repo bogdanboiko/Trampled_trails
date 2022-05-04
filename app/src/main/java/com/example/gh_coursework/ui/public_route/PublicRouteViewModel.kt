@@ -52,13 +52,13 @@ class PublicRouteViewModel(
     }
 
     fun addRouteToFavourites(routeId: String, userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addRouteToFavouritesUseCase.invoke(routeId, userId)
         }
     }
 
     fun removeRouteFromFavourites(routeId: String, userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             removeRouteFromFavouritesUseCase.invoke(routeId, userId)
         }
     }

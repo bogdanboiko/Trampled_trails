@@ -30,13 +30,13 @@ class RouteDetailsViewModel(
     }
 
     fun updateRouteDetails(route: RouteDetailsModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             updateRouteDetailsUseCase.invoke(mapRouteDetailsModelToDomain(route))
         }
     }
 
     fun addPointImageList(images: List<RouteImageModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addRouteImageListUseCase.invoke(images.map(::mapRouteImageModelToDomain))
         }
     }

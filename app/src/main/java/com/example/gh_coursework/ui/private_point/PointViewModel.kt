@@ -23,13 +23,13 @@ class PointViewModel(
         getAllPointsDetailsDetailsUseCase.invoke().map { pointList -> pointList.map(::mapPointDomainToModel) }
 
     fun addPoint(point: PrivatePointPreviewModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addPointPreviewWithDetailsUseCase.invoke(mapPointModelToDomain(point))
         }
     }
 
     fun deletePoint(point: PrivatePointDetailsModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deletePointUseCase.invoke(mapPrivatePointDetailsModelToPointDomain(point))
         }
     }

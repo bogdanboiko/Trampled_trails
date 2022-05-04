@@ -32,13 +32,13 @@ class RouteDetailsImageViewModel(
 
 
     fun deleteRouteImage(image: RouteImageModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteRouteImageUseCase.invoke(mapRouteImageModelToDomain(image))
         }
     }
 
     fun deletePointImage(image: PointImageModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deletePointImageUseCase.invoke(mapPointImageModelToDomain(image))
         }
     }

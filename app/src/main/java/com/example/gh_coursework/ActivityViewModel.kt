@@ -40,13 +40,13 @@ class ActivityViewModel(
     val syncProgress: SharedFlow<SyncingProgressState> = _syncProgress
 
     fun deleteAll() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteAllUseCase.invoke()
         }
     }
 
     fun syncDataWithFirebase(userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _syncProgress.emit(SyncingProgressState.Loading)
             deleteRemotePoints()
             deleteRemoteRoutes()
@@ -91,13 +91,13 @@ class ActivityViewModel(
     }
 
     private fun clearDeletedPointsTable() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             clearDeletedPointsTableUseCase.invoke()
         }
     }
 
     private fun clearDeletedRoutesTable() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             clearDeletesRoutesTableUseCase.invoke()
         }
     }

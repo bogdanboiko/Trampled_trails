@@ -33,7 +33,7 @@ class PrivateRouteViewModel(
         .map { route -> route.map(::mapRouteDomainToModel) }
 
     fun addRoute(route: RouteModel, pointsList: List<RoutePointModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addRouteUseCase.invoke(
                 mapRouteModelToDomain(route),
                 pointsList.map(::mapRoutePointModelToDomain)
@@ -48,19 +48,19 @@ class PrivateRouteViewModel(
     }
 
     fun deletePoint(point: RoutePointModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deletePointUseCase.invoke(mapRoutePointModelToPointDetailsDomain(point))
         }
     }
 
     fun deleteRoute(route: RouteModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteRouteUseCase.invoke(mapRouteModelToDomain(route))
         }
     }
 
     fun changeRouteAccess(routeId: String, isPublic: Boolean) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             changeRouteAccessUseCase.invoke(routeId, isPublic)
         }
     }

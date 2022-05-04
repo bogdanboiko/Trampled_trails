@@ -19,7 +19,7 @@ class ImageDetailsViewModel(
     val pointImages = getPointImagesUseCase.invoke(pointId).map { it.map(::mapPointImageDomainToModel) }
 
     fun deletePointImage(image: PointImageModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deletePointImageUseCase.invoke(mapPointImageModelToDomain(image))
         }
     }

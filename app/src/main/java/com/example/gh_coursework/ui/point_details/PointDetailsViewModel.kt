@@ -22,13 +22,13 @@ class PointDetailsViewModel(
         getPointDetailsUseCase.invoke(pointId).map { mapPointDetailsDomainToModel(it) }
 
     fun addPointDetails(details: PointDetailsModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addPointDetailsUseCase.invoke(mapPointDetailsModelToDomain(details))
         }
     }
 
     fun addPointImageList(images: List<PointImageModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addPointImageListUseCase.invoke(images.map(::mapPointImageModelToDomain))
         }
     }

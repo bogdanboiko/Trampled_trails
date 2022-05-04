@@ -29,13 +29,13 @@ class RouteTagDialogViewModel(
         getRouteTagsUseCase.invoke().map { tagList -> tagList.map(::mapRouteTagDomainToModel) }
 
     fun addTagsToRoute(tags: List<RouteTagsModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addRouteTagsUseCase.invoke(tags.map(::mapRouteTagsModelToDomain))
         }
     }
 
     fun deleteTagsFromRoute(tags: List<RouteTagsModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteTagsFromRouteUseCase.invoke(tags.map(::mapRouteTagsModelToDomain))
         }
     }

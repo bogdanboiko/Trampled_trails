@@ -25,13 +25,13 @@ class TagDialogViewModel(
     val pointTags = getPointTagsUseCase.invoke(pointId).map { it.map(::mapPointTagDomainToModel) }
 
     fun addTagsToPoint(tags: List<PointsTagsModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addPointsTagsListUseCase.invoke(tags.map(::mapPointsTagsModelToDomain))
         }
     }
 
     fun removeTagsToPoint(tags: List<PointsTagsModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             removePointsTagsListUseCase.invoke(tags.map(::mapPointsTagsModelToDomain))
         }
     }
