@@ -11,7 +11,10 @@ import com.example.gh_coursework.data.remote.mapper.mapPointDomainToPublicPointE
 import com.example.gh_coursework.data.remote.mapper.mapPublicPointResponseEntityToPublicDomain
 import com.example.gh_coursework.data.remote.mapper.mapPublicRouteResponseToDomain
 import com.example.gh_coursework.data.remote.mapper.mapRouteDomainToPublicRouteEntity
-import com.example.gh_coursework.domain.entity.*
+import com.example.gh_coursework.domain.entity.PointDomain
+import com.example.gh_coursework.domain.entity.PointImageDomain
+import com.example.gh_coursework.domain.entity.RouteDomain
+import com.example.gh_coursework.domain.entity.RouteImageDomain
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentReference
@@ -21,7 +24,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import java.util.*
 
 class RemoteDataSrcImpl(
@@ -186,20 +190,35 @@ class RemoteDataSrcImpl(
         val data = mutableListOf<PublicPointResponseEntity>()
 
         points.documents.forEach {
-            data.add(
-                PublicPointResponseEntity(
-                    it.id,
-                    it.getString("caption")!!,
-                    it.getString("description")!!,
-                    (it.get("tagsList") ?: emptyList<String>()) as List<String>,
-                    (it.get("imageList") ?: emptyList<String>()) as List<String>,
-                    it.getDouble("x")!!,
-                    it.getDouble("y")!!,
-                    it.getString("routeId"),
-                    it.getBoolean("routePoint")!!,
-                    it.getLong("position")!!
+
+            val caption = it.getString("caption")
+            val description = it.getString("description")
+            val x = it.getDouble("x")
+            val y = it.getDouble("y")
+            val isRoutePoint = it.getBoolean("routePoint")
+            val position = it.getLong("position")
+
+            if (caption != null &&
+                description != null &&
+                x != null &&
+                y != null &&
+                isRoutePoint != null &&
+                position != null) {
+                data.add(
+                    PublicPointResponseEntity(
+                        it.id,
+                        caption,
+                        description,
+                        (it.get("tagsList") ?: emptyList<String>()) as List<String>,
+                        (it.get("imageList") ?: emptyList<String>()) as List<String>,
+                        x,
+                        y,
+                        it.getString("routeId"),
+                        isRoutePoint,
+                        position
+                    )
                 )
-            )
+            }
         }
 
         data.sortBy { it.position }
@@ -212,17 +231,28 @@ class RemoteDataSrcImpl(
         val data = mutableListOf<PublicRouteResponseEntity>()
 
         routes.documents.forEach {
-            data.add(
-                PublicRouteResponseEntity(
-                    it.id,
-                    it.getString("name")!!,
-                    it.getString("description")!!,
-                    (it.get("tagsList") ?: emptyList<String>()) as List<String>,
-                    (it.get("imageList") ?: emptyList<String>()) as List<String>,
-                    it.getString("userId")!!,
-                    it.getBoolean("public")!!
+
+            val name = it.getString("name")
+            val description = it.getString("description")
+            val userId = it.getString("userId")
+            val isPublic = it.getBoolean("public")
+
+            if (name != null &&
+                description != null &&
+                userId != null &&
+                isPublic != null) {
+                data.add(
+                    PublicRouteResponseEntity(
+                        it.id,
+                        name,
+                        description,
+                        (it.get("tagsList") ?: emptyList<String>()) as List<String>,
+                        (it.get("imageList") ?: emptyList<String>()) as List<String>,
+                        userId,
+                        isPublic
+                    )
                 )
-            )
+            }
         }
 
         emit(data.map(::mapPublicRouteResponseToDomain))
@@ -234,20 +264,35 @@ class RemoteDataSrcImpl(
         val data = mutableListOf<PublicPointResponseEntity>()
 
         points.documents.forEach {
-            data.add(
-                PublicPointResponseEntity(
-                    it.id,
-                    it.getString("caption")!!,
-                    it.getString("description")!!,
-                    (it.get("tagsList") ?: emptyList<String>()) as List<String>,
-                    (it.get("imageList") ?: emptyList<String>()) as List<String>,
-                    it.getDouble("x")!!,
-                    it.getDouble("y")!!,
-                    it.getString("routeId"),
-                    it.getBoolean("routePoint")!!,
-                    it.getLong("position")!!
+
+            val caption = it.getString("caption")
+            val description = it.getString("description")
+            val x = it.getDouble("x")
+            val y = it.getDouble("y")
+            val isRoutePoint = it.getBoolean("routePoint")
+            val position = it.getLong("position")
+
+            if (caption != null &&
+                description != null &&
+                x != null &&
+                y != null &&
+                isRoutePoint != null &&
+                position != null) {
+                data.add(
+                    PublicPointResponseEntity(
+                        it.id,
+                        caption,
+                        description,
+                        (it.get("tagsList") ?: emptyList<String>()) as List<String>,
+                        (it.get("imageList") ?: emptyList<String>()) as List<String>,
+                        x,
+                        y,
+                        it.getString("routeId"),
+                        isRoutePoint,
+                        position
+                    )
                 )
-            )
+            }
         }
 
         data.sortBy { it.position }
@@ -261,17 +306,27 @@ class RemoteDataSrcImpl(
         val data = mutableListOf<PublicRouteResponseEntity>()
 
         routes.documents.forEach {
-            data.add(
-                PublicRouteResponseEntity(
-                    it.id,
-                    it.getString("name")!!,
-                    it.getString("description")!!,
-                    (it.get("tagsList") ?: emptyList<String>()) as List<String>,
-                    (it.get("imageList") ?: emptyList<String>()) as List<String>,
-                    it.getString("userId")!!,
-                    it.getBoolean("public")!!
+            val name = it.getString("name")
+            val description = it.getString("description")
+            val uid = it.getString("userId")
+            val isPublic = it.getBoolean("public")
+
+            if (name != null &&
+                description != null &&
+                uid != null &&
+                isPublic != null) {
+                data.add(
+                    PublicRouteResponseEntity(
+                        it.id,
+                        name,
+                        description,
+                        (it.get("tagsList") ?: emptyList<String>()) as List<String>,
+                        (it.get("imageList") ?: emptyList<String>()) as List<String>,
+                        uid,
+                        isPublic
+                    )
                 )
-            )
+            }
         }
 
         emit(data.map(::mapPublicRouteResponseToDomain))
