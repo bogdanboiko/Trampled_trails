@@ -31,6 +31,7 @@ import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 import com.example.gh_coursework.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment
 import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
@@ -435,16 +436,22 @@ class PublicRoutesFragment :
                 binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.VISIBLE
 
                 binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.setOnClickListener {
-                    if (isFavouritesShowing) {
-                        fetchRoutes()
-                        binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
-                            ColorStateList.valueOf(R.color.black)
-                        isFavouritesShowing = false
+                    if (FirebaseAuth.getInstance().currentUser == null) {
+                        Toast.makeText(requireContext(), "Log in to adding routes to favourites", Toast.LENGTH_SHORT).show()
                     } else {
-                        fetchFavouriteRoutes()
-                        binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
-                            ColorStateList.valueOf(R.color.yellow_dark)
-                        isFavouritesShowing = true
+                        if (isFavouritesShowing) {
+                            binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.VISIBLE
+                            fetchRoutes()
+                            binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
+                                ColorStateList.valueOf(R.color.black)
+                            isFavouritesShowing = false
+                        } else {
+                            binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
+                            fetchFavouriteRoutes()
+                            binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
+                                ColorStateList.valueOf(R.color.yellow_dark)
+                            isFavouritesShowing = true
+                        }
                     }
                 }
             } else {
@@ -453,6 +460,7 @@ class PublicRoutesFragment :
         }
 
         binding.bottomSheetDialogRoutes.routeFilterByTagButton.setOnClickListener {
+            binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.GONE
             findNavController().navigate(
                 PublicRoutesFragmentDirections.actionPublicRouteFragmentToPublicRouteFilterByTagsDialogFragment(
                     tagsFilter.toTypedArray()

@@ -1287,16 +1287,18 @@ class PrivateRoutesFragment :
 
             if (isPublic) {
                 btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
-                routeDetailsEditButton.setOnClickListener {
+            } else {
+                btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
+            }
+
+            routeDetailsEditButton.setOnClickListener {
+                if (isPublic) {
                     Toast.makeText(
                         requireContext(),
                         "Make your route private before editing it",
                         Toast.LENGTH_SHORT
                     ).show()
-                }
-            } else {
-                btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
-                routeDetailsEditButton.setOnClickListener {
+                } else {
                     findNavController().navigate(
                         PrivateRoutesFragmentDirections
                             .actionPrivateRoutesFragmentToRouteDetailsFragment(route.routeId)
@@ -1304,11 +1306,14 @@ class PrivateRoutesFragment :
                 }
             }
 
+
             btnChangeRouteAccess.setOnClickListener {
                 if (route.isPublic) {
                     viewModelPrivate.changeRouteAccess(route.routeId)
+                    btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
                     isPublic = false
                 } else {
+                    btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
                     val user = FirebaseAuth.getInstance().currentUser
                     if (user != null) {
                         if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
