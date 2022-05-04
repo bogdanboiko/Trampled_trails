@@ -1285,17 +1285,23 @@ class PrivateRoutesFragment :
             routeCaptionText.text = route.name
             routeDescriptionText.text = route.description
 
-            routeDetailsEditButton.setOnClickListener {
-                findNavController().navigate(
-                    PrivateRoutesFragmentDirections
-                        .actionPrivateRoutesFragmentToRouteDetailsFragment(route.routeId)
-                )
-            }
-
             if (isPublic) {
                 btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
+                routeDetailsEditButton.setOnClickListener {
+                    Toast.makeText(
+                        requireContext(),
+                        "Make your route private before editing it",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             } else {
                 btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
+                routeDetailsEditButton.setOnClickListener {
+                    findNavController().navigate(
+                        PrivateRoutesFragmentDirections
+                            .actionPrivateRoutesFragmentToRouteDetailsFragment(route.routeId)
+                    )
+                }
             }
 
             btnChangeRouteAccess.setOnClickListener {

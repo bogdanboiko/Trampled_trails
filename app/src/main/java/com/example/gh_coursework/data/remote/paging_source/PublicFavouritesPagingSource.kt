@@ -1,17 +1,19 @@
-package com.example.gh_coursework.data.remote
+package com.example.gh_coursework.data.remote.paging_source
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class FirestorePagingSource(
+class PublicFavouritesPagingSource(
     private val queryRoutes: Query,
-    private val tagsFilter: List<String>
+    private val routesIdList: List<String>
 ) : PagingSource<QuerySnapshot, PublicRouteModel>() {
 
     override fun getRefreshKey(state: PagingState<QuerySnapshot, PublicRouteModel>): QuerySnapshot? {
@@ -21,11 +23,11 @@ class FirestorePagingSource(
     override suspend fun load(params: LoadParams<QuerySnapshot>): LoadResult<QuerySnapshot, PublicRouteModel> {
         return try {
             withContext(Dispatchers.IO) {
-                val currentPage = params.key ?: if (tagsFilter.isNotEmpty()) {
+                val currentPage = params.key ?: if (routesIdList.isNotEmpty()) {
                     Tasks.await(
-                        queryRoutes.whereArrayContainsAny(
-                            "tagsList",
-                            tagsFilter
+                        queryRoutes.whereIn(
+                            FieldPath.documentId(),
+                            routesIdList
                         ).get()
                     )
                 } else {
@@ -43,11 +45,11 @@ class FirestorePagingSource(
                 }
 
                 val lastVisibleProduct = currentPage.documents[currentPage.size() - 1]
-                val nextPage = if (tagsFilter.isNotEmpty()) {
+                val nextPage = if (routesIdList.isNotEmpty()) {
                     Tasks.await(
-                        queryRoutes.whereArrayContainsAny(
-                            "tagsList",
-                            tagsFilter
+                        queryRoutes.whereIn(
+                            FieldPath.documentId(),
+                            routesIdList
                         ).startAfter(lastVisibleProduct).get()
                     )
                 } else {
@@ -79,6 +81,7 @@ class FirestorePagingSource(
                 )
             }
         } catch (e: Exception) {
+            Log.e("e", e.toString())
             LoadResult.Error(e)
         }
     }

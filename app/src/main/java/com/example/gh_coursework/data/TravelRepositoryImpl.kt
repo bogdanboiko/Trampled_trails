@@ -194,6 +194,10 @@ class TravelRepositoryImpl(
         return remoteDataSrcImpl.getAllFavouriteRoutes()
     }
 
+    override fun getUserFavouriteRoutes(userId: String): Flow<List<String>> {
+        return remoteDataSrcImpl.getUserFavouriteRoutes(userId)
+    }
+
     override suspend fun addRouteToFavourites(routeId: String, userId: String) {
         remoteDataSrcImpl.addRouteToFavourites(routeId, userId)
     }

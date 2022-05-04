@@ -410,7 +410,10 @@ class PublicRoutesFragment :
         pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun getRoutesDialog() {
+        var isFavouritesShowing = false
+
         binding.getRoutesList.setOnClickListener {
             routePointsDialogBehavior.peekHeight = 0
             routeDetailsDialogBehavior.peekHeight = 0
@@ -426,6 +429,26 @@ class PublicRoutesFragment :
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             } else {
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+
+            if (favourites.find { return@find it.userId == getUserIdCallback?.getUserId() } != null) {
+                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.VISIBLE
+
+                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.setOnClickListener {
+                    if (isFavouritesShowing) {
+                        fetchRoutes()
+                        binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.black)
+                        isFavouritesShowing = false
+                    } else {
+                        fetchFavouriteRoutes()
+                        binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.yellow_dark)
+                        isFavouritesShowing = true
+                    }
+                }
+            } else {
+                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.GONE
             }
         }
 
@@ -532,10 +555,32 @@ class PublicRoutesFragment :
             }
 
             routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
-                viewModelPublic.fetchRoutes(tagsFilter).collect { route ->
+                viewModelPublic.fetchTaggedRoutes(tagsFilter).collect { route ->
                     routesListAdapter.submitData(route)
                 }
             }
+        } else {
+            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun fetchFavouriteRoutes() {
+        if (internetCheckCallback?.isInternetAvailable() == true) {
+            if (this::routesFetchingJob.isInitialized) {
+                routesFetchingJob.cancel()
+            }
+
+            routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
+                getUserIdCallback?.getUserId()
+                    ?.let { userId ->
+                        viewModelPublic.getFavouriteRoutes(userId).collect {
+                            viewModelPublic.fetchFavouriteRoutes(it).collect { route ->
+                                routesListAdapter.submitData(route)
+                            }
+                        }
+                    }
+            }
+
         } else {
             Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
         }
@@ -786,7 +831,8 @@ class PublicRoutesFragment :
     ) {
         binding.bottomSheetDialogRouteDetails.apply {
             val isFavourite = favourites.find {
-                return@find it.routeId == publicRoute.routeId
+                return@find it.userId == getUserIdCallback?.getUserId()
+                        && it.routeId == publicRoute.routeId
             }
 
             isRouteFavourite = isFavourite != null

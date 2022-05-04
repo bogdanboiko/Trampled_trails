@@ -190,6 +190,10 @@ val pointUseCasesModule = module {
         GetAllFavouritesUseCaseImpl(get())
     }
 
+    single<GetUserFavouriteRoutesUseCase> {
+        GetUserFavouriteRoutesUseCaseImpl(get())
+    }
+
     single<GetUserPointsListUseCase> {
         GetUserPointsListUseCaseImpl(get())
     }

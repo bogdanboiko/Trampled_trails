@@ -21,9 +21,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageTask
 import com.google.firebase.storage.UploadTask
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.*
 import java.util.*
 
 class RemoteDataSrcImpl(
@@ -69,7 +67,7 @@ class RemoteDataSrcImpl(
     ) {
 
         val routeDocRef = db.collection("routes").document(route.routeId)
-        val favouritesDocRef = getFavouriteRoutes(route.routeId)
+        val favouritesDocRef = getFavouriteRoutesByRouteId(route.routeId)
 
         Tasks.await(db.runBatch { batch ->
             batch.set(routeDocRef, mapRouteDomainToPublicRouteEntity(
@@ -281,7 +279,7 @@ class RemoteDataSrcImpl(
 
     override fun changeRouteAccess(routeId: String, isPublic: Boolean) {
         val routeDocRef = db.collection("routes").document(routeId)
-        val favouritesDocRef = getFavouriteRoutes(routeId)
+        val favouritesDocRef = getFavouriteRoutesByRouteId(routeId)
 
         db.runBatch { batch ->
             batch.update(routeDocRef, "public", isPublic)
@@ -305,6 +303,22 @@ class RemoteDataSrcImpl(
         }
 
         emit(data)
+    }.flowOn(Dispatchers.IO)
+
+    override fun getUserFavouriteRoutes(userId: String) = flow {
+        val userFavouriteRoutes = Tasks.await(
+            db.collection("favourites")
+                .whereEqualTo("userId", userId)
+                .get()
+        )
+        val routesId = mutableListOf<String>()
+
+        userFavouriteRoutes.documents.forEach {
+            routesId.add(it.getString("routeId")!!)
+        }
+
+
+        emit(routesId)
     }.flowOn(Dispatchers.IO)
 
     override suspend fun addRouteToFavourites(routeId: String, userId: String) {
@@ -331,7 +345,7 @@ class RemoteDataSrcImpl(
         }
     }
 
-    private fun getFavouriteRoutes(routeId: String): List<DocumentReference> {
+    private fun getFavouriteRoutesByRouteId(routeId: String): List<DocumentReference> {
         val routes = Tasks.await(
             db.collection("favourites")
                 .whereEqualTo("routeId", routeId)
