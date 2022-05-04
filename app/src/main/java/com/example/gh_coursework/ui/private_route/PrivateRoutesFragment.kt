@@ -1310,7 +1310,7 @@ class PrivateRoutesFragment :
 
             btnChangeRouteAccess.setOnClickListener {
                 if (route.isPublic) {
-                    viewModelPrivate.changeRouteAccess(route.routeId)
+                    viewModelPrivate.changeRouteAccess(route.routeId, false)
                     btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
                     isPublic = false
                 } else {
@@ -1324,7 +1324,7 @@ class PrivateRoutesFragment :
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {
-                            viewModelPrivate.changeRouteAccess(route.routeId)
+                            viewModelPrivate.changeRouteAccess(route.routeId, true)
                             isPublic = true
                         }
                     } else {

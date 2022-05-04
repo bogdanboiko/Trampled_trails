@@ -59,9 +59,9 @@ class PrivateRouteViewModel(
         }
     }
 
-    fun changeRouteAccess(routeId: String) {
+    fun changeRouteAccess(routeId: String, isPublic: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
-            changeRouteAccessUseCase.invoke(routeId, true)
+            changeRouteAccessUseCase.invoke(routeId, isPublic)
         }
     }
 }
