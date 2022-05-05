@@ -2,13 +2,13 @@ package com.example.gh_coursework.ui.private_image_details.adapter
 
 import android.graphics.drawable.Drawable
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -23,13 +23,18 @@ class ImagesPreviewAdapter(private val onItemCLick: View.OnClickListener) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
             itemView.setOnClickListener(onItemCLick)
-            Log.e("e", imageModel.toString())
+
+            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+            circularProgressDrawable.strokeWidth = 5f
+            circularProgressDrawable.centerRadius = 30f
+            circularProgressDrawable.start()
 
             if (imageModel.isUploaded) {
                 itemView.context?.let { it1 ->
                     Glide.with(it1)
                         .load(imageModel.image)
                         .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
+                        .placeholder(circularProgressDrawable)
                         .into(binding.pointImage)
                 }
             } else {
@@ -41,6 +46,7 @@ class ImagesPreviewAdapter(private val onItemCLick: View.OnClickListener) :
                             Glide.with(it1)
                                 .load(image)
                                 .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
+                                .placeholder(circularProgressDrawable)
                                 .into(binding.pointImage)
                         }
                     }

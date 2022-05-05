@@ -12,7 +12,6 @@ import com.example.gh_coursework.ui.route_details.mapper.mapRouteDetailsModelToD
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageModelToDomain
 import com.example.gh_coursework.ui.route_details.mapper.mapRoutePointsImagesDomainToModel
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -30,13 +29,13 @@ class RouteDetailsViewModel(
     }
 
     fun updateRouteDetails(route: RouteDetailsModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             updateRouteDetailsUseCase.invoke(mapRouteDetailsModelToDomain(route))
         }
     }
 
     fun addPointImageList(images: List<RouteImageModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addRouteImageListUseCase.invoke(images.map(::mapRouteImageModelToDomain))
         }
     }

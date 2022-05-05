@@ -10,7 +10,7 @@ import com.example.gh_coursework.data.database.entity.*
         DeletedImageEntity::class,
         DeletedPointsEntity::class,
         DeletedRoutesEntity::class,
-        PointCoordinatesEntity::class,
+        PointPreviewEntity::class,
         PointDetailsEntity::class,
         PointTagEntity::class,
         PointsTagsEntity::class,
@@ -21,8 +21,8 @@ import com.example.gh_coursework.data.database.entity.*
         RouteImageEntity::class], version = 23
 )
 abstract class TravelDatabase : RoomDatabase() {
-    abstract fun getRoutePreviewDao(): RoutePreviewDao
-    abstract fun getPointDetailsDao(): PointDetailsDao
+    abstract fun getRoutePreviewDao(): RoutesDao
+    abstract fun getPointDetailsDao(): PointsDao
     abstract fun getPointTagDao(): PointTagDao
     abstract fun getRouteTagDao(): RouteTagDao
     abstract fun getImageDao(): ImageDao

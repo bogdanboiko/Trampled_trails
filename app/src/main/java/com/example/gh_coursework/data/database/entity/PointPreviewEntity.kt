@@ -11,7 +11,7 @@ import androidx.room.PrimaryKey
     parentColumns = arrayOf("routeId"),
     childColumns = arrayOf("routeId")
 )])
-data class PointCoordinatesEntity(
+data class PointPreviewEntity(
     @PrimaryKey
     @ColumnInfo(name = "pointId")
     val pointId: String,

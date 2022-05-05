@@ -1,18 +1,62 @@
 <resources>
+    <string name="app_name">Gh_Coursework</string>
+
     <string name="mapbox_access_token">pk.eyJ1IjoiZ2hjb3Vyc2V3b3JrIiwiYSI6ImNsMWYzMmlyZTAwYnMzZW8wYmxnbmxuaGMifQ.rjWVPxd3LzssJi3d4PjqJQ</string>
 
     <string name="facebook_application_id" translatable="false">522393695946820</string>
     <string name="fb_login_protocol_scheme" translatable="false">fb522393695946820</string>
-  
-    <string name="app_name">Gh_Coursework</string>
-    <string name="public_menu_item">Public</string>
-    <string name="private_menu_item">Private</string>
-    <string name="txtSaveButtonDisable">disable</string>
-    <string name="txtSaveButtonSave">save</string>
-    <string name="public_route_point_placeholder">This route doesn\'t contain annotated points</string>
 
-    <string name="private_no_point_placeholder">Points list is empty. Create your first point by pressing + button!</string>
-    <string name="private_no_point_found_by_tags_placeholder">There is no points found by that tags filter</string>
-    <string name="private_no_routes_placeholder">Routes list is empty. Create your first route by pressing + button!</string>
-    <string name="private_no_routes_found_by_tags_placeholder">There is no routes found by that tags filter</string>
+    <string name="bottom_nav_menu_public">Public</string>
+    <string name="bottom_nav_menu_private">Private</string>
+
+    <string name="homepage_theme">Theme</string>
+    <string name="homepage_edit_profile">Edit profile</string>
+    <string name="homepage_log_out">Log out</string>
+
+    <string name="save_button_save">save</string>
+    <string name="save_button_disable">disable</string>
+
+    <string name="tag_button_submit">submit</string>
+    <string name="tag_button_clear">clear</string>
+    <string name="tag_button_cancel">cancel</string>
+
+    <string name="sign_in_button">sign in</string>
+
+    <string name="points_button">points</string>
+    <string name="routes_button">routes</string>
+
+    <string name="reset_button">reset</string>
+    <string name="undo_button">undo</string>
+
+    <string name="progress_bar">Processing…</string>
+
+    <string name="hint_caption">Put in caption…</string>
+    <string name="hint_description">Put in description…</string>
+
+    <string name="no_internet_connection">No internet connection</string>
+
+    <string name="make_route_private_before_deleting">Make your route private before deleting it</string>
+    <string name="make_route_private_before_editing">Make your route private before editing it</string>
+    <string name="make_route_private_before_deleting_it_point">Make your route private before deleting it\'s point</string>
+    <string name="make_route_private_before_editing_it_point">Make your route private before editing it\'s point</string>
+
+    <string name="can_not_delete_route_point">It\'s route point. You can delete it only from routes screen</string>
+    <string name="can_not_edit_route_point">It\'s route point. You can edit it only from routes screen</string>
+
+    <string name="placeholder_public_route_points">This route doesn\'t contain annotated points</string>
+    <string name="placeholder_public_favourite_routes_not_found">You haven\'t added any favourite routes yet</string>
+
+    <string name="placeholder_private_routes_empty_list">Routes list is empty. Create your first route by pressing + button!</string>
+    <string name="placeholder_private_routes_not_found_by_tags">There is no routes found by that tags filter</string>
+    <string name="placeholder_private_route_points_list_empty">Points list is empty. Create your first route with annotated points!</string>
+    <string name="placeholder_private_route_item_empty">Text data is empty. Press flag icon than edit to start filling the data</string>
+    <string name="placeholder_fill_route_data">Caption or details of publishing route are empty! Fill data before publishing</string>
+    <string name="placeholder_sign_in_before_publishing_route">Sign in pressing the homepage button before publishing route!</string>
+
+    <string name="placeholder_private_points_list_empty">Points list is empty. Create your first point by pressing + button!</string>
+    <string name="placeholder_private_no_point_found_by_tags">There is no points found by that tags filter</string>
+    <string name="placeholder_private_point_item_empty">Text data is empty. Press point icon than edit to start filling the data</string>
+
+    <string name="placeholder_private_data_is_empty">Text data is empty. Press edit button to start filling the data</string>
+    <string name="placeholder_public_data_is_empty">Text data is empty</string>
 </resources>

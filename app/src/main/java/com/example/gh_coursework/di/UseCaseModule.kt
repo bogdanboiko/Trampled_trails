@@ -2,6 +2,8 @@ package com.example.gh_coursework.di
 
 import com.example.gh_coursework.domain.usecase.deleted.*
 import com.example.gh_coursework.domain.usecase.image.*
+import com.example.gh_coursework.domain.usecase.main_activity.GetAllPointsUseCase
+import com.example.gh_coursework.domain.usecase.main_activity.GetAllPointsUseCaseImpl
 import com.example.gh_coursework.domain.usecase.point_details.*
 import com.example.gh_coursework.domain.usecase.point_preview.*
 import com.example.gh_coursework.domain.usecase.point_tag.*
@@ -16,14 +18,6 @@ import org.koin.dsl.module
 val pointUseCasesModule = module {
 
     //Deleted routes and points
-    single<AddDeletedPointUseCase> {
-        AddDeletedPointUseCaseImpl(get())
-    }
-
-    single<AddDeletedRouteUseCase> {
-        AddDeletedRouteUseCaseImpl(get())
-    }
-
     single<ClearDeletedPointsTableUseCase> {
         ClearDeletedPointsTableUseCaseImpl(get())
     }
@@ -74,16 +68,16 @@ val pointUseCasesModule = module {
     }
 
     //Point details
-    single<AddPointDetailsUseCase> {
-        AddPointDetailsUseCaseImpl(get())
+    single<UpdatePointDetailsUseCase> {
+        UpdatePointDetailsUseCaseImpl(get())
     }
 
     single<GetPointDetailsUseCase> {
         GetPointDetailsUseCaseImpl(get())
     }
 
-    single<GetAllPointsDetailsUseCase> {
-        GetAllPointsDetailsUseCaseImpl(get())
+    single<com.example.gh_coursework.domain.usecase.point_preview.GetAllPointsUseCase> {
+        com.example.gh_coursework.domain.usecase.point_preview.GetAllPointsUseCaseImpl(get())
     }
 
     //Point images
@@ -135,10 +129,6 @@ val pointUseCasesModule = module {
     }
 
     //RouteDetails
-    single<GetPublicRouteListUseCase> {
-        GetPublicRouteListUseCaseImpl(get())
-    }
-
     single<GetRouteDetailsUseCase> {
         GetRouteDetailsUseCaseImpl(get())
     }
@@ -186,12 +176,12 @@ val pointUseCasesModule = module {
         FetchRoutePointsFromRemoteUseCaseImpl(get())
     }
 
-    single<GetAllFavouritesUseCase> {
-        GetAllFavouritesUseCaseImpl(get())
+    single<GetUserFavouriteRoutesUseCase> {
+        GetUserFavouriteRoutesUseCaseImpl(get())
     }
 
-    single<GetUserPointsListUseCase> {
-        GetUserPointsListUseCaseImpl(get())
+    single<GetUserPointListUseCase> {
+        GetUserPointListUseCaseImpl(get())
     }
 
     single<GetUserRouteListUseCase> {
@@ -206,12 +196,12 @@ val pointUseCasesModule = module {
         RemoveRouteFromFavouritesUseCaseImpl(get())
     }
 
-    single<SavePublicPointsToPrivateUseCase> {
-        SavePublicPointsToPrivateUseCaseImpl(get())
+    single<SyncRemotePointsWithLocalUseCase> {
+        SyncRemotePointsWithLocalUseCaseImpl(get())
     }
 
-    single<SavePublicRouteToPrivateUseCase> {
-        SavePublicRouteToPrivateUseCaseImpl(get())
+    single<SyncRemoteRoutesWithLocalUseCase> {
+        SyncRemoteRoutesWithLocalUseCaseImpl(get())
     }
 
     single<UploadPointsToFirebaseUseCase> {

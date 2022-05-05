@@ -1,6 +1,5 @@
 package com.example.gh_coursework.data
 
-import com.example.gh_coursework.data.database.mapper.route_preview.mapRoutePointDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.domain.entity.*
@@ -11,6 +10,11 @@ class TravelRepositoryImpl(
     private val localDataSrcIml: TravelDatasource.Local,
     private val remoteDataSrcImpl: TravelDatasource.Remote
 ) : TravelRepository {
+
+    override suspend fun deleteAll() {
+        deleteAllPoints()
+        deleteAllRoutes()
+    }
 
     //Deleted routes and points
     override suspend fun addDeletedPoint(point: DeletedPointDomain) {
@@ -42,8 +46,8 @@ class TravelRepositoryImpl(
     }
 
     //PointPreview
-    override suspend fun addPointCoordinatesWithDetails(poi: PointPreviewDomain) {
-        localDataSrcIml.addPointOfInterestCoordinates(poi)
+    override suspend fun addPointPreviewWithDetails(poi: PointPreviewDomain) {
+        localDataSrcIml.addPointPreview(poi)
     }
 
     override fun getAllPoints(): Flow<List<PointDomain>> {
@@ -60,7 +64,7 @@ class TravelRepositoryImpl(
 
     //PointDetails
     override suspend fun updatePointDetails(poi: PointDetailsDomain) {
-        localDataSrcIml.updatePointOfInterestDetails(poi)
+        localDataSrcIml.updatePointDetails(poi)
     }
 
     override fun getAllPointsDetails() = localDataSrcIml.getAllPointsDetails()
@@ -79,7 +83,7 @@ class TravelRepositoryImpl(
         }
     }
 
-    override fun getPointOfInterestDetails(id: String) = localDataSrcIml.getPointOfInterestDetails(id)
+    override fun getPointDetails(id: String) = localDataSrcIml.getPointDetails(id)
 
     override fun getPointImages(pointId: String) = localDataSrcIml.getPointImages(pointId)
 
@@ -90,6 +94,7 @@ class TravelRepositoryImpl(
 
     override suspend fun deletePoint(point: PointDetailsDomain) {
         localDataSrcIml.deletePoint(point.pointId)
+        addDeletedPoint(DeletedPointDomain(point.pointId))
 
         point.imageList.forEach {
             if (it.isUploaded) {
@@ -107,8 +112,12 @@ class TravelRepositoryImpl(
     }
 
     //RoutePreview
-    override suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointDomain>) {
-        localDataSrcIml.addRoute(route, coordinatesList.map(::mapRoutePointDomainToEntity))
+    override suspend fun addRoute(route: RouteDomain, pointsList: List<PointPreviewDomain>) {
+        localDataSrcIml.addRoute(route)
+
+        pointsList.forEach { point ->
+            localDataSrcIml.addPointPreview(point)
+        }
     }
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
@@ -125,6 +134,7 @@ class TravelRepositoryImpl(
 
     override suspend fun deleteRoute(route: RouteDomain) {
         localDataSrcIml.deleteRoute(route)
+        addDeletedRoute(DeletedRouteDomain(route.routeId))
 
         route.imageList.forEach {
             if (it.isUploaded) {
@@ -176,8 +186,6 @@ class TravelRepositoryImpl(
         return remoteDataSrcImpl.getUserPoints(userId)
     }
 
-    override fun getPublicRoutesList(): Flow<List<PublicRouteDomain>> = remoteDataSrcImpl.getPublicRoutes()
-
     override suspend fun uploadRouteToFirebase(route: RouteDomain, currentUser: String) {
         remoteDataSrcImpl.uploadRouteToFirebase(route, currentUser)
     }
@@ -190,8 +198,8 @@ class TravelRepositoryImpl(
         return remoteDataSrcImpl.fetchRoutePoints(routeId)
     }
 
-    override fun getAllFavourites(): Flow<List<PublicFavouriteEntity>> {
-        return remoteDataSrcImpl.getAllFavouriteRoutes()
+    override fun getUserFavouriteRoutes(userId: String): Flow<List<String>> {
+        return remoteDataSrcImpl.getUserFavouriteRoutes(userId)
     }
 
     override suspend fun addRouteToFavourites(routeId: String, userId: String) {

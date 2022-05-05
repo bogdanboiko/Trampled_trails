@@ -46,7 +46,7 @@
         android:layout_marginBottom="60dp"
         android:visibility="invisible"
         android:backgroundTint="@color/yellow_light"
-        android:text="Sing In"
+        android:text="@string/sign_in_button"
         android:textSize="17sp"
         android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -76,13 +76,14 @@
         android:layout_height="60dp"
         android:layout_marginBottom="50dp"
         android:visibility="invisible"
-        android:text="Save"
+        android:text="@string/save_button_save"
         android:textSize="18sp"
         android:textColor="@color/gray"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
+    <!--Username edit end-->
+    <!--Spinner-->
     <include
         android:id="@+id/progressBar"
         android:layout_height="match_parent"
@@ -92,5 +93,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         layout="@layout/progress_bar"/>
-    <!--Username edit end-->
 </androidx.constraintlayout.widget.ConstraintLayout>

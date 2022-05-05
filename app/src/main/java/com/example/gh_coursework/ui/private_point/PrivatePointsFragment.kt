@@ -90,7 +90,12 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
 
         if (result == null) {
-            val newPoint = PrivatePointPreviewModel(UUID.randomUUID().toString(), point.longitude(), point.latitude(), false)
+            val newPoint = PrivatePointPreviewModel(
+                UUID.randomUUID().toString(),
+                point.longitude(),
+                point.latitude(),
+                false
+            )
             viewModel.addPoint(newPoint)
         }
 
@@ -114,23 +119,24 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         super.onDetach()
 
         internetCheckCallback = null
+        syncStateCallback = null
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPrivatePointsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         configMap()
         configBottomNavBar()
         configMapSwitcherButton()
         configMapModSwitcher()
         configCancelButton()
-        configPointsButton()
         configBottomSheetDialog()
         onNavigateToHomepageButtonClickListener()
         fetchPoints()
@@ -138,8 +144,10 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         viewLifecycleOwner.lifecycleScope.launch {
             syncStateCallback?.getStateSubscribeTo()?.collect { state ->
                 when (state) {
-                    is SyncingProgressState.Loading -> binding.progressBar.loadBackground.visibility = View.VISIBLE
-                    is SyncingProgressState.FinishedSync -> binding.progressBar.loadBackground.visibility = View.GONE
+                    is SyncingProgressState.Loading -> binding.progressBar.loadBackground.visibility =
+                        View.VISIBLE
+                    is SyncingProgressState.FinishedSync -> binding.progressBar.loadBackground.visibility =
+                        View.GONE
                 }
             }
         }
@@ -151,7 +159,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
                 if (tagArray.isEmpty()) {
                     binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
-                        context?.resources?.getString(R.string.private_no_point_placeholder)
+                        context?.resources?.getString(R.string.placeholder_private_points_list_empty)
                 }
 
                 fetchPoints()
@@ -229,21 +237,6 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     }
 
-    private fun configBottomNavBar() {
-        binding.bottomNavigationView.menu.getItem(2).isChecked = true
-        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            if (internetCheckCallback?.isInternetAvailable() == true) {
-                findNavController().navigate(
-                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment("point")
-                )
-            } else {
-                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
-            }
-
-            return@setOnMenuItemClickListener true
-        }
-    }
-
     private fun configMap() {
         mapboxMap = binding.mapView.getMapboxMap().also {
             it.loadStyleUri(Style.MAPBOX_STREETS)
@@ -255,54 +248,34 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         pointAnnotationManager.addClickListener(onPointClickEvent)
     }
 
+    private fun configBottomNavBar() {
+        binding.bottomNavigationView.menu.getItem(2).isChecked = true
+        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
+            if (internetCheckCallback?.isInternetAvailable() == true) {
+                findNavController().navigate(
+                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment(
+                        "point"
+                    )
+                )
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.no_internet_connection,
+                    Toast.LENGTH_SHORT
+                )
+                    .show()
+            }
+
+            return@setOnMenuItemClickListener true
+        }
+    }
+
     private fun configMapSwitcherButton() {
         binding.mapRoutePointModSwitcher.setOnClickListener {
             findNavController().navigate(
                 PrivatePointsFragmentDirections
                     .actionPrivatePointsFragmentToPrivateRoutesFragment()
             )
-        }
-    }
-
-    private fun configBottomSheetDialog() {
-        PagerSnapHelper().attachToRecyclerView(binding.pointDetailsBottomSheetDialogLayout.imageRecycler)
-        pointDetailsImagesLayoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        pointDetailsBottomSheetBehavior =
-            BottomSheetBehavior.from(binding.pointDetailsBottomSheetDialogLayout.pointBottomSheetDialog)
-
-        pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-        pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        pointsListBottomSheetBehavior =
-            BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
-        pointsListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-        binding.bottomSheetDialogPoints.pointsRecyclerView.apply {
-            adapter = pointListAdapter
-            layoutManager = pointsLayoutManager
-        }
-
-        binding.bottomSheetDialogPoints.pointFilterByTagButton.setOnClickListener {
-            findNavController().navigate(
-                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPointFilterByTagsDialogFragment(
-                    checkedTagList.toTypedArray()
-                )
-            )
-        }
-    }
-
-    private fun getPointDetailsDialog(annotation: PointAnnotation) {
-
-        loadPointDetailsData(annotation)
-
-        pointsListBottomSheetBehavior.peekHeight = 0
-        pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-
-        if (pointDetailsBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -354,9 +327,52 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     }
 
-    private fun configPointsButton() {
+    private fun configBottomSheetDialog() {
+        PagerSnapHelper().attachToRecyclerView(binding.pointDetailsBottomSheetDialogLayout.imageRecycler)
+
+        pointDetailsImagesLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        pointDetailsBottomSheetBehavior = BottomSheetBehavior.from(binding.pointDetailsBottomSheetDialogLayout.pointBottomSheetDialog)
+        pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        pointsListBottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
+        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        getPointsDialog()
+    }
+
+    private fun getPointsDialog() {
+        binding.bottomSheetDialogPoints.pointsRecyclerView.apply {
+            adapter = pointListAdapter
+            layoutManager = pointsLayoutManager
+        }
+
         binding.getPointsList.setOnClickListener {
-            pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            pointDetailsBottomSheetBehavior.peekHeight = 0
+            pointsListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+
+            if (pointsListBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        binding.bottomSheetDialogPoints.pointFilterByTagButton.setOnClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPointFilterByTagsDialogFragment(
+                    checkedTagList.toTypedArray()
+                )
+            )
+        }
+    }
+
+    private fun getPointDetailsDialog(annotation: PointAnnotation) {
+        loadPointDetailsData(annotation)
+
+        pointsListBottomSheetBehavior.peekHeight = 0
+        pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+
+        if (pointDetailsBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -390,7 +406,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
                     if (filteredPoints.isEmpty()) {
                         binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
-                            context?.resources?.getString(R.string.private_no_point_found_by_tags_placeholder)
+                            context?.resources?.getString(R.string.placeholder_private_no_point_found_by_tags)
                     }
                 } else {
                     filteredPoints = points.toMutableList()
@@ -467,39 +483,62 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                pointCaptionText.text = point.caption
-                pointDescriptionText.text = point.description
+                emptyDataPlaceholder.visibility = View.GONE
+            }
+
+            pointCaptionText.text = point.caption
+            pointDescriptionText.text = point.description
+            if (point.tagList.isEmpty()) {
+                tagListTextView.text = ""
+                tagListTextView.visibility = View.GONE
+            } else {
                 tagListTextView.text = point.tagList.joinToString(
                     ",",
                     "Tags: "
                 ) { pointTagModel -> pointTagModel.name }
-                emptyDataPlaceholder.visibility = View.GONE
+                tagListTextView.visibility = View.VISIBLE
             }
 
-            imagesPreviewAdapter = ImagesPreviewAdapter {
-                findNavController().navigate(
-                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPrivateImageDetails(
-                        point.pointId,
-                        this@PrivatePointsFragment.pointDetailsImagesLayoutManager.findFirstVisibleItemPosition()
-                    )
+
+        imagesPreviewAdapter = ImagesPreviewAdapter {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPrivateImageDetails(
+                    point.pointId,
+                    this@PrivatePointsFragment.pointDetailsImagesLayoutManager.findFirstVisibleItemPosition()
                 )
-            }
+            )
+        }
 
-            imageRecycler.apply {
-                adapter = imagesPreviewAdapter
-                layoutManager = this@PrivatePointsFragment.pointDetailsImagesLayoutManager
-            }
+        imageRecycler.apply {
+            adapter = imagesPreviewAdapter
+            layoutManager = this@PrivatePointsFragment.pointDetailsImagesLayoutManager
+        }
 
-            imagesPreviewAdapter.submitList(point.imageList)
+        imagesPreviewAdapter.submitList(point.imageList)
 
-            pointDetailsEditButton.setOnClickListener {
+        pointDetailsEditButton.setOnClickListener {
+            if (!point.routeId.isNullOrEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.can_not_edit_route_point,
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
                 findNavController().navigate(
                     PrivatePointsFragmentDirections
                         .actionPrivatePointsFragmentToPointDetailsFragment(point.pointId)
                 )
             }
+        }
 
-            pointDetailsDeleteButton.setOnClickListener {
+        pointDetailsDeleteButton.setOnClickListener {
+            if (!point.routeId.isNullOrEmpty()) {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.can_not_delete_route_point,
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
                 viewModel.deletePoint(point)
 
                 pointAnnotationManager.delete(pointAnnotation)
@@ -507,6 +546,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             }
         }
     }
+}
 
     override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
         eraseCameraToPoint(pointDetails.x, pointDetails.y)

@@ -22,9 +22,9 @@ import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPointDetailsBinding
+import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
-import com.example.gh_coursework.ui.point_details.model.PointDetailsModel
 import com.example.gh_coursework.ui.themes.MyAppTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -32,7 +32,6 @@ import org.koin.core.parameter.parametersOf
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
-
 
 class PointDetailsFragment : ThemeFragment() {
     private lateinit var layoutManager: LinearLayoutManager
@@ -76,7 +75,7 @@ class PointDetailsFragment : ThemeFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPointDetailsBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
@@ -144,6 +143,8 @@ class PointDetailsFragment : ThemeFragment() {
             confirmEditButton.setOnClickListener {
                 it.visibility = View.GONE
                 pointDetailsEditButton.visibility = View.VISIBLE
+                pointDetailsTagButton.visibility = View.VISIBLE
+                pointImageAddButton.visibility = View.VISIBLE
                 pointCaptionText.isEnabled = false
                 pointDescriptionText.isEnabled = false
                 pointCaptionText.hint = ""
@@ -177,10 +178,12 @@ class PointDetailsFragment : ThemeFragment() {
                 it.visibility = View.GONE
                 emptyDataPlaceholder.visibility = View.INVISIBLE
                 confirmEditButton.visibility = View.VISIBLE
+                pointDetailsTagButton.visibility = View.GONE
+                pointImageAddButton.visibility = View.GONE
                 pointCaptionText.isEnabled = true
                 pointDescriptionText.isEnabled = true
-                pointCaptionText.hint = "Put in point caption..."
-                pointDescriptionText.hint = "Put in point description..."
+                pointCaptionText.hint = resources.getString(R.string.hint_caption)
+                pointDescriptionText.hint = resources.getString(R.string.hint_description)
             }
 
             pointImageAddButton.setOnClickListener {

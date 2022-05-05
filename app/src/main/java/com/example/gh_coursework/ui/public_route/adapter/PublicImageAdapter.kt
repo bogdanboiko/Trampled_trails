@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -18,11 +19,17 @@ class PublicImageAdapter(private val onItemCLick: View.OnClickListener) :
     inner class ImageViewHolder(private val binding: ItemImagesPreviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(image: String) {
+            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+            circularProgressDrawable.strokeWidth = 5f
+            circularProgressDrawable.centerRadius = 30f
+            circularProgressDrawable.start()
+
             itemView.setOnClickListener(onItemCLick)
             itemView.context?.let { it1 ->
                 Glide.with(it1)
                     .load(image)
                     .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
+                    .placeholder(circularProgressDrawable)
                     .into(binding.pointImage)
             }
         }

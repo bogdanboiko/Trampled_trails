@@ -15,7 +15,6 @@ import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointDomainToMo
 import com.example.gh_coursework.ui.private_route.mapper.mapRoutePointModelToDomain
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -33,7 +32,7 @@ class PrivateRouteViewModel(
         .map { route -> route.map(::mapRouteDomainToModel) }
 
     fun addRoute(route: RouteModel, pointsList: List<RoutePointModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addRouteUseCase.invoke(
                 mapRouteModelToDomain(route),
                 pointsList.map(::mapRoutePointModelToDomain)
@@ -48,20 +47,20 @@ class PrivateRouteViewModel(
     }
 
     fun deletePoint(point: RoutePointModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deletePointUseCase.invoke(mapRoutePointModelToPointDetailsDomain(point))
         }
     }
 
     fun deleteRoute(route: RouteModel) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteRouteUseCase.invoke(mapRouteModelToDomain(route))
         }
     }
 
-    fun changeRouteAccess(routeId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            changeRouteAccessUseCase.invoke(routeId, true)
+    fun changeRouteAccess(routeId: String, isPublic: Boolean) {
+        viewModelScope.launch {
+            changeRouteAccessUseCase.invoke(routeId, isPublic)
         }
     }
 }

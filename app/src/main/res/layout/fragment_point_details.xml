@@ -145,7 +145,7 @@
         android:paddingEnd="60dp"
         app:layout_anchor="@id/pointDescriptionText"
         app:layout_anchorGravity="bottom"
-        android:text="Text data is empty. Press edit button to start filling the data"
+        android:text="@string/placeholder_private_data_is_empty"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

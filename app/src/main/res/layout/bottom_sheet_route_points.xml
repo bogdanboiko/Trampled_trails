@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:gravity="center"
-        android:text="Points list is empty. Create your first route with annotated points!"
+        android:text="@string/placeholder_private_route_points_list_empty"
         android:textColor="@color/beige"
         android:textSize="20sp"
         android:visibility="visible" />

@@ -3,11 +3,10 @@ package com.example.gh_coursework
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.deleted.*
-import com.example.gh_coursework.domain.usecase.point_preview.GetAllPointsUseCase
+import com.example.gh_coursework.domain.usecase.main_activity.GetAllPointsUseCase
 import com.example.gh_coursework.domain.usecase.public.*
 import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
 import com.example.gh_coursework.ui.homepage.data.SyncingProgressState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
@@ -26,12 +25,12 @@ class ActivityViewModel(
     private val getDeletedPointsUseCase: GetDeletedPointsUseCase,
     private val getRoutesListUseCase: GetRoutesListUseCase,
     private val getPointsListUseCase: GetAllPointsUseCase,
-    private val getUserPointsListUseCase: GetUserPointsListUseCase,
+    private val getUserPointsListUseCase: GetUserPointListUseCase,
     private val getUserRouteListUseCase: GetUserRouteListUseCase,
     private val uploadRouteUseCase: UploadRouteToFirebaseUseCase,
     private val uploadPointsUseCase: UploadPointsToFirebaseUseCase,
-    private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase,
-    private val savePublicPointsToPrivateUseCase: SavePublicPointsToPrivateUseCase
+    private val savePublicRouteToPrivateUseCase: SyncRemoteRoutesWithLocalUseCase,
+    private val savePublicPointsToPrivateUseCase: SyncRemotePointsWithLocalUseCase
 ) : ViewModel() {
 
     private val deletedRoutes = getDeletedRoutesUseCase.invoke()
@@ -40,13 +39,13 @@ class ActivityViewModel(
     val syncProgress: SharedFlow<SyncingProgressState> = _syncProgress
 
     fun deleteAll() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteAllUseCase.invoke()
         }
     }
 
     fun syncDataWithFirebase(userId: String) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             _syncProgress.emit(SyncingProgressState.Loading)
             deleteRemotePoints()
             deleteRemoteRoutes()
@@ -91,13 +90,13 @@ class ActivityViewModel(
     }
 
     private fun clearDeletedPointsTable() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             clearDeletedPointsTableUseCase.invoke()
         }
     }
 
     private fun clearDeletedRoutesTable() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             clearDeletesRoutesTableUseCase.invoke()
         }
     }

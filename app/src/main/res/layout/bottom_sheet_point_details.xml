@@ -34,7 +34,7 @@
         android:gravity="center"
         android:paddingStart="60dp"
         android:paddingEnd="60dp"
-        android:text="Text data is empty. Press edit button to start filling the data"
+        android:text="@string/placeholder_private_data_is_empty"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="@id/nestedScroll" />
 

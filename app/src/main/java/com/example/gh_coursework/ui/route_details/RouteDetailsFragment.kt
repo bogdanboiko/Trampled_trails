@@ -22,9 +22,9 @@ import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentRouteDetailsBinding
+import com.example.gh_coursework.ui.private_image_details.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel.RouteImageModel
-import com.example.gh_coursework.ui.private_image_details.adapter.ImagesInDetailsAdapter
 import com.example.gh_coursework.ui.route_details.model.RouteCompleteModel
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
 import com.example.gh_coursework.ui.themes.MyAppTheme
@@ -158,6 +158,8 @@ class RouteDetailsFragment : ThemeFragment() {
             confirmEditButton.setOnClickListener {
                 it.visibility = View.GONE
                 routeDetailsEditButton.visibility = View.VISIBLE
+                routeDetailsTagButton.visibility = View.VISIBLE
+                routeImageAddButton.visibility = View.VISIBLE
                 routeCaptionText.isEnabled = false
                 routeDescriptionText.isEnabled = false
                 routeCaptionText.hint = ""
@@ -192,10 +194,12 @@ class RouteDetailsFragment : ThemeFragment() {
                 it.visibility = View.GONE
                 emptyDataPlaceholder.visibility = View.GONE
                 confirmEditButton.visibility = View.VISIBLE
+                routeDetailsTagButton.visibility = View.GONE
+                routeImageAddButton.visibility = View.GONE
                 routeCaptionText.isEnabled = true
                 routeDescriptionText.isEnabled = true
-                routeCaptionText.hint = "Put in point caption..."
-                routeDescriptionText.hint = "Put in point description..."
+                routeCaptionText.hint = resources.getString(R.string.hint_caption)
+                routeDescriptionText.hint = resources.getString(R.string.hint_description)
             }
 
             routeImageAddButton.setOnClickListener {

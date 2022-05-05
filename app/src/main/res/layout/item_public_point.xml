@@ -57,7 +57,7 @@
         android:layout_marginEnd="15dp"
         android:gravity="center"
         android:padding="5dp"
-        android:text="Text data is empty"
+        android:text="@string/placeholder_public_data_is_empty"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_anchorGravity="bottom"

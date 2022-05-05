@@ -17,6 +17,7 @@ import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.dolatkia.animatedThemeManager.AppTheme
@@ -31,6 +32,7 @@ import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 import com.example.gh_coursework.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment
 import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.JsonPrimitive
 import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
@@ -47,6 +49,7 @@ import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListene
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotationManager
 import com.mapbox.maps.plugin.annotation.generated.createPointAnnotationManager
+import com.mapbox.maps.plugin.compass.compass
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.navigation.base.ExperimentalPreviewMapboxNavigationAPI
 import com.mapbox.navigation.base.extensions.applyDefaultNavigationOptions
@@ -65,8 +68,10 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
@@ -94,9 +99,9 @@ class PublicRoutesFragment :
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
     private var tagsFilter = emptyList<String>()
-    private var favourites = emptyList<PublicFavouriteEntity>()
+    private var favourites = mutableListOf<String>()
     private var isRouteFavourite = false
-    private var savedPublicRoutesList = emptyList<PublicRouteModel>()
+    private var isSortedByFavourites = false
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private lateinit var focusedPublicRoute: PublicRouteModel
 
@@ -120,7 +125,8 @@ class PublicRoutesFragment :
                 getRouteDetailsDialog()
             }
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
 
         true
@@ -230,7 +236,7 @@ class PublicRoutesFragment :
                 tagsFilter = tagArray.toList()
                 if (tagArray.isEmpty()) {
                     binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
-                        context?.resources?.getString(R.string.private_no_routes_placeholder)
+                        context?.resources?.getString(R.string.placeholder_private_routes_empty_list)
                 }
 
                 fetchRoutes()
@@ -276,9 +282,6 @@ class PublicRoutesFragment :
                 homepageButton.setImageResource(R.drawable.ic_home_dark)
             }
 
-            createButton.backgroundTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-
             DrawableCompat.wrap(getRoutesList.background)
                 .setTint(theme.colorOnPrimary(requireContext()))
             DrawableCompat.wrap(getRoutePointsList.background)
@@ -312,8 +315,19 @@ class PublicRoutesFragment :
                 )
             )
 
-            bottomSheetDialogPointDetails.pointDetailsAddToFavouriteButton.imageTintList =
+            bottomSheetDialogRouteDetails.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogRouteDetails.routeDetailsAddToFavouriteButton.imageTintList =
                 ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
+            bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(requireContext())
+            )
+
+            bottomSheetDialogPointDetails.root.backgroundTintList =
+                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
+            bottomSheetDialogPointDetails.emptyDataPlaceholder.setTextColor(
+                theme.colorSecondaryVariant(requireContext())
+            )
         }
     }
 
@@ -337,14 +351,15 @@ class PublicRoutesFragment :
     private fun fetchSavedPublicRoutes() {
         if (internetCheckCallback?.isInternetAvailable() == true) {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModelPublic.fetchPublicRouteList().collect {
-                    savedPublicRoutesList = it
-                }
 
-                favourites = viewModelPublic.favourites.first()
+                favourites =
+                    getUserIdCallback?.let {
+                        viewModelPublic.getFavouriteRoutes(it.getUserId()).first()
+                    } as MutableList<String>
             }
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -369,6 +384,8 @@ class PublicRoutesFragment :
             enabled = true
         }
 
+        binding.mapView.compass.enabled = false
+
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
         pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
     }
@@ -388,7 +405,7 @@ class PublicRoutesFragment :
         getRoutePointsDialog()
         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.text =
-            resources.getText(R.string.public_route_point_placeholder)
+            resources.getText(R.string.placeholder_public_route_points)
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
         routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
@@ -410,7 +427,9 @@ class PublicRoutesFragment :
         pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun getRoutesDialog() {
+
         binding.getRoutesList.setOnClickListener {
             routePointsDialogBehavior.peekHeight = 0
             routeDetailsDialogBehavior.peekHeight = 0
@@ -426,6 +445,32 @@ class PublicRoutesFragment :
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             } else {
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility =
+                    View.VISIBLE
+
+                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.setOnClickListener {
+                    if (isSortedByFavourites) {
+                        binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
+                        binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility =
+                            View.VISIBLE
+                        fetchRoutes()
+                        binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.black)
+                        isSortedByFavourites = false
+                    } else {
+                        binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility =
+                            View.GONE
+                        fetchFavouriteRoutes()
+                        binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.yellow_dark)
+                        isSortedByFavourites = true
+                    }
+                }
+            } else {
+                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.GONE
             }
         }
 
@@ -532,12 +577,48 @@ class PublicRoutesFragment :
             }
 
             routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
-                viewModelPublic.fetchRoutes(tagsFilter).collect { route ->
+                viewModelPublic.fetchTaggedRoutes(tagsFilter).collect { route ->
                     routesListAdapter.submitData(route)
                 }
             }
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    private fun fetchFavouriteRoutes() {
+        if (internetCheckCallback?.isInternetAvailable() == true) {
+            if (this::routesFetchingJob.isInitialized) {
+                routesFetchingJob.cancel()
+            }
+
+            routesFetchingJob = viewLifecycleOwner.lifecycleScope.launch {
+                getUserIdCallback?.getUserId()
+                    ?.let { userId ->
+                        viewModelPublic.getFavouriteRoutes(userId).collect {
+                            if (it.isNotEmpty()) {
+                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                                    View.GONE
+                                viewModelPublic.fetchFavouriteRoutes(it).collect { route ->
+                                    routesListAdapter.submitData(route)
+                                }
+                            } else {
+                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                                    View.VISIBLE
+                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
+                                    resources.getText(R.string.placeholder_public_favourite_routes_not_found)
+                                binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility =
+                                    View.GONE
+                                routesListAdapter.submitData(PagingData.empty())
+                            }
+                        }
+                    }
+            }
+
+        } else {
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -547,7 +628,8 @@ class PublicRoutesFragment :
             focusedPublicRoute = publicRoute
             routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -736,7 +818,8 @@ class PublicRoutesFragment :
             pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
             routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -757,10 +840,11 @@ class PublicRoutesFragment :
             if (point.caption.isEmpty() && point.description.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                pointCaptionText.text = point.caption
-                pointDescriptionText.text = point.description
                 emptyDataPlaceholder.visibility = View.GONE
             }
+
+            pointCaptionText.text = point.caption
+            pointDescriptionText.text = point.description
 
             pointImagesPreviewAdapter = PublicImageAdapter {
                 findNavController().navigate(
@@ -785,36 +869,71 @@ class PublicRoutesFragment :
         publicRoute: PublicRouteModel
     ) {
         binding.bottomSheetDialogRouteDetails.apply {
-            val isFavourite = favourites.find {
-                return@find it.routeId == publicRoute.routeId
-            }
+            isRouteFavourite = favourites.contains(publicRoute.routeId)
 
-            isRouteFavourite = isFavourite != null
+            if (FirebaseAuth.getInstance().currentUser == null) {
+                routeDetailsAddToFavouriteButton.visibility = View.GONE
+            } else {
+                routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
+            }
 
             if (isRouteFavourite) {
-                routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
+                routeDetailsAddToFavouriteButton.imageTintList =
+                    ColorStateList.valueOf(R.color.yellow_dark)
             } else {
-                routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
+                routeDetailsAddToFavouriteButton.imageTintList =
+                    ColorStateList.valueOf(R.color.black)
             }
 
-            routeDetailsAddToFavouriteButton.setOnClickListener {
-                if (isRouteFavourite) {
-                    viewModelPublic.removeRouteFromFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
-                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
-                    isRouteFavourite = false
-                } else {
-                    viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
-                    routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
-                    isRouteFavourite = true
+            if (internetCheckCallback?.isInternetAvailable() == true) {
+                routeDetailsAddToFavouriteButton.setOnClickListener {
+                    if (isRouteFavourite) {
+                        viewModelPublic.removeRouteFromFavourites(
+                            publicRoute.routeId,
+                            getUserIdCallback?.getUserId().toString()
+                        )
+                        routeDetailsAddToFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.black)
+                        isRouteFavourite = false
+                    } else {
+                        viewModelPublic.addRouteToFavourites(
+                            publicRoute.routeId,
+                            getUserIdCallback?.getUserId().toString()
+                        )
+                        routeDetailsAddToFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.yellow_dark)
+                        isRouteFavourite = true
+                    }
+
+                    runBlocking {
+                        fetchSavedPublicRoutes()
+                        if (isSortedByFavourites) {
+                            delay(500)
+                            fetchFavouriteRoutes()
+                        }
+                    }
                 }
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.no_internet_connection,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
-            if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {
-                emptyDataPlaceholder.visibility = View.VISIBLE
+            emptyDataPlaceholder.visibility = View.GONE
+            routeCaptionText.text = publicRoute.name
+            routeDescriptionText.text = publicRoute.description
+
+            if (publicRoute.tagsList.isEmpty()) {
+                tagListTextView.text = ""
+                tagListTextView.visibility = View.GONE
             } else {
-                routeCaptionText.text = publicRoute.name
-                routeDescriptionText.text = publicRoute.description
-                emptyDataPlaceholder.visibility = View.GONE
+                tagListTextView.text = publicRoute.tagsList.joinToString(
+                    ",",
+                    "Tags: "
+                )
+                tagListTextView.visibility = View.VISIBLE
             }
 
             routeImagesPreviewAdapter = PublicImageAdapter {

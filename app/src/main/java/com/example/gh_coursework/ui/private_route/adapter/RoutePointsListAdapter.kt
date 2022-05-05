@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.R
@@ -41,23 +42,25 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: RoutePointModel) {
+            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+            circularProgressDrawable.strokeWidth = 5f
+            circularProgressDrawable.centerRadius = 30f
+            circularProgressDrawable.start()
+
             with(binding) {
                 if (item.caption.isEmpty() && item.description.isEmpty()) {
-                    txtName.visibility = View.INVISIBLE
-                    txtDescription.visibility = View.INVISIBLE
-
                     emptyDataPlaceholder.visibility = View.VISIBLE
-
                 } else {
-                    txtName.text = item.caption
-                    txtDescription.text = item.description
                     emptyDataPlaceholder.visibility = View.GONE
                 }
+
+                txtName.text = item.caption
+                txtDescription.text = item.description
 
                 if (item.imageList.isEmpty()) {
                     Glide.with(itemView)
                         .load(R.drawable.ic_image_placeholder)
-                        .placeholder(imgMapImage.drawable)
+                        .placeholder(circularProgressDrawable)
                         .transform(RoundedCorners(10))
                         .into(imgMapImage)
                 }
@@ -67,14 +70,14 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
                     if (imageLink.isUploaded) {
                         Glide.with(itemView)
                             .load(imageLink.image)
-                            .placeholder(imgMapImage.drawable)
+                            .placeholder(circularProgressDrawable)
                             .error(R.drawable.ic_image_placeholder)
                             .transform(RoundedCorners(10))
                             .into(imgMapImage)
                     } else {
                         Glide.with(itemView)
                             .load(Drawable.createFromPath(Uri.parse(item.imageList[0].image).path))
-                            .placeholder(imgMapImage.drawable)
+                            .placeholder(circularProgressDrawable)
                             .error(R.drawable.ic_image_placeholder)
                             .transform(RoundedCorners(10))
                             .into(imgMapImage)

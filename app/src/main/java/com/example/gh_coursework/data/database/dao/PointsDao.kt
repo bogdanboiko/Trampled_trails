@@ -2,15 +2,15 @@ package com.example.gh_coursework.data.database.dao
 
 import androidx.room.*
 import androidx.room.OnConflictStrategy.REPLACE
-import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
+import com.example.gh_coursework.data.database.entity.PointPreviewEntity
 import com.example.gh_coursework.data.database.entity.PointDetailsEntity
 import com.example.gh_coursework.data.database.response.PointResponse
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class PointDetailsDao {
+abstract class PointsDao {
     @Insert(onConflict = REPLACE)
-    abstract suspend fun addPointPreview(pointCoordinatesEntity: PointCoordinatesEntity)
+    abstract suspend fun addPointPreview(pointCoordinatesEntity: PointPreviewEntity)
 
     @Insert(onConflict = REPLACE)
     abstract suspend fun addPointDetails(details: PointDetailsEntity)
@@ -34,7 +34,7 @@ abstract class PointDetailsDao {
     abstract fun deletePoint(pointId: String)
 
     @Transaction
-    open suspend fun insertPointCoordinatesAndCreateDetails(point: PointCoordinatesEntity) {
+    open suspend fun insertPointPreviewAndCreateDetails(point: PointPreviewEntity) {
         addPointPreview(point)
         addPointDetails(PointDetailsEntity(point.pointId, "", ""))
     }

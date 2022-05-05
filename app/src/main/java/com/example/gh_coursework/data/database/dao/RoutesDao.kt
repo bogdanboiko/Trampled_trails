@@ -8,7 +8,7 @@ import com.example.gh_coursework.data.database.response.RoutePreviewResponse
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class RoutePreviewDao {
+abstract class RoutesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertRoute(routeEntity: RouteEntity)
 

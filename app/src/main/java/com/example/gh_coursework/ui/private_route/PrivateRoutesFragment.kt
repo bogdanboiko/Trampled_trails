@@ -103,6 +103,7 @@ class PrivateRoutesFragment :
     private val viewModelPrivate: PrivateRouteViewModel by viewModel()
     private var internetCheckCallback: InternetCheckCallback? = null
 
+    private var isPublic = false
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private val creatingRouteCoordinatesList = mutableListOf<RoutePointModel>()
     private var filteredTags = emptyList<RouteTagModel>()
@@ -300,7 +301,7 @@ class PrivateRoutesFragment :
                 if (tagArray.isEmpty()) {
 
                     binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
-                        context?.resources?.getString(R.string.private_no_routes_placeholder)
+                        context?.resources?.getString(R.string.placeholder_private_routes_empty_list)
                 }
 
                 resetCurrentRoute()
@@ -553,7 +554,11 @@ class PrivateRoutesFragment :
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment("route")
                 )
             } else {
-                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    R.string.no_internet_connection,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             return@setOnMenuItemClickListener true
@@ -608,7 +613,7 @@ class PrivateRoutesFragment :
     private fun configSaveRouteButton() {
         isRouteSaveable.observe(viewLifecycleOwner) {
             if (it) {
-                binding.saveRouteButton.text = getString(R.string.txtSaveButtonSave)
+                binding.saveRouteButton.text = getString(R.string.save_button_save)
                 binding.saveRouteButton.icon =
                     view?.context?.let { it1 ->
                         AppCompatResources.getDrawable(
@@ -624,7 +629,7 @@ class PrivateRoutesFragment :
                     isRouteSaveable.value = false
                 }
             } else {
-                binding.saveRouteButton.text = getString(R.string.txtSaveButtonDisable)
+                binding.saveRouteButton.text = getString(R.string.save_button_disable)
                 binding.saveRouteButton.icon =
                     view?.context?.let { it1 ->
                         AppCompatResources.getDrawable(
@@ -753,22 +758,18 @@ class PrivateRoutesFragment :
 
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
-        routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         routePointsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutePoints.routePointsBottomSheetDialog)
-        routePointsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         routePointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         routeDetailsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRouteDetails.routeBottomSheetDialog)
-        routeDetailsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         pointDetailsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogPointDetails.pointBottomSheetDialog)
-        pointDetailsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
@@ -893,7 +894,7 @@ class PrivateRoutesFragment :
 
                     if (filteredRoutes.isEmpty()) {
                         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
-                            context?.resources?.getString(R.string.private_no_routes_found_by_tags_placeholder)
+                            context?.resources?.getString(R.string.placeholder_private_routes_not_found_by_tags)
                     }
                 } else {
                     filteredRoutes = routes.toMutableList()
@@ -1217,14 +1218,23 @@ class PrivateRoutesFragment :
             if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                pointCaptionText.text = point.caption
-                pointDescriptionText.text = point.description
+                emptyDataPlaceholder.visibility = View.GONE
+            }
+
+            pointCaptionText.text = point.caption
+            pointDescriptionText.text = point.description
+
+            if (point.tagList.isEmpty()) {
+                tagListTextView.text = ""
+                tagListTextView.visibility = View.GONE
+            } else {
                 tagListTextView.text = point.tagList.joinToString(
                     ",",
                     "Tags: "
                 ) { pointTagModel -> pointTagModel.name }
-                emptyDataPlaceholder.visibility = View.GONE
+                tagListTextView.visibility = View.VISIBLE
             }
+
 
             pointImagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
@@ -1243,28 +1253,44 @@ class PrivateRoutesFragment :
             pointImagesPreviewAdapter.submitList(point.imageList)
 
             pointDetailsEditButton.setOnClickListener {
-                findNavController().navigate(
-                    PrivateRoutesFragmentDirections
-                        .actionPrivateRoutesFragmentToPointDetailsFragment(
-                            pointAnnotation.getData()?.asString!!
-                        )
-                )
+                if (isPublic) {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.make_route_private_before_editing_it_point,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    findNavController().navigate(
+                        PrivateRoutesFragmentDirections
+                            .actionPrivateRoutesFragmentToPointDetailsFragment(
+                                pointAnnotation.getData()?.asString!!
+                            )
+                    )
+                }
             }
 
             pointDetailsDeleteButton.setOnClickListener {
-                binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.VISIBLE
-
-                if (currentRoutePointsList.size == 2) {
-                    deleteRoute(focusedRoute)
+                if (isPublic) {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.make_route_private_before_deleting_it_point,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
+                    binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility = View.VISIBLE
+
+                    if (currentRoutePointsList.size == 2) {
+                        deleteRoute(focusedRoute)
+                    } else {
                         viewModelPrivate.deletePoint(point)
                         pointAnnotationManager.delete(pointAnnotation)
 
                         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.visibility =
                             View.GONE
-                }
+                    }
 
-                pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
             }
         }
     }
@@ -1273,10 +1299,10 @@ class PrivateRoutesFragment :
         route: RouteModel
     ) {
         val imageList = mutableListOf<ImageModel>()
-        var isPublic = route.isPublic
+        isPublic = route.isPublic
 
         binding.bottomSheetDialogRouteDetails.apply {
-            if (route.name?.isEmpty() == true && route.description?.isEmpty() == true) {
+            if (route.name?.isEmpty() == true && route.description?.isEmpty() == true && route.tagsList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
                 emptyDataPlaceholder.visibility = View.GONE
@@ -1285,11 +1311,15 @@ class PrivateRoutesFragment :
             routeCaptionText.text = route.name
             routeDescriptionText.text = route.description
 
-            routeDetailsEditButton.setOnClickListener {
-                findNavController().navigate(
-                    PrivateRoutesFragmentDirections
-                        .actionPrivateRoutesFragmentToRouteDetailsFragment(route.routeId)
-                )
+            if (route.tagsList.isEmpty()) {
+                tagListTextView.text = ""
+                tagListTextView.visibility = View.GONE
+            } else {
+                tagListTextView.text = route.tagsList.joinToString(
+                    ",",
+                    "Tags: "
+                ) { pointTagModel -> pointTagModel.name }
+                tagListTextView.visibility = View.VISIBLE
             }
 
             if (isPublic) {
@@ -1298,30 +1328,58 @@ class PrivateRoutesFragment :
                 btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
             }
 
-            btnChangeRouteAccess.setOnClickListener {
-                if (route.isPublic) {
-                    viewModelPrivate.changeRouteAccess(route.routeId)
-                    isPublic = false
+            routeDetailsEditButton.setOnClickListener {
+                if (isPublic) {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.make_route_private_before_editing,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 } else {
-                    val user = FirebaseAuth.getInstance().currentUser
-                    if (user != null) {
-                        if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+                    findNavController().navigate(
+                        PrivateRoutesFragmentDirections
+                            .actionPrivateRoutesFragmentToRouteDetailsFragment(route.routeId)
+                    )
+                }
+            }
+
+
+            btnChangeRouteAccess.setOnClickListener {
+                previousRouteId = route.routeId
+
+                if (internetCheckCallback?.isInternetAvailable() == true) {
+                    if (isPublic) {
+                        viewModelPrivate.changeRouteAccess(route.routeId, false)
+                        btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
+                        isPublic = false
+                    } else {
+                        val user = FirebaseAuth.getInstance().currentUser
+                        if (user != null) {
+                            if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
+                                Toast.makeText(
+                                    context,
+                                    R.string.placeholder_fill_route_data,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else {
+                                btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
+                                viewModelPrivate.changeRouteAccess(route.routeId, true)
+                                isPublic = true
+                            }
+                        } else {
                             Toast.makeText(
                                 context,
-                                "Caption or details of publishing route are empty! Fill data before publishing",
+                                R.string.placeholder_sign_in_before_publishing_route,
                                 Toast.LENGTH_SHORT
                             ).show()
-                        } else {
-                            viewModelPrivate.changeRouteAccess(route.routeId)
-                            isPublic = true
                         }
-                    } else {
-                        Toast.makeText(
-                            context,
-                            "Sign in pressing the homepage button before publishing route!",
-                            Toast.LENGTH_SHORT
-                        ).show()
                     }
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.no_internet_connection,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -1347,9 +1405,17 @@ class PrivateRoutesFragment :
             routeImagesPreviewAdapter.submitList(imageList)
 
             routeDetailsDeleteButton.setOnClickListener {
-                deleteRoute(route)
+                if (isPublic) {
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.make_route_private_before_deleting,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    deleteRoute(route)
 
-                routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                }
             }
         }
     }

@@ -9,6 +9,7 @@ import androidx.core.net.toFile
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.MultiTransformation
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
@@ -23,6 +24,10 @@ class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
             itemView.setOnClickListener(onItemCLick)
+            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+            circularProgressDrawable.strokeWidth = 5f
+            circularProgressDrawable.centerRadius = 30f
+            circularProgressDrawable.start()
 
             if (!imageModel.isUploaded) {
                 val imageUri = Uri.parse(imageModel.image)
@@ -39,6 +44,7 @@ class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
                                             RoundedCorners(10)
                                         )
                                     )
+                                    .placeholder(circularProgressDrawable)
                                     .into(binding.pointImage)
                             }
                         }
@@ -49,6 +55,7 @@ class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
                     Glide.with(it1)
                         .load(imageModel.image)
                         .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
+                        .placeholder(circularProgressDrawable)
                         .into(binding.pointImage)
                 }
             }

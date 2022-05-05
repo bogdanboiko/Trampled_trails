@@ -10,7 +10,6 @@ import com.example.gh_coursework.ui.route_details.mapper.mapRouteDetailsDomainTo
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteTagDomainToModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteTagsModelToDomain
 import com.example.gh_coursework.ui.route_details.model.RouteTagsModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -29,13 +28,13 @@ class RouteTagDialogViewModel(
         getRouteTagsUseCase.invoke().map { tagList -> tagList.map(::mapRouteTagDomainToModel) }
 
     fun addTagsToRoute(tags: List<RouteTagsModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             addRouteTagsUseCase.invoke(tags.map(::mapRouteTagsModelToDomain))
         }
     }
 
     fun deleteTagsFromRoute(tags: List<RouteTagsModel>) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             deleteTagsFromRouteUseCase.invoke(tags.map(::mapRouteTagsModelToDomain))
         }
     }

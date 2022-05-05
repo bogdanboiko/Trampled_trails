@@ -1,8 +1,8 @@
-package com.example.gh_coursework.domain.usecase.point_details
+package com.example.gh_coursework.domain.usecase.main_activity
 
 import com.example.gh_coursework.domain.entity.PointDomain
 import kotlinx.coroutines.flow.Flow
 
-interface GetAllPointsDetailsUseCase {
+interface GetAllPointsUseCase {
     fun invoke(): Flow<List<PointDomain>>
 }

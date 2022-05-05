@@ -3,7 +3,6 @@ package com.example.gh_coursework.ui.private_route.model
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
 
-
 data class RoutePointModel(
     val pointId: String,
     val caption: String,

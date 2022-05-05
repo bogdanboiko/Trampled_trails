@@ -13,6 +13,7 @@ fun mapPointDomainToModel(point: PointDomain): PrivatePointDetailsModel {
         point.imageList.map(::mapPointImageDomainToModel),
         point.tagsList.map(::mapPointTagDomainToModel),
         point.caption,
-        point.description
+        point.description,
+        point.routeId
     )
 }

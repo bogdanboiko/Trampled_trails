@@ -1,7 +1,7 @@
 package com.example.gh_coursework.ui.point_details.model
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class PointTagModel(

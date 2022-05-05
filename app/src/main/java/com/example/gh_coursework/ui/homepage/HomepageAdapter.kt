@@ -16,7 +16,7 @@ interface HomepageCallback {
     fun onLogOutClick()
 }
 
-data class Data(val viewType: Int, val image: Int, val text: String)
+data class Data(val viewType: Int)
 
 class HomepageAdapter(
     private val callback: HomepageCallback,
@@ -29,10 +29,10 @@ class HomepageAdapter(
         const val VIEW_TYPE_LOG_OUT = 3
     }
 
-    var list = listOf(
-        Data(VIEW_TYPE_THEME, R.drawable.ic_setting, "Theme"),
-        Data(VIEW_TYPE_EDIT, R.drawable.ic_edit, "Edit profile"),
-        Data(VIEW_TYPE_LOG_OUT, R.drawable.ic_log_out, "Log out")
+    var viewTypeList = listOf(
+        Data(VIEW_TYPE_THEME),
+        Data(VIEW_TYPE_EDIT),
+        Data(VIEW_TYPE_LOG_OUT)
     )
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -63,33 +63,33 @@ class HomepageAdapter(
         )
     }
 
-    override fun getItemCount(): Int = list.size
+    override fun getItemCount(): Int = viewTypeList.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (list[position].viewType) {
+        when (viewTypeList[position].viewType) {
             VIEW_TYPE_THEME -> {
-                list[position].let { (holder as ThemeViewHolder).bind(it) }
+                viewTypeList[position].let { (holder as ThemeViewHolder).bind() }
             }
             VIEW_TYPE_EDIT -> {
-                list[position].let { (holder as EditViewHolder).bind(it) }
+                viewTypeList[position].let { (holder as EditViewHolder).bind() }
             }
             VIEW_TYPE_LOG_OUT -> {
-                list[position].let { (holder as LogOutViewHolder).bind(it) }
+                viewTypeList[position].let { (holder as LogOutViewHolder).bind() }
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-        return list[position].viewType
+        return viewTypeList[position].viewType
     }
 
     private inner class ThemeViewHolder(private val binding: ItemHomepageSwitchBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(item: Data) {
+            fun bind() {
                 with(binding) {
-                    imgItemHomepage.setImageResource(item.image)
-                    txtItemHomepage.text = item.text
+                    imgItemHomepage.setImageResource(R.drawable.ic_setting)
+                    txtItemHomepage.text = itemView.context.resources.getText(R.string.homepage_theme)
                     switchTheme.isChecked = sharedPreferences.getBoolean("theme_switch", false)
 
                     switchTheme.setOnCheckedChangeListener { _, isChecked ->
@@ -110,10 +110,10 @@ class HomepageAdapter(
     private inner class EditViewHolder(private val binding: ItemHomepageBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Data) {
+        fun bind() {
             with(binding) {
-                imgItemHomepage.setImageResource(item.image)
-                txtItemHomepage.text = item.text
+                imgItemHomepage.setImageResource(R.drawable.ic_edit)
+                txtItemHomepage.text = itemView.resources.getText(R.string.homepage_edit_profile)
 
                 root.setOnClickListener {
                     callback.onEditClick()
@@ -125,10 +125,10 @@ class HomepageAdapter(
     private inner class LogOutViewHolder(private val binding: ItemHomepageBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Data) {
+        fun bind() {
             with(binding) {
-                imgItemHomepage.setImageResource(item.image)
-                txtItemHomepage.text = item.text
+                imgItemHomepage.setImageResource(R.drawable.ic_log_out)
+                txtItemHomepage.text = itemView.resources.getText(R.string.homepage_log_out)
 
                 root.setOnClickListener {
                     callback.onLogOutClick()

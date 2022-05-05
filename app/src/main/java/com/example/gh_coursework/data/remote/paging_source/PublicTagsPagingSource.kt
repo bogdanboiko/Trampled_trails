@@ -1,4 +1,4 @@
-package com.example.gh_coursework.data.remote
+package com.example.gh_coursework.data.remote.paging_source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -9,7 +9,7 @@ import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class FirestorePagingSource(
+class PublicTagsPagingSource(
     private val queryRoutes: Query,
     private val tagsFilter: List<String>
 ) : PagingSource<QuerySnapshot, PublicRouteModel>() {
