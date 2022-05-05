@@ -1333,7 +1333,6 @@ class PrivateRoutesFragment :
                         btnChangeRouteAccess.setImageResource(R.drawable.ic_upload)
                         isPublic = false
                     } else {
-                        btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
                         val user = FirebaseAuth.getInstance().currentUser
                         if (user != null) {
                             if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
@@ -1343,6 +1342,7 @@ class PrivateRoutesFragment :
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
+                                btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)
                                 viewModelPrivate.changeRouteAccess(route.routeId, true)
                                 isPublic = true
                             }

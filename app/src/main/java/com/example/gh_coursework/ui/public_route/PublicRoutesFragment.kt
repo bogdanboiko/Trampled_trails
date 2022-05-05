@@ -607,7 +607,7 @@ class PublicRoutesFragment :
                                 binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
                                     View.VISIBLE
                                 binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
-                                    R.string.placeholder_public_favourite_routes_not_found.toString()
+                                    resources.getText(R.string.placeholder_public_favourite_routes_not_found)
                                 binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility =
                                     View.GONE
                                 routesListAdapter.submitData(PagingData.empty())

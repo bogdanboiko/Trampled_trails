@@ -47,16 +47,13 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
 
             with(binding) {
                 if (item.caption.isEmpty() && item.description.isEmpty()) {
-                    txtName.visibility = View.INVISIBLE
-                    txtDescription.visibility = View.INVISIBLE
-
                     emptyDataPlaceholder.visibility = View.VISIBLE
-
                 } else {
-                    txtName.text = item.caption
-                    txtDescription.text = item.description
                     emptyDataPlaceholder.visibility = View.GONE
                 }
+
+                txtName.text = item.caption
+                txtDescription.text = item.description
 
                 if (item.imageList.isEmpty()) {
                     Glide.with(itemView)

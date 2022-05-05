@@ -143,6 +143,8 @@ class PointDetailsFragment : ThemeFragment() {
             confirmEditButton.setOnClickListener {
                 it.visibility = View.GONE
                 pointDetailsEditButton.visibility = View.VISIBLE
+                pointDetailsTagButton.visibility = View.VISIBLE
+                pointImageAddButton.visibility = View.VISIBLE
                 pointCaptionText.isEnabled = false
                 pointDescriptionText.isEnabled = false
                 pointCaptionText.hint = ""
@@ -176,10 +178,12 @@ class PointDetailsFragment : ThemeFragment() {
                 it.visibility = View.GONE
                 emptyDataPlaceholder.visibility = View.INVISIBLE
                 confirmEditButton.visibility = View.VISIBLE
+                pointDetailsTagButton.visibility = View.GONE
+                pointImageAddButton.visibility = View.GONE
                 pointCaptionText.isEnabled = true
                 pointDescriptionText.isEnabled = true
-                pointCaptionText.hint = R.string.hint_point_caption.toString()
-                pointDescriptionText.hint = R.string.hint_point_description.toString()
+                pointCaptionText.hint = resources.getString(R.string.hint_caption)
+                pointDescriptionText.hint = resources.getString(R.string.hint_description)
             }
 
             pointImageAddButton.setOnClickListener {

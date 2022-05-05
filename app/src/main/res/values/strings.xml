@@ -29,8 +29,8 @@
 
     <string name="progress_bar">Processing…</string>
 
-    <string name="hint_point_caption">Put in point caption…</string>
-    <string name="hint_point_description">Put in point description…</string>
+    <string name="hint_caption">Put in caption…</string>
+    <string name="hint_description">Put in description…</string>
 
     <string name="no_internet_connection">No internet connection</string>
 
@@ -43,7 +43,7 @@
     <string name="can_not_edit_route_point">It\'s route point. You can edit it only from routes screen</string>
 
     <string name="placeholder_public_route_points">This route doesn\'t contain annotated points</string>
-    <string name="placeholder_public_favourite_routes_not_found">You haven\'t any favourite routes yet</string>
+    <string name="placeholder_public_favourite_routes_not_found">You haven\'t added any favourite routes yet</string>
 
     <string name="placeholder_private_routes_empty_list">Routes list is empty. Create your first route by pressing + button!</string>
     <string name="placeholder_private_routes_not_found_by_tags">There is no routes found by that tags filter</string>

@@ -49,16 +49,13 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
 
             with(binding) {
                 if (item.name?.isEmpty() == true && item.description?.isEmpty() == true) {
-                    txtName.visibility = View.INVISIBLE
-                    txtDescription.visibility = View.INVISIBLE
-
                     emptyDataPlaceholder.visibility = View.VISIBLE
-
                 } else {
-                    txtName.text = item.name
-                    txtDescription.text = item.description
-                    emptyDataPlaceholder.visibility = View.INVISIBLE
+                    emptyDataPlaceholder.visibility = View.GONE
                 }
+
+                txtName.text = item.name
+                txtDescription.text = item.description
 
                 if (item.imageList.isEmpty()) {
                     Glide.with(itemView)

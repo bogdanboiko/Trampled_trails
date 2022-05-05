@@ -158,6 +158,8 @@ class RouteDetailsFragment : ThemeFragment() {
             confirmEditButton.setOnClickListener {
                 it.visibility = View.GONE
                 routeDetailsEditButton.visibility = View.VISIBLE
+                routeDetailsTagButton.visibility = View.VISIBLE
+                routeImageAddButton.visibility = View.VISIBLE
                 routeCaptionText.isEnabled = false
                 routeDescriptionText.isEnabled = false
                 routeCaptionText.hint = ""
@@ -192,10 +194,12 @@ class RouteDetailsFragment : ThemeFragment() {
                 it.visibility = View.GONE
                 emptyDataPlaceholder.visibility = View.GONE
                 confirmEditButton.visibility = View.VISIBLE
+                routeDetailsTagButton.visibility = View.GONE
+                routeImageAddButton.visibility = View.GONE
                 routeCaptionText.isEnabled = true
                 routeDescriptionText.isEnabled = true
-                routeCaptionText.hint = R.string.hint_point_caption.toString()
-                routeDescriptionText.hint = R.string.hint_point_description.toString()
+                routeCaptionText.hint = resources.getString(R.string.hint_caption)
+                routeDescriptionText.hint = resources.getString(R.string.hint_description)
             }
 
             routeImageAddButton.setOnClickListener {
