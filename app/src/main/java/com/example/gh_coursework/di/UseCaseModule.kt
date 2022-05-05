@@ -2,6 +2,8 @@ package com.example.gh_coursework.di
 
 import com.example.gh_coursework.domain.usecase.deleted.*
 import com.example.gh_coursework.domain.usecase.image.*
+import com.example.gh_coursework.domain.usecase.main_activity.GetAllPointsUseCase
+import com.example.gh_coursework.domain.usecase.main_activity.GetAllPointsUseCaseImpl
 import com.example.gh_coursework.domain.usecase.point_details.*
 import com.example.gh_coursework.domain.usecase.point_preview.*
 import com.example.gh_coursework.domain.usecase.point_tag.*

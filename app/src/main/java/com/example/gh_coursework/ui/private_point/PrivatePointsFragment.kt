@@ -119,23 +119,24 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         super.onDetach()
 
         internetCheckCallback = null
+        syncStateCallback = null
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPrivatePointsBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         configMap()
         configBottomNavBar()
         configMapSwitcherButton()
         configMapModSwitcher()
         configCancelButton()
-        configPointsButton()
         configBottomSheetDialog()
         onNavigateToHomepageButtonClickListener()
         fetchPoints()
@@ -236,6 +237,17 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     }
 
+    private fun configMap() {
+        mapboxMap = binding.mapView.getMapboxMap().also {
+            it.loadStyleUri(Style.MAPBOX_STREETS)
+        }
+
+        binding.mapView.compass.enabled = false
+
+        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        pointAnnotationManager.addClickListener(onPointClickEvent)
+    }
+
     private fun configBottomNavBar() {
         binding.bottomNavigationView.menu.getItem(2).isChecked = true
         binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
@@ -254,65 +266,12 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     }
 
-    private fun configMap() {
-        mapboxMap = binding.mapView.getMapboxMap().also {
-            it.loadStyleUri(Style.MAPBOX_STREETS)
-        }
-
-        binding.mapView.compass.enabled = false
-
-        pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
-        pointAnnotationManager.addClickListener(onPointClickEvent)
-    }
-
     private fun configMapSwitcherButton() {
         binding.mapRoutePointModSwitcher.setOnClickListener {
             findNavController().navigate(
                 PrivatePointsFragmentDirections
                     .actionPrivatePointsFragmentToPrivateRoutesFragment()
             )
-        }
-    }
-
-    private fun configBottomSheetDialog() {
-        PagerSnapHelper().attachToRecyclerView(binding.pointDetailsBottomSheetDialogLayout.imageRecycler)
-        pointDetailsImagesLayoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        pointDetailsBottomSheetBehavior =
-            BottomSheetBehavior.from(binding.pointDetailsBottomSheetDialogLayout.pointBottomSheetDialog)
-
-        pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-        pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        pointsListBottomSheetBehavior =
-            BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
-        pointsListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-
-        binding.bottomSheetDialogPoints.pointsRecyclerView.apply {
-            adapter = pointListAdapter
-            layoutManager = pointsLayoutManager
-        }
-
-        binding.bottomSheetDialogPoints.pointFilterByTagButton.setOnClickListener {
-            findNavController().navigate(
-                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPointFilterByTagsDialogFragment(
-                    checkedTagList.toTypedArray()
-                )
-            )
-        }
-    }
-
-    private fun getPointDetailsDialog(annotation: PointAnnotation) {
-
-        loadPointDetailsData(annotation)
-
-        pointsListBottomSheetBehavior.peekHeight = 0
-        pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-
-        if (pointDetailsBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 
@@ -364,9 +323,51 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     }
 
-    private fun configPointsButton() {
+    private fun configBottomSheetDialog() {
+        getPointsDialog()
+        PagerSnapHelper().attachToRecyclerView(binding.pointDetailsBottomSheetDialogLayout.imageRecycler)
+
+        pointDetailsImagesLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        pointDetailsBottomSheetBehavior = BottomSheetBehavior.from(binding.pointDetailsBottomSheetDialogLayout.pointBottomSheetDialog)
+        pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        pointsListBottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
+        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
+    private fun getPointsDialog() {
+        binding.bottomSheetDialogPoints.pointsRecyclerView.apply {
+            adapter = pointListAdapter
+            layoutManager = pointsLayoutManager
+        }
+
         binding.getPointsList.setOnClickListener {
-            pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            pointDetailsBottomSheetBehavior.peekHeight = 0
+            pointsListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+
+            if (pointsListBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+        }
+
+        binding.bottomSheetDialogPoints.pointFilterByTagButton.setOnClickListener {
+            findNavController().navigate(
+                PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPointFilterByTagsDialogFragment(
+                    checkedTagList.toTypedArray()
+                )
+            )
+        }
+    }
+
+    private fun getPointDetailsDialog(annotation: PointAnnotation) {
+        loadPointDetailsData(annotation)
+
+        pointsListBottomSheetBehavior.peekHeight = 0
+        pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+
+        if (pointDetailsBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
 

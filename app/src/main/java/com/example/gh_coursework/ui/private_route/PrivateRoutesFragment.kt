@@ -754,22 +754,18 @@ class PrivateRoutesFragment :
 
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
-        routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         routePointsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutePoints.routePointsBottomSheetDialog)
-        routePointsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         routePointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         routeDetailsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRouteDetails.routeBottomSheetDialog)
-        routeDetailsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         pointDetailsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogPointDetails.pointBottomSheetDialog)
-        pointDetailsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
         pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 

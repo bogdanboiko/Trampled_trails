@@ -2,22 +2,22 @@ package com.example.gh_coursework.ui.point_details.tag_dialog
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.point_tag.*
+import com.example.gh_coursework.domain.usecase.point_tag.AddPointsTagsListUseCase
+import com.example.gh_coursework.domain.usecase.point_tag.GetPointTagListUseCase
+import com.example.gh_coursework.domain.usecase.point_tag.GetPointTagsUseCase
+import com.example.gh_coursework.domain.usecase.point_tag.RemovePointsTagsListUseCase
 import com.example.gh_coursework.ui.point_details.mapper.mapPointTagDomainToModel
-import com.example.gh_coursework.ui.point_details.mapper.mapPointTagModelToDomain
 import com.example.gh_coursework.ui.point_details.mapper.mapPointsTagsModelToDomain
-import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.point_details.model.PointsTagsModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class TagDialogViewModel(
     private val pointId: String,
-    private val getPointTagListUseCase: GetPointTagListUseCase,
     private val addPointsTagsListUseCase: AddPointsTagsListUseCase,
-    private val removePointsTagsListUseCase: RemovePointsTagsListUseCase,
-    private val getPointTagsUseCase: GetPointTagsUseCase
+    private val getPointTagListUseCase: GetPointTagListUseCase,
+    private val getPointTagsUseCase: GetPointTagsUseCase,
+    private val removePointsTagsListUseCase: RemovePointsTagsListUseCase
 ) : ViewModel() {
     val tags =
         getPointTagListUseCase.invoke().map { tagList -> tagList.map(::mapPointTagDomainToModel) }

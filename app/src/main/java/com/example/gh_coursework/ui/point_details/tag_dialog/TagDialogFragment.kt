@@ -18,8 +18,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class TagDialogFragment : DialogFragment() {
-    private val tagAdapter = TagAdapter()
     private lateinit var binding: DialogTagBinding
+    private val tagAdapter = TagAdapter()
     private val arguments by navArgs<PointDetailsFragmentArgs>()
     private val viewModel: TagDialogViewModel by viewModel { parametersOf(arguments.pointId) }
 
@@ -27,7 +27,7 @@ class TagDialogFragment : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DialogTagBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -68,7 +68,6 @@ class TagDialogFragment : DialogFragment() {
             }
 
             submitTagsButton.setOnClickListener {
-                Log.e("e", tagAdapter.addTagList.toString())
                 viewModel.addTagsToPoint(tagAdapter.addTagList.map {
                     PointsTagsModel(
                         arguments.pointId,

@@ -3,11 +3,10 @@ package com.example.gh_coursework
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gh_coursework.domain.usecase.deleted.*
-import com.example.gh_coursework.domain.usecase.point_preview.GetAllPointsUseCase
+import com.example.gh_coursework.domain.usecase.main_activity.GetAllPointsUseCase
 import com.example.gh_coursework.domain.usecase.public.*
 import com.example.gh_coursework.domain.usecase.route_preview.GetRoutesListUseCase
 import com.example.gh_coursework.ui.homepage.data.SyncingProgressState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.first
