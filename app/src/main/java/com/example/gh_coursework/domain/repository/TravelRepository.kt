@@ -28,7 +28,7 @@ interface TravelRepository {
     suspend fun deletePointImage(image: PointImageDomain)
     suspend fun deleteRouteImage(image: RouteImageDomain)
 
-    suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointDomain>)
+    suspend fun addRoute(route: RouteDomain, pointsList: List<PointPreviewDomain>)
     suspend fun updateRoute(route: RouteDomain)
     suspend fun deleteAllRoutes()
     suspend fun deleteRoute(route: RouteDomain)

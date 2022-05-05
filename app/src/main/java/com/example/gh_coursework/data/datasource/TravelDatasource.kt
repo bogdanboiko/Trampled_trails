@@ -31,7 +31,7 @@ interface TravelDatasource {
         suspend fun deletePointImage(image: PointImageDomain)
         suspend fun deleteRouteImage(image: RouteImageDomain)
 
-        suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointPreviewEntity>)
+        suspend fun addRoute(route: RouteDomain)
         suspend fun updateRoute(route: RouteDomain)
         suspend fun deleteRoute(route: RouteDomain)
         suspend fun deleteAllRoutes()

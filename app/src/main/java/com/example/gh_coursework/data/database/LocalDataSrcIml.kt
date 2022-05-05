@@ -3,8 +3,8 @@ package com.example.gh_coursework.data.database
 import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.DeletedImageEntity
-import com.example.gh_coursework.data.database.entity.PointPreviewEntity
 import com.example.gh_coursework.data.database.entity.PointDetailsEntity
+import com.example.gh_coursework.data.database.entity.PointPreviewEntity
 import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedRouteDomainToEntity
@@ -17,7 +17,6 @@ import com.example.gh_coursework.data.database.mapper.point_details.mapPointDeta
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointDetailsEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_details.mapPointResponseToDomain
 import com.example.gh_coursework.data.database.mapper.point_preview.mapPointDomainToEntity
-import com.example.gh_coursework.data.database.mapper.point_preview.mapPointEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointTagEntityToDomain
 import com.example.gh_coursework.data.database.mapper.point_tag.mapPointsTagsDomainToEntity
 import com.example.gh_coursework.data.database.mapper.public.mapPublicRouteDomainToEntity
@@ -147,14 +146,8 @@ class LocalDataSrcIml(
     }
 
     //RoutePreview
-    override suspend fun addRoute(
-        route: RouteDomain,
-        coordinatesList: List<PointPreviewEntity>
-    ) {
+    override suspend fun addRoute(route: RouteDomain) {
         routesDao.insertRoute(mapRouteDomainToEntity(route))
-        coordinatesList.forEach {
-            addPointPreview(mapPointEntityToDomain(it))
-        }
     }
 
     override fun getRouteDetails(routeId: String): Flow<RouteDomain> {

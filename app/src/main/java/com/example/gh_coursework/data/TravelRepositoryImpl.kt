@@ -107,8 +107,12 @@ class TravelRepositoryImpl(
     }
 
     //RoutePreview
-    override suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointDomain>) {
-        localDataSrcIml.addRoute(route, coordinatesList.map(::mapRoutePointDomainToEntity))
+    override suspend fun addRoute(route: RouteDomain, pointsList: List<PointPreviewDomain>) {
+        localDataSrcIml.addRoute(route)
+
+        pointsList.forEach { point ->
+            localDataSrcIml.addPointPreview(point)
+        }
     }
 
     override fun getRoutesList() = localDataSrcIml.getRoutesList()
