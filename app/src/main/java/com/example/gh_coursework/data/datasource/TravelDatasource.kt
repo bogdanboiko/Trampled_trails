@@ -71,9 +71,6 @@ interface TravelDatasource {
         fun deleteImagesFromFirebase(images: List<String>)
 
         fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>>
-        fun getPublicRoutes(): Flow<List<PublicRouteDomain>>
-
-        fun getAllFavouriteRoutes(): Flow<List<PublicFavouriteEntity>>
         fun getUserFavouriteRoutes(userId: String): Flow<List<String>>
         suspend fun addRouteToFavourites(routeId: String, userId: String)
         suspend fun removeRouteFromFavourites(routeId: String, userId: String)

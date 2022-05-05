@@ -99,10 +99,9 @@ class PublicRoutesFragment :
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
     private var tagsFilter = emptyList<String>()
-    private var favourites = mutableListOf<PublicFavouriteEntity>()
+    private var favourites = mutableListOf<String>()
     private var isRouteFavourite = false
     private var isSortedByFavourites = false
-    private var savedPublicRoutesList = emptyList<PublicRouteModel>()
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
     private lateinit var focusedPublicRoute: PublicRouteModel
 
@@ -126,7 +125,8 @@ class PublicRoutesFragment :
                 getRouteDetailsDialog()
             }
         } else {
-            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
 
         true
@@ -351,14 +351,15 @@ class PublicRoutesFragment :
     private fun fetchSavedPublicRoutes() {
         if (internetCheckCallback?.isInternetAvailable() == true) {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModelPublic.fetchPublicRouteList().collect {
-                    savedPublicRoutesList = it
-                }
 
-                favourites = viewModelPublic.favourites.first() as MutableList<PublicFavouriteEntity>
+                favourites =
+                    getUserIdCallback?.let {
+                        viewModelPublic.getFavouriteRoutes(it.getUserId()).first()
+                    } as MutableList<String>
             }
         } else {
-            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -447,18 +448,21 @@ class PublicRoutesFragment :
             }
 
             if (FirebaseAuth.getInstance().currentUser != null) {
-                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.VISIBLE
+                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility =
+                    View.VISIBLE
 
                 binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.setOnClickListener {
                     if (isSortedByFavourites) {
                         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
-                        binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.VISIBLE
+                        binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility =
+                            View.VISIBLE
                         fetchRoutes()
                         binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
                             ColorStateList.valueOf(R.color.black)
                         isSortedByFavourites = false
                     } else {
-                        binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
+                        binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility =
+                            View.GONE
                         fetchFavouriteRoutes()
                         binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.imageTintList =
                             ColorStateList.valueOf(R.color.yellow_dark)
@@ -578,7 +582,8 @@ class PublicRoutesFragment :
                 }
             }
         } else {
-            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -593,15 +598,18 @@ class PublicRoutesFragment :
                     ?.let { userId ->
                         viewModelPublic.getFavouriteRoutes(userId).collect {
                             if (it.isNotEmpty()) {
-                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
+                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                                    View.GONE
                                 viewModelPublic.fetchFavouriteRoutes(it).collect { route ->
                                     routesListAdapter.submitData(route)
                                 }
                             } else {
-                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.VISIBLE
+                                binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
+                                    View.VISIBLE
                                 binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
                                     R.string.placeholder_public_favourite_routes_not_found.toString()
-                                binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
+                                binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility =
+                                    View.GONE
                                 routesListAdapter.submitData(PagingData.empty())
                             }
                         }
@@ -609,7 +617,8 @@ class PublicRoutesFragment :
             }
 
         } else {
-            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -619,7 +628,8 @@ class PublicRoutesFragment :
             focusedPublicRoute = publicRoute
             routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -808,7 +818,8 @@ class PublicRoutesFragment :
             pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
             routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -857,12 +868,7 @@ class PublicRoutesFragment :
         publicRoute: PublicRouteModel
     ) {
         binding.bottomSheetDialogRouteDetails.apply {
-            val isFavourite = favourites.find {
-                return@find it.userId == getUserIdCallback?.getUserId()
-                        && it.routeId == publicRoute.routeId
-            }
-
-            isRouteFavourite = isFavourite != null
+            isRouteFavourite = favourites.contains(publicRoute.routeId)
 
             if (FirebaseAuth.getInstance().currentUser == null) {
                 routeDetailsAddToFavouriteButton.visibility = View.GONE
@@ -871,20 +877,30 @@ class PublicRoutesFragment :
             }
 
             if (isRouteFavourite) {
-                routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
+                routeDetailsAddToFavouriteButton.imageTintList =
+                    ColorStateList.valueOf(R.color.yellow_dark)
             } else {
-                routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
+                routeDetailsAddToFavouriteButton.imageTintList =
+                    ColorStateList.valueOf(R.color.black)
             }
 
             if (internetCheckCallback?.isInternetAvailable() == true) {
                 routeDetailsAddToFavouriteButton.setOnClickListener {
                     if (isRouteFavourite) {
-                        viewModelPublic.removeRouteFromFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
-                        routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.black)
+                        viewModelPublic.removeRouteFromFavourites(
+                            publicRoute.routeId,
+                            getUserIdCallback?.getUserId().toString()
+                        )
+                        routeDetailsAddToFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.black)
                         isRouteFavourite = false
                     } else {
-                        viewModelPublic.addRouteToFavourites(publicRoute.routeId, getUserIdCallback?.getUserId().toString())
-                        routeDetailsAddToFavouriteButton.imageTintList = ColorStateList.valueOf(R.color.yellow_dark)
+                        viewModelPublic.addRouteToFavourites(
+                            publicRoute.routeId,
+                            getUserIdCallback?.getUserId().toString()
+                        )
+                        routeDetailsAddToFavouriteButton.imageTintList =
+                            ColorStateList.valueOf(R.color.yellow_dark)
                         isRouteFavourite = true
                     }
 
@@ -897,7 +913,11 @@ class PublicRoutesFragment :
                     }
                 }
             } else {
-                Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    R.string.no_internet_connection,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {

@@ -2,7 +2,7 @@ package com.example.gh_coursework.ui.point_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.point_details.AddPointDetailsUseCase
+import com.example.gh_coursework.domain.usecase.point_details.UpdatePointDetailsUseCase
 import com.example.gh_coursework.domain.usecase.point_details.AddPointImageListUseCase
 import com.example.gh_coursework.domain.usecase.point_details.GetPointDetailsUseCase
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class PointDetailsViewModel(
     private val pointId: String,
-    private val addPointDetailsUseCase: AddPointDetailsUseCase,
+    private val addPointDetailsUseCase: UpdatePointDetailsUseCase,
     private val getPointDetailsUseCase: GetPointDetailsUseCase,
     private val addPointImageListUseCase: AddPointImageListUseCase
 ) : ViewModel() {

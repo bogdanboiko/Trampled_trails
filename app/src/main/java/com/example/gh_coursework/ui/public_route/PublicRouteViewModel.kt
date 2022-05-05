@@ -8,10 +8,7 @@ import androidx.paging.cachedIn
 import com.example.gh_coursework.data.remote.paging_source.PublicFavouritesPagingSource
 import com.example.gh_coursework.data.remote.paging_source.PublicTagsPagingSource
 import com.example.gh_coursework.domain.usecase.public.*
-import com.example.gh_coursework.domain.usecase.route_details.GetPublicRouteListUseCase
-import com.example.gh_coursework.ui.public_route.mapper.mapPublicRouteDomainToModel
 import com.example.gh_coursework.ui.public_route.mapper.mapRoutePointDomainToModel
-import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -21,16 +18,11 @@ import kotlinx.coroutines.launch
 
 class PublicRouteViewModel(
     private val query: Query,
-    private val getAllFavouritesUseCase: GetAllFavouritesUseCase,
     private val getUserFavouriteRoutesUseCase: GetUserFavouriteRoutesUseCase,
     private val addRouteToFavouritesUseCase: AddRouteToFavouritesUseCase,
     private val removeRouteFromFavouritesUseCase: RemoveRouteFromFavouritesUseCase,
-    private val fetchRoutePointsUseCase: FetchRoutePointsFromRemoteUseCase,
-    private val getPublicRouteListUseCase: GetPublicRouteListUseCase
+    private val fetchRoutePointsUseCase: FetchRoutePointsFromRemoteUseCase
 ) : ViewModel() {
-
-    val favourites = getAllFavouritesUseCase.invoke()
-
     fun fetchTaggedRoutes(tagsFilter: List<String>) = Pager(
         PagingConfig(pageSize = 10)
     ) {
@@ -64,9 +56,5 @@ class PublicRouteViewModel(
 
     fun fetchRoutePoints(routeId: String): Flow<List<RoutePointModel>> {
         return fetchRoutePointsUseCase.invoke(routeId).map { it.map(::mapRoutePointDomainToModel) }
-    }
-
-    fun fetchPublicRouteList(): Flow<List<PublicRouteModel>>  {
-        return getPublicRouteListUseCase.invoke().map { it.map(::mapPublicRouteDomainToModel) }
     }
 }

@@ -25,12 +25,12 @@ class ActivityViewModel(
     private val getDeletedPointsUseCase: GetDeletedPointsUseCase,
     private val getRoutesListUseCase: GetRoutesListUseCase,
     private val getPointsListUseCase: GetAllPointsUseCase,
-    private val getUserPointsListUseCase: GetUserPointsListUseCase,
+    private val getUserPointsListUseCase: GetUserPointListUseCase,
     private val getUserRouteListUseCase: GetUserRouteListUseCase,
     private val uploadRouteUseCase: UploadRouteToFirebaseUseCase,
     private val uploadPointsUseCase: UploadPointsToFirebaseUseCase,
-    private val savePublicRouteToPrivateUseCase: SavePublicRouteToPrivateUseCase,
-    private val savePublicPointsToPrivateUseCase: SavePublicPointsToPrivateUseCase
+    private val savePublicRouteToPrivateUseCase: SyncRemoteRoutesWithLocalUseCase,
+    private val savePublicPointsToPrivateUseCase: SyncRemotePointsWithLocalUseCase
 ) : ViewModel() {
 
     private val deletedRoutes = getDeletedRoutesUseCase.invoke()

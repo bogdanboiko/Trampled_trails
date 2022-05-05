@@ -45,7 +45,6 @@ interface TravelRepository {
     fun getRouteImages(routeId: String): Flow<List<RouteImageDomain>>
 
     fun getRoutesList(): Flow<List<RouteDomain>>
-    fun getPublicRoutesList(): Flow<List<PublicRouteDomain>>
     fun getRouteDetails(routeId: String): Flow<RouteDomain>
     fun getRoutePointsList(routeId: String): Flow<List<PointDomain>>
     fun getRoutePointsImagesList(routeId: String): Flow<List<RoutePointsImagesDomain>>
@@ -66,7 +65,6 @@ interface TravelRepository {
 
     fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>>
 
-    fun getAllFavourites(): Flow<List<PublicFavouriteEntity>>
     fun getUserFavouriteRoutes(userId: String): Flow<List<String>>
     suspend fun addRouteToFavourites(routeId: String, userId: String)
     suspend fun removeRouteFromFavourites(routeId: String, userId: String)
@@ -76,4 +74,5 @@ interface TravelRepository {
 
     suspend fun changeRouteAccess(routeId: String, isPublic: Boolean)
     fun deleteImagesFromFirebase(images: List<String>)
+    suspend fun deleteAll()
 }

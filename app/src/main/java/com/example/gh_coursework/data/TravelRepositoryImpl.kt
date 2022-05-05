@@ -11,6 +11,11 @@ class TravelRepositoryImpl(
     private val remoteDataSrcImpl: TravelDatasource.Remote
 ) : TravelRepository {
 
+    override suspend fun deleteAll() {
+        deleteAllPoints()
+        deleteAllRoutes()
+    }
+
     //Deleted routes and points
     override suspend fun addDeletedPoint(point: DeletedPointDomain) {
         localDataSrcIml.addDeletedPoint(point)
@@ -89,6 +94,7 @@ class TravelRepositoryImpl(
 
     override suspend fun deletePoint(point: PointDetailsDomain) {
         localDataSrcIml.deletePoint(point.pointId)
+        addDeletedPoint(DeletedPointDomain(point.pointId))
 
         point.imageList.forEach {
             if (it.isUploaded) {
@@ -128,6 +134,7 @@ class TravelRepositoryImpl(
 
     override suspend fun deleteRoute(route: RouteDomain) {
         localDataSrcIml.deleteRoute(route)
+        addDeletedRoute(DeletedRouteDomain(route.routeId))
 
         route.imageList.forEach {
             if (it.isUploaded) {
@@ -179,8 +186,6 @@ class TravelRepositoryImpl(
         return remoteDataSrcImpl.getUserPoints(userId)
     }
 
-    override fun getPublicRoutesList(): Flow<List<PublicRouteDomain>> = remoteDataSrcImpl.getPublicRoutes()
-
     override suspend fun uploadRouteToFirebase(route: RouteDomain, currentUser: String) {
         remoteDataSrcImpl.uploadRouteToFirebase(route, currentUser)
     }
@@ -191,10 +196,6 @@ class TravelRepositoryImpl(
 
     override fun fetchRoutePoints(routeId: String): Flow<List<PublicPointDomain>> {
         return remoteDataSrcImpl.fetchRoutePoints(routeId)
-    }
-
-    override fun getAllFavourites(): Flow<List<PublicFavouriteEntity>> {
-        return remoteDataSrcImpl.getAllFavouriteRoutes()
     }
 
     override fun getUserFavouriteRoutes(userId: String): Flow<List<String>> {

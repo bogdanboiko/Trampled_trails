@@ -4,8 +4,8 @@ import com.example.gh_coursework.domain.entity.PointDomain
 import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetAllPointsDetailsUseCaseImpl(private val repository: TravelRepository) :
-    GetAllPointsDetailsUseCase {
+class GetAllPointsUseCaseImpl(private val repository: TravelRepository) :
+    GetAllPointsUseCase {
     override fun invoke(): Flow<List<PointDomain>> {
         return repository.getAllPointsDetails()
     }

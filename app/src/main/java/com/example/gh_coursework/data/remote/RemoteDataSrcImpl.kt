@@ -226,45 +226,12 @@ class RemoteDataSrcImpl(
         emit(data.map(::mapPublicPointResponseEntityToPublicDomain))
     }.flowOn(Dispatchers.IO)
 
-    override fun getPublicRoutes() = flow {
-        val routes = Tasks.await(db.collection("routes").whereEqualTo("public", true).get())
-        val data = mutableListOf<PublicRouteResponseEntity>()
-
-        routes.documents.forEach {
-
-            val name = it.getString("name")
-            val description = it.getString("description")
-            val userId = it.getString("userId")
-            val isPublic = it.getBoolean("public")
-
-            if (name != null &&
-                description != null &&
-                userId != null &&
-                isPublic != null) {
-                data.add(
-                    PublicRouteResponseEntity(
-                        it.id,
-                        name,
-                        description,
-                        (it.get("tagsList") ?: emptyList<String>()) as List<String>,
-                        (it.get("imageList") ?: emptyList<String>()) as List<String>,
-                        userId,
-                        isPublic
-                    )
-                )
-            }
-        }
-
-        emit(data.map(::mapPublicRouteResponseToDomain))
-    }.flowOn(Dispatchers.IO)
-
     override fun getUserPoints(userId: String) = flow {
         val points = Tasks.await(db.collection("points").whereEqualTo("userId", userId).get())
 
         val data = mutableListOf<PublicPointResponseEntity>()
 
         points.documents.forEach {
-
             val caption = it.getString("caption")
             val description = it.getString("description")
             val x = it.getDouble("x")
@@ -346,19 +313,6 @@ class RemoteDataSrcImpl(
             }
         }
     }
-
-    override fun getAllFavouriteRoutes() = flow {
-        val favourites = Tasks.await(db.collection("favourites").get())
-        val data = mutableListOf<PublicFavouriteEntity>()
-
-        favourites.documents.forEach {
-            data.add(
-                PublicFavouriteEntity(it.getString("routeId")!!, it.getString("userId")!!)
-            )
-        }
-
-        emit(data)
-    }.flowOn(Dispatchers.IO)
 
     override fun getUserFavouriteRoutes(userId: String) = flow {
         val userFavouriteRoutes = Tasks.await(

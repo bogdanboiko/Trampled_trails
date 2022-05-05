@@ -5,7 +5,7 @@ import com.example.gh_coursework.domain.repository.TravelRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.invoke
 
-class SavePublicPointsToPrivateUseCaseImpl(private val repository: TravelRepository): SavePublicPointsToPrivateUseCase {
+class SyncRemotePointsWithLocalUseCaseImpl(private val repository: TravelRepository): SyncRemotePointsWithLocalUseCase {
     override suspend fun invoke(points: List<PublicPointDomain>) = (Dispatchers.IO) {
         repository.saveFirebasePointsToLocal(points)
     }
