@@ -37,7 +37,7 @@
         android:paddingTop="60dp"
         android:paddingStart="60dp"
         android:paddingEnd="60dp"
-        android:text="Text data is empty"
+        android:text="@string/placeholder_public_data_is_empty"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="@id/nestedScroll" />

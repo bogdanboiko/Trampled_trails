@@ -10,7 +10,6 @@ import com.example.gh_coursework.ui.route_details.mapper.mapRouteDetailsDomainTo
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteTagDomainToModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteTagsModelToDomain
 import com.example.gh_coursework.ui.route_details.model.RouteTagsModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 

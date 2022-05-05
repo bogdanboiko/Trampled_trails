@@ -24,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="@string/private_no_point_placeholder"
+        android:text="@string/placeholder_private_points_list_empty"
         android:textColor="@color/beige"
         android:textSize="20sp"
         android:visibility="visible" />

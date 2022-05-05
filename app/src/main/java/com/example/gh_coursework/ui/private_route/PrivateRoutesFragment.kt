@@ -301,7 +301,7 @@ class PrivateRoutesFragment :
                 if (tagArray.isEmpty()) {
 
                     binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
-                        context?.resources?.getString(R.string.private_no_routes_placeholder)
+                        context?.resources?.getString(R.string.placeholder_private_routes_empty_list)
                 }
 
                 resetCurrentRoute()
@@ -554,7 +554,11 @@ class PrivateRoutesFragment :
                     PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment("route")
                 )
             } else {
-                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireContext(),
+                    R.string.no_internet_connection,
+                    Toast.LENGTH_SHORT
+                ).show()
             }
 
             return@setOnMenuItemClickListener true
@@ -609,7 +613,7 @@ class PrivateRoutesFragment :
     private fun configSaveRouteButton() {
         isRouteSaveable.observe(viewLifecycleOwner) {
             if (it) {
-                binding.saveRouteButton.text = getString(R.string.txtSaveButtonSave)
+                binding.saveRouteButton.text = getString(R.string.save_button_save)
                 binding.saveRouteButton.icon =
                     view?.context?.let { it1 ->
                         AppCompatResources.getDrawable(
@@ -625,7 +629,7 @@ class PrivateRoutesFragment :
                     isRouteSaveable.value = false
                 }
             } else {
-                binding.saveRouteButton.text = getString(R.string.txtSaveButtonDisable)
+                binding.saveRouteButton.text = getString(R.string.save_button_disable)
                 binding.saveRouteButton.icon =
                     view?.context?.let { it1 ->
                         AppCompatResources.getDrawable(
@@ -890,7 +894,7 @@ class PrivateRoutesFragment :
 
                     if (filteredRoutes.isEmpty()) {
                         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
-                            context?.resources?.getString(R.string.private_no_routes_found_by_tags_placeholder)
+                            context?.resources?.getString(R.string.placeholder_private_routes_not_found_by_tags)
                     }
                 } else {
                     filteredRoutes = routes.toMutableList()
@@ -1243,7 +1247,7 @@ class PrivateRoutesFragment :
                 if (isPublic) {
                     Toast.makeText(
                         requireContext(),
-                        "Make your route private before editing it's point",
+                        R.string.make_route_private_before_editing_it_point,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
@@ -1260,7 +1264,7 @@ class PrivateRoutesFragment :
                 if (isPublic) {
                     Toast.makeText(
                         requireContext(),
-                        "Make your route private before deleting it's point",
+                        R.string.make_route_private_before_deleting_it_point,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
@@ -1308,7 +1312,7 @@ class PrivateRoutesFragment :
                 if (isPublic) {
                     Toast.makeText(
                         requireContext(),
-                        "Make your route private before editing it",
+                        R.string.make_route_private_before_editing,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
@@ -1335,7 +1339,7 @@ class PrivateRoutesFragment :
                             if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
                                 Toast.makeText(
                                     context,
-                                    "Caption or details of publishing route are empty! Fill data before publishing",
+                                    R.string.placeholder_fill_route_data,
                                     Toast.LENGTH_SHORT
                                 ).show()
                             } else {
@@ -1345,13 +1349,17 @@ class PrivateRoutesFragment :
                         } else {
                             Toast.makeText(
                                 context,
-                                "Sign in pressing the homepage button before publishing route!",
+                                R.string.placeholder_sign_in_before_publishing_route,
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
                     }
                 } else {
-                    Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        R.string.no_internet_connection,
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
 
@@ -1380,7 +1388,7 @@ class PrivateRoutesFragment :
                 if (isPublic) {
                     Toast.makeText(
                         requireContext(),
-                        "Make your route private before deleting it",
+                        R.string.make_route_private_before_deleting,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {

@@ -1,7 +1,5 @@
 package com.example.gh_coursework.ui.public_route.adapter
 
-import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,7 +10,6 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.R
-import com.example.gh_coursework.databinding.ItemPointBinding
 import com.example.gh_coursework.databinding.ItemPublicPointBinding
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 
@@ -81,9 +78,7 @@ class RoutePointsListAdapter(val callback: RoutePointsListCallback) :
 
                 root.setOnClickListener {
                     item.pointId.let { pointId ->
-                        if (pointId != null) {
-                            callback.onPointItemClick(pointId)
-                        }
+                        callback.onPointItemClick(pointId)
                     }
                 }
             }

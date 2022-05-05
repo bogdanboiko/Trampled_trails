@@ -20,7 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="Submit"
+        android:text="@string/tag_button_submit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tagRecycler" />
 
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text="Cancel"
+        android:text="@string/tag_button_clear"
         app:layout_constraintTop_toBottomOf="@id/tagRecycler"
         app:layout_constraintEnd_toStartOf="@id/submitTagsButton" />
 

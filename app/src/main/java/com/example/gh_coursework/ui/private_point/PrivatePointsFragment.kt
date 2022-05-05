@@ -159,7 +159,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
                 if (tagArray.isEmpty()) {
                     binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
-                        context?.resources?.getString(R.string.private_no_point_placeholder)
+                        context?.resources?.getString(R.string.placeholder_private_points_list_empty)
                 }
 
                 fetchPoints()
@@ -258,7 +258,11 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
                     )
                 )
             } else {
-                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    requireContext(),
+                    R.string.no_internet_connection,
+                    Toast.LENGTH_SHORT
+                )
                     .show()
             }
 
@@ -402,7 +406,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
                     if (filteredPoints.isEmpty()) {
                         binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
-                            context?.resources?.getString(R.string.private_no_point_found_by_tags_placeholder)
+                            context?.resources?.getString(R.string.placeholder_private_no_point_found_by_tags)
                     }
                 } else {
                     filteredPoints = points.toMutableList()
@@ -514,7 +518,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             if (!point.routeId.isNullOrEmpty()) {
                 Toast.makeText(
                     requireContext(),
-                    "It's route point. You can edit it only from routes screen",
+                    R.string.can_not_edit_route_point,
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
@@ -529,7 +533,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             if (!point.routeId.isNullOrEmpty()) {
                 Toast.makeText(
                     requireContext(),
-                    "It's route point. You can delete it only from routes screen",
+                    R.string.can_not_delete_route_point,
                     Toast.LENGTH_SHORT
                 ).show()
             } else {

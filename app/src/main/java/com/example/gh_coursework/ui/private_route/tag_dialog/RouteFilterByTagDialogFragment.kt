@@ -17,7 +17,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class RouteFilterByTagDialogFragment : DialogFragment() {
     companion object {
-        val REQUEST_KEY = "route_filter_by_tag_dialog_fragment"
+        const val REQUEST_KEY = "route_filter_by_tag_dialog_fragment"
     }
 
     private lateinit var binding: DialogFilterRoutesByTagsBinding

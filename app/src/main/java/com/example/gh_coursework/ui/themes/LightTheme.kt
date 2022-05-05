@@ -1,7 +1,6 @@
 package com.example.gh_coursework.ui.themes
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.example.gh_coursework.R
 

@@ -6,13 +6,12 @@ import com.example.gh_coursework.domain.usecase.image.DeletePointImageUseCase
 import com.example.gh_coursework.domain.usecase.image.DeleteRouteImageUseCase
 import com.example.gh_coursework.domain.usecase.image.GetRouteImagesUseCase
 import com.example.gh_coursework.domain.usecase.route_details.GetRoutePointsImagesUseCase
+import com.example.gh_coursework.ui.point_details.mapper.mapPointImageModelToDomain
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel.PointImageModel
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel.RouteImageModel
-import com.example.gh_coursework.ui.point_details.mapper.mapPointImageModelToDomain
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageDomainToModel
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageModelToDomain
 import com.example.gh_coursework.ui.route_details.mapper.mapRoutePointsImagesDomainToModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 

@@ -33,7 +33,7 @@ class ImageDetailsFragment : ThemeFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentImageDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }

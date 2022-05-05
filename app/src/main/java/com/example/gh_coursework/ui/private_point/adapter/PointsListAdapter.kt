@@ -1,6 +1,5 @@
 package com.example.gh_coursework.ui.private_point.adapter
 
-import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.LayoutInflater
@@ -13,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.ItemPointBinding
+import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
 
 interface PointsListCallback {
     fun onPointItemClick(pointDetails: PrivatePointDetailsModel)

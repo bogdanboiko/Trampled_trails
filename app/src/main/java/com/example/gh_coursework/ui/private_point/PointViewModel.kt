@@ -2,9 +2,9 @@ package com.example.gh_coursework.ui.private_point
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gh_coursework.domain.usecase.point_preview.GetAllPointsDetailsUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.AddPointPreviewWithDetailsUseCase
 import com.example.gh_coursework.domain.usecase.point_preview.DeletePointUseCase
+import com.example.gh_coursework.domain.usecase.point_preview.GetAllPointsDetailsUseCase
 import com.example.gh_coursework.ui.private_point.mapper.mapPointDomainToModel
 import com.example.gh_coursework.ui.private_point.mapper.mapPointModelToDomain
 import com.example.gh_coursework.ui.private_point.mapper.mapPrivatePointDetailsModelToPointDomain

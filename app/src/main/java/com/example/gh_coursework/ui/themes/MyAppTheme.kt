@@ -1,7 +1,6 @@
 package com.example.gh_coursework.ui.themes
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import com.dolatkia.animatedThemeManager.AppTheme
 
 interface MyAppTheme : AppTheme {

@@ -30,9 +30,9 @@ class HomepageAdapter(
     }
 
     var list = listOf(
-        Data(VIEW_TYPE_THEME, R.drawable.ic_setting, "Theme"),
-        Data(VIEW_TYPE_EDIT, R.drawable.ic_edit, "Edit profile"),
-        Data(VIEW_TYPE_LOG_OUT, R.drawable.ic_log_out, "Log out")
+        Data(VIEW_TYPE_THEME, R.drawable.ic_setting, R.string.homepage_theme.toString()),
+        Data(VIEW_TYPE_EDIT, R.drawable.ic_edit, R.string.homepage_edit_profile.toString()),
+        Data(VIEW_TYPE_LOG_OUT, R.drawable.ic_log_out, R.string.homepage_log_out.toString())
     )
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {

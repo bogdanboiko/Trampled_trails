@@ -126,7 +126,7 @@ class PublicRoutesFragment :
                 getRouteDetailsDialog()
             }
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
         }
 
         true
@@ -236,7 +236,7 @@ class PublicRoutesFragment :
                 tagsFilter = tagArray.toList()
                 if (tagArray.isEmpty()) {
                     binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
-                        context?.resources?.getString(R.string.private_no_routes_placeholder)
+                        context?.resources?.getString(R.string.placeholder_private_routes_empty_list)
                 }
 
                 fetchRoutes()
@@ -358,7 +358,7 @@ class PublicRoutesFragment :
                 favourites = viewModelPublic.favourites.first() as MutableList<PublicFavouriteEntity>
             }
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -404,7 +404,7 @@ class PublicRoutesFragment :
         getRoutePointsDialog()
         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.text =
-            resources.getText(R.string.public_route_point_placeholder)
+            resources.getText(R.string.placeholder_public_route_points)
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
         routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
@@ -578,7 +578,7 @@ class PublicRoutesFragment :
                 }
             }
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -600,7 +600,7 @@ class PublicRoutesFragment :
                             } else {
                                 binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.VISIBLE
                                 binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
-                                    "You haven't any favourite routes yet"
+                                    R.string.placeholder_public_favourite_routes_not_found.toString()
                                 binding.bottomSheetDialogRoutes.routeFilterByTagButton.visibility = View.GONE
                                 routesListAdapter.submitData(PagingData.empty())
                             }
@@ -609,7 +609,7 @@ class PublicRoutesFragment :
             }
 
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -619,7 +619,7 @@ class PublicRoutesFragment :
             focusedPublicRoute = publicRoute
             routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -808,7 +808,7 @@ class PublicRoutesFragment :
             pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
             routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -897,7 +897,7 @@ class PublicRoutesFragment :
                     }
                 }
             } else {
-                Toast.makeText(requireContext(), "No internet connection", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
             }
 
             if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {

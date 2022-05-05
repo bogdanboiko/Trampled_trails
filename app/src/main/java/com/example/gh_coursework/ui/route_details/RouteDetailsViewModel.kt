@@ -12,7 +12,6 @@ import com.example.gh_coursework.ui.route_details.mapper.mapRouteDetailsModelToD
 import com.example.gh_coursework.ui.route_details.mapper.mapRouteImageModelToDomain
 import com.example.gh_coursework.ui.route_details.mapper.mapRoutePointsImagesDomainToModel
 import com.example.gh_coursework.ui.route_details.model.RouteDetailsModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
