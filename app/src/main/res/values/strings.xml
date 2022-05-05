@@ -18,6 +18,7 @@
 
     <string name="tag_button_submit">submit</string>
     <string name="tag_button_clear">clear</string>
+    <string name="tag_button_cancel">cancel</string>
 
     <string name="sign_in_button">sign in</string>
 

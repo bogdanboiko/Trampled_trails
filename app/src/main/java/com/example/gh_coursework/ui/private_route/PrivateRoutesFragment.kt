@@ -1218,14 +1218,23 @@ class PrivateRoutesFragment :
             if (point.caption.isEmpty() && point.description.isEmpty() && point.tagList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                pointCaptionText.text = point.caption
-                pointDescriptionText.text = point.description
+                emptyDataPlaceholder.visibility = View.GONE
+            }
+
+            pointCaptionText.text = point.caption
+            pointDescriptionText.text = point.description
+
+            if (point.tagList.isEmpty()) {
+                tagListTextView.text = ""
+                tagListTextView.visibility = View.GONE
+            } else {
                 tagListTextView.text = point.tagList.joinToString(
                     ",",
                     "Tags: "
                 ) { pointTagModel -> pointTagModel.name }
-                emptyDataPlaceholder.visibility = View.GONE
+                tagListTextView.visibility = View.VISIBLE
             }
+
 
             pointImagesPreviewAdapter = ImagesPreviewAdapter {
                 findNavController().navigate(
@@ -1293,7 +1302,7 @@ class PrivateRoutesFragment :
         isPublic = route.isPublic
 
         binding.bottomSheetDialogRouteDetails.apply {
-            if (route.name?.isEmpty() == true && route.description?.isEmpty() == true) {
+            if (route.name?.isEmpty() == true && route.description?.isEmpty() == true && route.tagsList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
                 emptyDataPlaceholder.visibility = View.GONE
@@ -1301,6 +1310,17 @@ class PrivateRoutesFragment :
 
             routeCaptionText.text = route.name
             routeDescriptionText.text = route.description
+
+            if (route.tagsList.isEmpty()) {
+                tagListTextView.text = ""
+                tagListTextView.visibility = View.GONE
+            } else {
+                tagListTextView.text = route.tagsList.joinToString(
+                    ",",
+                    "Tags: "
+                ) { pointTagModel -> pointTagModel.name }
+                tagListTextView.visibility = View.VISIBLE
+            }
 
             if (isPublic) {
                 btnChangeRouteAccess.setImageResource(R.drawable.ic_lock)

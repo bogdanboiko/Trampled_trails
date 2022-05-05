@@ -1,6 +1,5 @@
 package com.example.gh_coursework.data.database
 
-import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.DeletedImageEntity
 import com.example.gh_coursework.data.database.entity.PointDetailsEntity
@@ -85,7 +84,7 @@ class LocalDataSrcIml(
 
     //PointPreview
     override suspend fun addPointPreview(poi: PointPreviewDomain) {
-        pointsDao.insertPointCoordinatesAndCreateDetails(mapPointDomainToEntity(poi))
+        pointsDao.insertPointPreviewAndCreateDetails(mapPointDomainToEntity(poi))
     }
 
     override fun getAllPoints(): Flow<List<PointDomain>> {
@@ -219,7 +218,7 @@ class LocalDataSrcIml(
     override suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>) {
         points.forEachIndexed { _, point ->
 
-            pointsDao.insertPointCoordinatesAndCreateDetails(
+            pointsDao.insertPointPreviewAndCreateDetails(
                 PointPreviewEntity(
                     point.pointId,
                     point.x,
@@ -261,7 +260,6 @@ class LocalDataSrcIml(
     ) {
         routesDao.insertRoute(mapPublicRouteDomainToEntity(route))
         imageDao.deleteAllRouteLocalStoredImages(route.routeId)
-        Log.e("e", "route fetched")
         addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it, true) })
         addRouteTagsList(route.tagsList.map {
             RouteTagsDomain(

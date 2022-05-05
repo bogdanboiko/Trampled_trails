@@ -97,6 +97,7 @@ class RemoteDataSrcImpl(
         points.forEachIndexed { index, point ->
             val pointDocRef =
                 db.collection("points").document(point.pointId)
+            Log.e("e", point.tagsList.toString())
             Tasks.await(pointDocRef.set(
                 mapPointDomainToPublicPointEntity(
                     point,

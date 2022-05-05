@@ -488,13 +488,15 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
             pointCaptionText.text = point.caption
             pointDescriptionText.text = point.description
-            tagListTextView.text = if (point.tagList.isEmpty()) {
-                ""
+            if (point.tagList.isEmpty()) {
+                tagListTextView.text = ""
+                tagListTextView.visibility = View.GONE
             } else {
-                point.tagList.joinToString(
+                tagListTextView.text = point.tagList.joinToString(
                     ",",
                     "Tags: "
                 ) { pointTagModel -> pointTagModel.name }
+                tagListTextView.visibility = View.VISIBLE
             }
 
 

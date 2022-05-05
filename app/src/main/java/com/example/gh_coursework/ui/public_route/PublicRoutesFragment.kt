@@ -840,10 +840,11 @@ class PublicRoutesFragment :
             if (point.caption.isEmpty() && point.description.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
-                pointCaptionText.text = point.caption
-                pointDescriptionText.text = point.description
                 emptyDataPlaceholder.visibility = View.GONE
             }
+
+            pointCaptionText.text = point.caption
+            pointDescriptionText.text = point.description
 
             pointImagesPreviewAdapter = PublicImageAdapter {
                 findNavController().navigate(
@@ -920,12 +921,19 @@ class PublicRoutesFragment :
                 ).show()
             }
 
-            if (publicRoute.name.isEmpty() && publicRoute.description.isEmpty() && publicRoute.tagsList.isEmpty()) {
-                emptyDataPlaceholder.visibility = View.VISIBLE
+            emptyDataPlaceholder.visibility = View.GONE
+            routeCaptionText.text = publicRoute.name
+            routeDescriptionText.text = publicRoute.description
+
+            if (publicRoute.tagsList.isEmpty()) {
+                tagListTextView.text = ""
+                tagListTextView.visibility = View.GONE
             } else {
-                routeCaptionText.text = publicRoute.name
-                routeDescriptionText.text = publicRoute.description
-                emptyDataPlaceholder.visibility = View.GONE
+                tagListTextView.text = publicRoute.tagsList.joinToString(
+                    ",",
+                    "Tags: "
+                )
+                tagListTextView.visibility = View.VISIBLE
             }
 
             routeImagesPreviewAdapter = PublicImageAdapter {

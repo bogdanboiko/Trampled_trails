@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class PointTagDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun addTagToPoint(pointTag: PointsTagsEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

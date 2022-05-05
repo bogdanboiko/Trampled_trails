@@ -34,7 +34,7 @@ abstract class PointsDao {
     abstract fun deletePoint(pointId: String)
 
     @Transaction
-    open suspend fun insertPointCoordinatesAndCreateDetails(point: PointPreviewEntity) {
+    open suspend fun insertPointPreviewAndCreateDetails(point: PointPreviewEntity) {
         addPointPreview(point)
         addPointDetails(PointDetailsEntity(point.pointId, "", ""))
     }

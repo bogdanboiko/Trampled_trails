@@ -28,7 +28,7 @@
         android:id="@+id/cancelTagsDialogButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/tag_button_clear"
+        android:text="@string/tag_button_cancel"
         app:layout_constraintTop_toBottomOf="@+id/tagRecycler"
         app:layout_constraintEnd_toStartOf="@id/submitTagsButton"
         app:layout_constraintBottom_toBottomOf="parent"
