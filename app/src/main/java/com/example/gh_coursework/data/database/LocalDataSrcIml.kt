@@ -36,8 +36,8 @@ import kotlinx.coroutines.flow.map
 
 class LocalDataSrcIml(
     private val deleteDao: DeleteDao,
-    private val routeDao: RoutePreviewDao,
-    private val pointDetailsDao: PointDetailsDao,
+    private val routesDao: RoutesDao,
+    private val pointsDao: PointsDao,
     private val tagDao: PointTagDao,
     private val imageDao: ImageDao,
     private val routeTagDao: RouteTagDao
@@ -74,20 +74,20 @@ class LocalDataSrcIml(
 
     //PointPreview
     override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
-        pointDetailsDao.insertPointCoordinatesAndCreateDetails(mapPointDomainToEntity(poi))
+        pointsDao.insertPointCoordinatesAndCreateDetails(mapPointDomainToEntity(poi))
     }
 
     override fun getAllPoints(): Flow<List<PointDomain>> {
-        return pointDetailsDao.getAllPoints()
+        return pointsDao.getAllPoints()
             .map { it.map(::mapPointResponseToDomain) }
     }
 
     override suspend fun deleteAllPoints() {
-        pointDetailsDao.deleteAllPoints()
+        pointsDao.deleteAllPoints()
     }
 
     override suspend fun deletePoint(pointId: String) {
-        pointDetailsDao.deletePoint(pointId)
+        pointsDao.deletePoint(pointId)
     }
 
     override suspend fun addPointImages(images: List<PointImageDomain>) {
@@ -96,16 +96,16 @@ class LocalDataSrcIml(
 
     //PointDetails
     override suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain) {
-        pointDetailsDao.updatePointDetails(mapPointDetailsDomainToEntity(poi))
+        pointsDao.updatePointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
     override fun getAllPointsDetails(): Flow<List<PointDomain>> {
-        return pointDetailsDao.getAllPointsDetails()
+        return pointsDao.getAllPointsDetails()
             .map { it.map(::mapPointResponseToDomain) }
     }
 
     override fun getPointOfInterestDetails(id: String): Flow<PointDetailsDomain> {
-        return pointDetailsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
+        return pointsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
     }
 
     override fun getPointImages(pointId: String): Flow<List<PointImageDomain>> {
@@ -139,39 +139,39 @@ class LocalDataSrcIml(
         route: RouteDomain,
         coordinatesList: List<PointCoordinatesEntity>
     ) {
-        routeDao.insertRoute(mapRouteDomainToEntity(route))
+        routesDao.insertRoute(mapRouteDomainToEntity(route))
         coordinatesList.forEach {
             addPointOfInterestCoordinates(mapPointEntityToDomain(it))
         }
     }
 
     override fun getRouteDetails(routeId: String): Flow<RouteDomain> {
-        return routeDao.getRouteDetails(routeId).map(::mapRouteResponseToDomain)
+        return routesDao.getRouteDetails(routeId).map(::mapRouteResponseToDomain)
     }
 
     @OptIn(FlowPreview::class)
     override fun getRoutesList(): Flow<List<RouteDomain>> {
-        return routeDao.getRoutesResponse().map { it.map(::mapRouteResponseToDomain) }
+        return routesDao.getRoutesResponse().map { it.map(::mapRouteResponseToDomain) }
     }
 
     override fun getRoutePointsList(routeId: String): Flow<List<PointDomain>> {
-        return routeDao.getRoutePoints(routeId).map { it.map(::mapPointResponseToDomain) }
+        return routesDao.getRoutePoints(routeId).map { it.map(::mapPointResponseToDomain) }
     }
 
     override fun changeRouteAccess(routeId: String, isPublic: Boolean) {
-        routeDao.changeRouteAccess(routeId, isPublic)
+        routesDao.changeRouteAccess(routeId, isPublic)
     }
 
     override suspend fun updateRoute(route: RouteDomain) {
-        routeDao.updateRouteDetails(mapRouteDomainToEntity(route))
+        routesDao.updateRouteDetails(mapRouteDomainToEntity(route))
     }
 
     override suspend fun deleteAllRoutes() {
-        routeDao.deleteAllRoutes()
+        routesDao.deleteAllRoutes()
     }
 
     override suspend fun deleteRoute(route: RouteDomain) {
-        routeDao.deleteRoute(mapRouteDomainToEntity(route))
+        routesDao.deleteRoute(mapRouteDomainToEntity(route))
     }
 
     //RouteImage
@@ -190,7 +190,7 @@ class LocalDataSrcIml(
     }
 
     override fun getRoutePointsImagesList(routeId: String): Flow<List<RoutePointsImagesDomain>> {
-        return routeDao.getRoutePointsImages(routeId).map { image ->
+        return routesDao.getRoutePointsImages(routeId).map { image ->
             image.map(::mapRoutePointsImagesResponseToDomain)
         }
     }
@@ -214,7 +214,7 @@ class LocalDataSrcIml(
     override suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>) {
         points.forEachIndexed { _, point ->
 
-            pointDetailsDao.insertPointCoordinatesAndCreateDetails(
+            pointsDao.insertPointCoordinatesAndCreateDetails(
                 PointCoordinatesEntity(
                     point.pointId,
                     point.x,
@@ -225,7 +225,7 @@ class LocalDataSrcIml(
                 )
             )
 
-            pointDetailsDao.updatePointDetails(
+            pointsDao.updatePointDetails(
                 PointDetailsEntity(
                     point.pointId,
                     point.caption,
@@ -254,7 +254,7 @@ class LocalDataSrcIml(
     override suspend fun saveFirebaseRouteToLocal(
         route: PublicRouteDomain
     ) {
-        routeDao.insertRoute(mapPublicRouteDomainToEntity(route))
+        routesDao.insertRoute(mapPublicRouteDomainToEntity(route))
         imageDao.deleteAllRouteLocalStoredImages(route.routeId)
         Log.e("e", "route fetched")
         addRouteImages(route.imageList.map { RouteImageDomain(route.routeId, it, true) })

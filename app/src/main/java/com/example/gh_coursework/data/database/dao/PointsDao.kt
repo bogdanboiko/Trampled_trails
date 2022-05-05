@@ -8,7 +8,7 @@ import com.example.gh_coursework.data.database.response.PointResponse
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class PointDetailsDao {
+abstract class PointsDao {
     @Insert(onConflict = REPLACE)
     abstract suspend fun addPointPreview(pointCoordinatesEntity: PointCoordinatesEntity)
 
