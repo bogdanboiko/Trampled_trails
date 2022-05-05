@@ -10,7 +10,7 @@ import com.example.gh_coursework.data.database.entity.*
         DeletedImageEntity::class,
         DeletedPointsEntity::class,
         DeletedRoutesEntity::class,
-        PointCoordinatesEntity::class,
+        PointPreviewEntity::class,
         PointDetailsEntity::class,
         PointTagEntity::class,
         PointsTagsEntity::class,

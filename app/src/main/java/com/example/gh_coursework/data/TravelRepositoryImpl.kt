@@ -42,8 +42,8 @@ class TravelRepositoryImpl(
     }
 
     //PointPreview
-    override suspend fun addPointCoordinatesWithDetails(poi: PointPreviewDomain) {
-        localDataSrcIml.addPointOfInterestCoordinates(poi)
+    override suspend fun addPointPreviewWithDetails(poi: PointPreviewDomain) {
+        localDataSrcIml.addPointPreview(poi)
     }
 
     override fun getAllPoints(): Flow<List<PointDomain>> {
@@ -60,7 +60,7 @@ class TravelRepositoryImpl(
 
     //PointDetails
     override suspend fun updatePointDetails(poi: PointDetailsDomain) {
-        localDataSrcIml.updatePointOfInterestDetails(poi)
+        localDataSrcIml.updatePointDetails(poi)
     }
 
     override fun getAllPointsDetails() = localDataSrcIml.getAllPointsDetails()
@@ -79,7 +79,7 @@ class TravelRepositoryImpl(
         }
     }
 
-    override fun getPointOfInterestDetails(id: String) = localDataSrcIml.getPointOfInterestDetails(id)
+    override fun getPointDetails(id: String) = localDataSrcIml.getPointDetails(id)
 
     override fun getPointImages(pointId: String) = localDataSrcIml.getPointImages(pointId)
 

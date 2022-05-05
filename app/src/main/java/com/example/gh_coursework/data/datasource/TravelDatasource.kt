@@ -1,6 +1,6 @@
 package com.example.gh_coursework.data.datasource
 
-import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
+import com.example.gh_coursework.data.database.entity.PointPreviewEntity
 import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.domain.entity.*
 import kotlinx.coroutines.flow.Flow
@@ -14,9 +14,11 @@ interface TravelDatasource {
         suspend fun clearDeletedImagesTable()
         fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>>
         fun getDeletedPoints(): Flow<List<DeletedPointDomain>>
+        fun getImageListToDelete(): Flow<List<String>>
+        fun addImageToDelete(imageUrl: String)
 
-        suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain)
-        suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain)
+        suspend fun addPointPreview(poi: PointPreviewDomain)
+        suspend fun updatePointDetails(poi: PointDetailsDomain)
         suspend fun deletePoint(pointId: String)
         suspend fun deleteAllPoints()
         fun getAllPoints(): Flow<List<PointDomain>>
@@ -29,7 +31,7 @@ interface TravelDatasource {
         suspend fun deletePointImage(image: PointImageDomain)
         suspend fun deleteRouteImage(image: RouteImageDomain)
 
-        suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointCoordinatesEntity>)
+        suspend fun addRoute(route: RouteDomain, coordinatesList: List<PointPreviewEntity>)
         suspend fun updateRoute(route: RouteDomain)
         suspend fun deleteRoute(route: RouteDomain)
         suspend fun deleteAllRoutes()
@@ -38,7 +40,7 @@ interface TravelDatasource {
         suspend fun deleteTagsFromRoute(routeTagsList: List<RouteTagsDomain>)
 
         fun getPointsTagsList(pointId: String): Flow<List<PointTagDomain>>
-        fun getPointOfInterestDetails(id: String): Flow<PointDetailsDomain?>
+        fun getPointDetails(id: String): Flow<PointDetailsDomain?>
         fun getAllPointsDetails(): Flow<List<PointDomain>>
         fun getPointTagList(): Flow<List<PointTagDomain>>
 
@@ -55,8 +57,6 @@ interface TravelDatasource {
 
         suspend fun saveFirebasePointsToLocal(points: List<PublicPointDomain>)
         suspend fun saveFirebaseRouteToLocal(route: PublicRouteDomain)
-        fun getImageListToDelete(): Flow<List<String>>
-        fun addImageToDelete(imageUrl: String)
     }
 
     interface Remote {

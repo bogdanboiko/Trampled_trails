@@ -928,7 +928,6 @@ class PrivateRoutesFragment :
     }
 
     private fun rebuildRoute(route: RouteModel) {
-        previousRouteId = route.routeId
         focusedRoute = route
 
         if (this::routePointsJob.isInitialized) {
@@ -1322,6 +1321,8 @@ class PrivateRoutesFragment :
 
 
             btnChangeRouteAccess.setOnClickListener {
+                previousRouteId = route.routeId
+
                 if (internetCheckCallback?.isInternetAvailable() == true) {
                     if (isPublic) {
                         viewModelPrivate.changeRouteAccess(route.routeId, false)

@@ -8,6 +8,6 @@ import kotlinx.coroutines.invoke
 class AddPointPreviewWithDetailsUseCaseImpl(private val repository: TravelRepository) :
     AddPointPreviewWithDetailsUseCase {
     override suspend fun invoke(point: PointPreviewDomain) = (Dispatchers.IO) {
-        repository.addPointCoordinatesWithDetails(point)
+        repository.addPointPreviewWithDetails(point)
     }
 }

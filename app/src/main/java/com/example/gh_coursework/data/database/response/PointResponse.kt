@@ -7,7 +7,7 @@ import com.example.gh_coursework.data.database.entity.*
 
 data class PointResponse(
     @Embedded
-    val coordinate: PointCoordinatesEntity,
+    val coordinate: PointPreviewEntity,
 
     @Relation(
         parentColumn = "pointId",

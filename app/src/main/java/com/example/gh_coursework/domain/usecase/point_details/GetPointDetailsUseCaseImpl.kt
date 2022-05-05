@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 class GetPointDetailsUseCaseImpl(private val repository: TravelRepository) :
     GetPointDetailsUseCase {
     override fun invoke(pointId: String): Flow<PointDetailsDomain?> {
-       return repository.getPointOfInterestDetails(pointId)
+       return repository.getPointDetails(pointId)
     }
 }

@@ -13,7 +13,7 @@ import androidx.room.ForeignKey
         childColumns = arrayOf("tagId")
     ),
         ForeignKey(
-            entity = PointCoordinatesEntity::class,
+            entity = PointPreviewEntity::class,
             onDelete = ForeignKey.CASCADE,
             parentColumns = arrayOf("pointId"),
             childColumns = arrayOf("pointId")

@@ -6,7 +6,7 @@ import androidx.room.ForeignKey
 
 @Entity(
     tableName = "point_image", primaryKeys = ["pointId", "image"], foreignKeys = [ForeignKey(
-        entity = PointCoordinatesEntity::class,
+        entity = PointPreviewEntity::class,
         onDelete = ForeignKey.CASCADE,
         parentColumns = arrayOf("pointId"),
         childColumns = arrayOf("pointId")

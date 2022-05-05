@@ -3,7 +3,7 @@ package com.example.gh_coursework.data.database
 import android.util.Log
 import com.example.gh_coursework.data.database.dao.*
 import com.example.gh_coursework.data.database.entity.DeletedImageEntity
-import com.example.gh_coursework.data.database.entity.PointCoordinatesEntity
+import com.example.gh_coursework.data.database.entity.PointPreviewEntity
 import com.example.gh_coursework.data.database.entity.PointDetailsEntity
 import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointDomainToEntity
 import com.example.gh_coursework.data.database.mapper.deleted.mapDeletedPointEntityToDomain
@@ -72,8 +72,20 @@ class LocalDataSrcIml(
         }
     }
 
+    override fun getImageListToDelete(): Flow<List<String>> {
+        return deleteDao.getDeletedImages().map { it.map { image -> image.imageUrl } }
+    }
+
+    override fun addImageToDelete(imageUrl: String) {
+        deleteDao.addDeletedImage(DeletedImageEntity(imageUrl))
+    }
+
+    override suspend fun clearDeletedImagesTable() {
+        deleteDao.clearDeletedImagesTable()
+    }
+
     //PointPreview
-    override suspend fun addPointOfInterestCoordinates(poi: PointPreviewDomain) {
+    override suspend fun addPointPreview(poi: PointPreviewDomain) {
         pointsDao.insertPointCoordinatesAndCreateDetails(mapPointDomainToEntity(poi))
     }
 
@@ -95,7 +107,7 @@ class LocalDataSrcIml(
     }
 
     //PointDetails
-    override suspend fun updatePointOfInterestDetails(poi: PointDetailsDomain) {
+    override suspend fun updatePointDetails(poi: PointDetailsDomain) {
         pointsDao.updatePointDetails(mapPointDetailsDomainToEntity(poi))
     }
 
@@ -104,7 +116,7 @@ class LocalDataSrcIml(
             .map { it.map(::mapPointResponseToDomain) }
     }
 
-    override fun getPointOfInterestDetails(id: String): Flow<PointDetailsDomain> {
+    override fun getPointDetails(id: String): Flow<PointDetailsDomain> {
         return pointsDao.getPointDetails(id).map { mapPointDetailsEntityToDomain(it) }
     }
 
@@ -127,7 +139,7 @@ class LocalDataSrcIml(
     }
 
     override fun getPointsTagsList(pointId: String): Flow<List<PointTagDomain>> {
-        return getPointOfInterestDetails(pointId).map { it.tagList }
+        return getPointDetails(pointId).map { it.tagList }
     }
 
     override suspend fun removePointsTagsList(pointsTagsList: List<PointsTagsDomain>) {
@@ -137,11 +149,11 @@ class LocalDataSrcIml(
     //RoutePreview
     override suspend fun addRoute(
         route: RouteDomain,
-        coordinatesList: List<PointCoordinatesEntity>
+        coordinatesList: List<PointPreviewEntity>
     ) {
         routesDao.insertRoute(mapRouteDomainToEntity(route))
         coordinatesList.forEach {
-            addPointOfInterestCoordinates(mapPointEntityToDomain(it))
+            addPointPreview(mapPointEntityToDomain(it))
         }
     }
 
@@ -215,7 +227,7 @@ class LocalDataSrcIml(
         points.forEachIndexed { _, point ->
 
             pointsDao.insertPointCoordinatesAndCreateDetails(
-                PointCoordinatesEntity(
+                PointPreviewEntity(
                     point.pointId,
                     point.x,
                     point.y,
@@ -264,17 +276,5 @@ class LocalDataSrcIml(
                 routeTags.indexOf(it).toLong() + 1
             )
         })
-    }
-
-    override fun getImageListToDelete(): Flow<List<String>> {
-        return deleteDao.getDeletedImages().map { it.map { image -> image.imageUrl } }
-    }
-
-    override fun addImageToDelete(imageUrl: String) {
-        deleteDao.addDeletedImage(DeletedImageEntity(imageUrl))
-    }
-
-    override suspend fun clearDeletedImagesTable() {
-        deleteDao.clearDeletedImagesTable()
     }
 }

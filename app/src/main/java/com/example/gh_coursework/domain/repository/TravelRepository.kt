@@ -11,8 +11,10 @@ interface TravelRepository {
     suspend fun clearDeletedRoutesTable()
     fun getDeletedPoints(): Flow<List<DeletedPointDomain>>
     fun getDeletedRoutes(): Flow<List<DeletedRouteDomain>>
+    fun getImageListToDelete(): Flow<List<String>>
+    suspend fun clearDeletedImagesTable()
 
-    suspend fun addPointCoordinatesWithDetails(poi: PointPreviewDomain)
+    suspend fun addPointPreviewWithDetails(poi: PointPreviewDomain)
     suspend fun updatePointDetails(poi: PointDetailsDomain)
     suspend fun deleteAllPoints()
     suspend fun deletePoint(point: PointDetailsDomain)
@@ -36,7 +38,7 @@ interface TravelRepository {
 
     fun getAllPointsDetails(): Flow<List<PointDomain>>
     fun getPointsTagsList(pointId: String): Flow<List<PointTagDomain>>
-    fun getPointOfInterestDetails(id: String): Flow<PointDetailsDomain?>
+    fun getPointDetails(id: String): Flow<PointDetailsDomain?>
     fun getPointTagList(): Flow<List<PointTagDomain>>
 
     fun getPointImages(pointId: String): Flow<List<PointImageDomain>>
@@ -74,6 +76,4 @@ interface TravelRepository {
 
     suspend fun changeRouteAccess(routeId: String, isPublic: Boolean)
     fun deleteImagesFromFirebase(images: List<String>)
-    fun getImageListToDelete(): Flow<List<String>>
-    suspend fun clearDeletedImagesTable()
 }

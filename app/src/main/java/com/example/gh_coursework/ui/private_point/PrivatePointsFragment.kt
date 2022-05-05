@@ -324,7 +324,6 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     }
 
     private fun configBottomSheetDialog() {
-        getPointsDialog()
         PagerSnapHelper().attachToRecyclerView(binding.pointDetailsBottomSheetDialogLayout.imageRecycler)
 
         pointDetailsImagesLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
@@ -334,6 +333,8 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         pointsListBottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
         pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        getPointsDialog()
     }
 
     private fun getPointsDialog() {
