@@ -21,9 +21,7 @@ class PublicRouteFilterByTagAdapter : ListAdapter<String, PublicRouteFilterByTag
         fun bind(tag: String) {
             binding.tagCheckbox.apply {
                 text = tag
-                if (_filterByTagList.contains(tag)) {
-                    this.isChecked = true
-                }
+                this.isChecked = _filterByTagList.contains(tag)
 
                 this.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {

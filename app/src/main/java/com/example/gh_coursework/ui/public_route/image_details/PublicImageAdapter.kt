@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.gh_coursework.databinding.ItemImageDetailsBinding
 
-class PublicImageAdapter :
-    ListAdapter<String, PublicImageAdapter.ImageViewHolder>(Diff) {
+class PublicImageAdapter : ListAdapter<String, PublicImageAdapter.ImageViewHolder>(Diff) {
 
     inner class ImageViewHolder(private val binding: ItemImageDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {

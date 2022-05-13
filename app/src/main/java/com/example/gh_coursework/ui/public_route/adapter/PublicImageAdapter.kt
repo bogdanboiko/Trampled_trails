@@ -19,7 +19,8 @@ class PublicImageAdapter(private val onItemCLick: View.OnClickListener) :
     inner class ImageViewHolder(private val binding: ItemImagesPreviewBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(image: String) {
-            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+
+            val circularProgressDrawable = CircularProgressDrawable(itemView.context)
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f
             circularProgressDrawable.start()
