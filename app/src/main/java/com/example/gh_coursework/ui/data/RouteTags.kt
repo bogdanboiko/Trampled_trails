@@ -1,4 +1,4 @@
-package com.example.gh_coursework.ui.helper
+package com.example.gh_coursework.ui.data
 
 val routeTags = listOf ("Historical",
     "Evening walk",

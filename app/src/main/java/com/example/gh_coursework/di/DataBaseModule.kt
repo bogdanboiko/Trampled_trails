@@ -4,8 +4,8 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.gh_coursework.data.database.TravelDatabase
-import com.example.gh_coursework.ui.helper.pointTags
-import com.example.gh_coursework.ui.helper.routeTags
+import com.example.gh_coursework.ui.data.pointTags
+import com.example.gh_coursework.ui.data.routeTags
 import org.koin.dsl.module
 
 val localDataBaseModule = module {
