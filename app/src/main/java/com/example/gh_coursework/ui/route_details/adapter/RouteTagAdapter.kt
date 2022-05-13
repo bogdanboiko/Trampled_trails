@@ -36,9 +36,7 @@ class RouteTagAdapter : ListAdapter<RouteTagModel, RouteTagAdapter.TagViewHolder
             binding.tagCheckbox.apply {
                 text = tagModel.name
 
-                isChecked =
-                    (checkedTagList.contains(tagModel) && !removeTagList.contains(tagModel)) ||
-                            addTagList.contains(tagModel)
+                isChecked = (checkedTagList.contains(tagModel) && !removeTagList.contains(tagModel)) || addTagList.contains(tagModel)
 
                 setOnClickListener {
                     if (isChecked) {
