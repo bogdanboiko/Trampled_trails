@@ -54,10 +54,12 @@ class MainActivity :
         syncData()
     }
 
+    //calls from homepage when user successfully logged in
     override fun onSuccessLogin() {
         syncData()
     }
 
+    //calls from homepage when user successfully logged in
     override fun onSuccessLogOut() {
         viewModel.deleteAll()
     }
@@ -68,6 +70,7 @@ class MainActivity :
         }
     }
 
+    //returns device id if user not logged in
     @SuppressLint("HardwareIds")
     override fun getUserId(): String {
         return if (FirebaseAuth.getInstance().currentUser == null) {
@@ -78,6 +81,7 @@ class MainActivity :
         }
     }
 
+    //checking for internet connection
     override fun isInternetAvailable(): Boolean {
         val connectivityManager: ConnectivityManager =
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -103,6 +107,7 @@ class MainActivity :
         return false
     }
 
+    //permissions ask start
     override fun onExplanationNeeded(permissionsToExplain: MutableList<String>?) {
         Toast.makeText(
             this,
@@ -147,10 +152,11 @@ class MainActivity :
             )
         }
     }
+    //permissions ask end
 
+    //get interface theme from shared preferences
     override fun getStartTheme(): AppTheme {
-        val sharedPref = this.getPreferences(Context.MODE_PRIVATE)
-        return if (sharedPref.getBoolean("theme_switch", false)) {
+        return if (this.getPreferences(Context.MODE_PRIVATE).getBoolean("theme_switch", false)) {
             LightTheme()
         } else {
             DarkTheme()
@@ -161,12 +167,8 @@ class MainActivity :
         // useless
     }
 
+    //sync progress bar animation
     override fun getStateSubscribeTo(): SharedFlow<SyncingProgressState> {
         return viewModel.syncProgress
     }
-}
-
-enum class MapState {
-    CREATOR,
-    PRESENTATION
 }
