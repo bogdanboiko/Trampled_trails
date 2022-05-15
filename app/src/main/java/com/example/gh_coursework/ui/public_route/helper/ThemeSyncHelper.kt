@@ -58,12 +58,24 @@ fun syncPublicFragmentTheme(theme: MyAppTheme, binding: FragmentPublicRouteBindi
             ColorStateList.valueOf(theme.colorPrimary(context))
         bottomSheetDialogRouteDetails.routeDetailsAddToFavouriteButton.imageTintList =
             ColorStateList.valueOf(theme.colorSecondaryVariant(context))
+        bottomSheetDialogRouteDetails.routeCaptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
+        bottomSheetDialogRouteDetails.routeDescriptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
         bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
             theme.colorSecondaryVariant(context)
         )
 
         bottomSheetDialogPointDetails.root.backgroundTintList =
             ColorStateList.valueOf(theme.colorPrimary(context))
+        bottomSheetDialogPointDetails.pointCaptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
+        bottomSheetDialogPointDetails.pointDescriptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
         bottomSheetDialogPointDetails.emptyDataPlaceholder.setTextColor(
             theme.colorSecondaryVariant(context)
         )

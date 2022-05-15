@@ -88,6 +88,12 @@ fun syncPrivateRoutesFragmentTheme(theme: MyAppTheme, binding: FragmentPrivateRo
             ColorStateList.valueOf(theme.colorSecondaryVariant(context))
         bottomSheetDialogRouteDetails.btnChangeRouteAccess.imageTintList =
             ColorStateList.valueOf(theme.colorSecondaryVariant(context))
+        bottomSheetDialogRouteDetails.routeCaptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
+        bottomSheetDialogRouteDetails.routeDescriptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
         bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
             theme.colorSecondaryVariant(context)
         )
@@ -98,6 +104,12 @@ fun syncPrivateRoutesFragmentTheme(theme: MyAppTheme, binding: FragmentPrivateRo
             ColorStateList.valueOf(theme.colorSecondaryVariant(context))
         bottomSheetDialogPointDetails.pointDetailsEditButton.imageTintList =
             ColorStateList.valueOf(theme.colorSecondaryVariant(context))
+        bottomSheetDialogPointDetails.pointCaptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
+        bottomSheetDialogPointDetails.pointDescriptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
         bottomSheetDialogPointDetails.emptyDataPlaceholder.setTextColor(
             theme.colorSecondaryVariant(context)
         )

@@ -86,7 +86,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     private var syncStateCallback: GetSyncStateCallback? = null
 
-    private val onMapClickListener = OnMapClickListener { point ->
+    private val addPointOnClick = OnMapClickListener { point ->
         pointAnnotationManager.annotations.find {
             return@find it.point.latitude() == point.latitude()
                     && it.point.longitude() == point.longitude()
@@ -99,6 +99,15 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
                 ).also { newPoint -> viewModel.addPoint(newPoint)}
             }
         }
+
+        binding.cancelButton.text = context?.resources?.getString(R.string.save_button_save)
+        binding.cancelButton.icon =
+            view?.context?.let { context ->
+                AppCompatResources.getDrawable(
+                    context,
+                    R.drawable.ic_confirm
+                )
+            }
 
         return@OnMapClickListener true
     }
@@ -208,12 +217,21 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun configMapModSwitcher() {
         binding.createButton.setOnClickListener {
             if (mapState == MapState.CREATOR) {
                 executeClickAtPoint()
             } else {
                 mapState = MapState.CREATOR
+                binding.cancelButton.text = context?.resources?.getString(R.string.save_button_disable)
+                binding.cancelButton.icon =
+                    view?.context?.let { context ->
+                        AppCompatResources.getDrawable(
+                            context,
+                            R.drawable.ic_close
+                        )
+                    }
             }
         }
     }
@@ -231,7 +249,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             )
         }
 
-        mapboxMap.addOnMapClickListener(onMapClickListener)
+        mapboxMap.addOnMapClickListener(addPointOnClick)
         pointAnnotationManager.removeClickListener(onPointClickEvent)
 
     }
@@ -249,7 +267,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             )
         }
 
-        mapboxMap.removeOnMapClickListener(onMapClickListener)
+        mapboxMap.removeOnMapClickListener(addPointOnClick)
         pointAnnotationManager.addClickListener(onPointClickEvent)
     }
 

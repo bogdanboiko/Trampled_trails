@@ -348,6 +348,7 @@ class PrivateRoutesFragment :
         binding.mapView.compass.enabled = false
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
     }
 
     private fun configMapStateSwitcher() {
@@ -483,9 +484,9 @@ class PrivateRoutesFragment :
             if (isSaveable) {
                 binding.saveRouteButton.text = getString(R.string.save_button_save)
                 binding.saveRouteButton.icon =
-                    view?.context?.let { it1 ->
+                    view?.context?.let { context ->
                         AppCompatResources.getDrawable(
-                            it1,
+                            context,
                             R.drawable.ic_confirm
                         )
                     }

@@ -50,6 +50,12 @@ fun syncPrivatePointsFragmentTheme(theme: MyAppTheme, binding: FragmentPrivatePo
             ColorStateList.valueOf(theme.colorSecondary(context))
         pointDetailsBottomSheetDialogLayout.pointDetailsDeleteButton.imageTintList =
             ColorStateList.valueOf(theme.colorSecondary(context))
+        pointDetailsBottomSheetDialogLayout.pointCaptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
+        pointDetailsBottomSheetDialogLayout.pointDescriptionText.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
         pointDetailsBottomSheetDialogLayout.emptyDataPlaceholder.setTextColor(
             theme.colorSecondaryVariant(context)
         )

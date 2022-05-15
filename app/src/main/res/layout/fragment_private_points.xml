@@ -18,6 +18,7 @@
         android:id="@+id/groupCreatorItems"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="invisible"
         app:constraint_referenced_ids="centralPointer, cancelButton" />
 
     <androidx.constraintlayout.widget.Group
