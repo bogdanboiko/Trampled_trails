@@ -18,16 +18,16 @@ class ImageDetailsAdapter :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: PointImageModel) {
             if (imageModel.isUploaded) {
-                itemView.context?.let { it1 ->
-                    Glide.with(it1)
+                itemView.context?.let { context ->
+                    Glide.with(context)
                         .load(imageModel.image)
                         .into(binding.pointImage)
                 }
             } else {
                 val imageUri = Uri.parse(imageModel.image)
+
                 itemView.context?.contentResolver?.openInputStream(imageUri).use {
-                    val image = Drawable.createFromStream(it, imageUri.toString())
-                    if (image != null) {
+                    Drawable.createFromStream(it, imageUri.toString())?.let { image ->
                         itemView.context?.let { it1 ->
                             Glide.with(it1)
                                 .load(image)
