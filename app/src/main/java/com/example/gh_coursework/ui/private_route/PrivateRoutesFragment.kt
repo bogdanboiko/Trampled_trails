@@ -267,7 +267,7 @@ class PrivateRoutesFragment :
         configMap()
         configMapStateSwitcher()
         configBottomNavBar()
-        onNavigateToPrivatePointButtonClickListener()
+        onNavigateToPrivatePointsButtonClickListener()
         onNavigateToHomepageButtonClickListener()
         configSaveRouteButton()
         setUpBottomSheetsRecyclers()
@@ -318,6 +318,7 @@ class PrivateRoutesFragment :
         mapboxNavigation.onDestroy()
     }
 
+    //sync app theme
     override fun syncTheme(appTheme: AppTheme) {
         theme = appTheme as MyAppTheme
         syncPrivateRoutesFragmentTheme(theme, binding, requireContext())
@@ -360,14 +361,15 @@ class PrivateRoutesFragment :
     }
 
     private fun executeOnScreenCenterClick() {
-        val clickEvent = createOnMapClickEvent(
+        createOnMapClickEvent(
             Pair(
                 resources.displayMetrics.widthPixels / 2,
                 resources.displayMetrics.heightPixels / 2
             )
-        )
-        binding.mapView.dispatchTouchEvent(clickEvent.first)
-        binding.mapView.dispatchTouchEvent(clickEvent.second)
+        ).also { clickEvent ->
+            binding.mapView.dispatchTouchEvent(clickEvent.first)
+            binding.mapView.dispatchTouchEvent(clickEvent.second)
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -455,7 +457,7 @@ class PrivateRoutesFragment :
         }
     }
 
-    private fun onNavigateToPrivatePointButtonClickListener() {
+    private fun onNavigateToPrivatePointsButtonClickListener() {
         binding.mapRoutePointModSwitcher.setOnClickListener {
             findNavController().navigate(
                 PrivateRoutesFragmentDirections
@@ -491,7 +493,6 @@ class PrivateRoutesFragment :
                 binding.saveRouteButton.setOnClickListener {
                     saveRoute()
                     mapState = MapState.PRESENTATION
-                    binding.saveRouteButton.visibility = View.INVISIBLE
                     isRouteSaveable.value = false
                 }
             } else {
@@ -507,7 +508,6 @@ class PrivateRoutesFragment :
                 binding.saveRouteButton.setOnClickListener {
                     resetCurrentRoute()
                     mapState = MapState.PRESENTATION
-                    binding.saveRouteButton.visibility = View.INVISIBLE
                 }
             }
         }
@@ -603,6 +603,7 @@ class PrivateRoutesFragment :
         }
     }
 
+    //bottom sheets set up start
     private fun setUpBottomSheetsRecyclers() {
         binding.bottomSheetDialogRoutes.routesRecyclerView.apply {
             adapter = routesListAdapter
@@ -716,6 +717,7 @@ class PrivateRoutesFragment :
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
+    //bottom sheets set up end
 
     private fun initMapboxNavigation() {
         mapboxNavigation = MapboxNavigationProvider.create(
@@ -787,6 +789,7 @@ class PrivateRoutesFragment :
         }
     }
 
+    //called from RoutesListAdapter when user clicked on item
     override fun onRouteItemClick(route: RouteModel) {
         rebuildRoute(route)
         focusedRoute = route
@@ -1053,6 +1056,7 @@ class PrivateRoutesFragment :
         }
     }
 
+    //called from RoutePointsListAdapter when user clicked on item
     override fun onPointItemClick(pointId: String) {
         currentRoutePointsList.find {
             it.pointId == pointId

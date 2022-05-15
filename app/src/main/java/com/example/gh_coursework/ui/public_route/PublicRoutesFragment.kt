@@ -246,6 +246,7 @@ class PublicRoutesFragment :
         mapboxNavigation.onDestroy()
     }
 
+    //sync app theme
     override fun syncTheme(appTheme: AppTheme) {
         theme = appTheme as MyAppTheme
         syncPublicFragmentTheme(theme, binding, requireContext())
@@ -529,6 +530,7 @@ class PublicRoutesFragment :
         }
     }
 
+    //called from RoutesListAdapter when user clicked on item
     override fun onRouteItemClick(publicRoute: PublicRouteModel) {
         if (internetCheckCallback?.isInternetAvailable() == true) {
             rebuildRoute(publicRoute)
@@ -717,6 +719,7 @@ class PublicRoutesFragment :
         }
     }
 
+    //called from RoutePointsListAdapter when user clicked on item
     override fun onPointItemClick(pointId: String) {
         if (internetCheckCallback?.isInternetAvailable() == true) {
             currentRoutePointsList.find { it.pointId == pointId }?.let { pointPreview ->
