@@ -11,36 +11,133 @@
         android:layout_height="match_parent"
         android:elevation="-3dp" />
 
-    <ImageButton
-        android:id="@+id/mapRoutePointModSwitcher"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="35dp"
-        android:background="@drawable/ic_routes_dark"
-        android:elevation="-2dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupCreatorItems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/homepageButton"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginTop="35dp"
-        android:background="@drawable/ic_home_dark"
-        android:elevation="-2dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/centralPointer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
+            mapbox:layout_constraintEnd_toEndOf="parent"
+            mapbox:layout_constraintStart_toStartOf="parent" />
 
-    <ImageView
-        android:id="@+id/centralPointer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
-        mapbox:layout_constraintEnd_toEndOf="parent"
-        mapbox:layout_constraintStart_toStartOf="parent" />
+        <com.rm.rmswitch.RMSwitch
+            android:id="@+id/pointTypeSwitchButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
+            android:rotation="90"
+            android:scaleX="1.3"
+            android:scaleY="1.3"
+            android:visibility="invisible"
+            app:checked="true"
+            app:enabled="true"
+            app:forceAspectRatio="false"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:switchBkgCheckedColor="@color/yellow_dark"
+            app:switchBkgNotCheckedColor="@color/yellow_dark"
+            app:switchDesign="android"
+            app:switchToggleCheckedColor="@color/yellow_light"
+            app:switchToggleCheckedImage="@drawable/ic_pin_route_rotated_dark"
+            app:switchToggleNotCheckedColor="@color/yellow_light"
+            app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated_dark" />
+
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/saveRouteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="15dp"
+            android:elevation="2dp"
+            android:paddingStart="20dp"
+            android:text="@string/save_button_disable"
+            android:visibility="invisible"
+            app:icon="@drawable/ic_close"
+            app:iconGravity="start"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.Group>
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupButtonsItems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:id="@+id/mapRoutePointModSwitcher"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/ic_routes_dark"
+            android:elevation="-2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageButton
+            android:id="@+id/homepageButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/ic_home_dark"
+            android:elevation="-2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="?attr/actionBarSize"
+            app:layout_constraintBottom_toBottomOf="@+id/mapView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/getRoutesList"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="start"
+                android:layout_marginStart="15dp"
+                android:paddingTop="0dp"
+                android:paddingEnd="10dp"
+                android:paddingBottom="0dp"
+                android:text="@string/routes_button"
+                android:textSize="12sp"
+                android:visibility="visible"
+                app:icon="@drawable/ic_routes_dark"
+                app:iconGravity="end"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:id="@+id/getRoutePointsList"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginEnd="15dp"
+                android:elevation="-1dp"
+                android:paddingStart="10dp"
+                android:paddingTop="0dp"
+                android:paddingBottom="0dp"
+                android:text="@string/points_button"
+                android:textSize="12sp"
+                android:visibility="visible"
+                app:icon="@drawable/ic_points_dark"
+                app:iconGravity="start"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.Group>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/centerGuideline"
@@ -77,91 +174,6 @@
         app:iconGravity="end"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="?attr/actionBarSize"
-        app:layout_constraintBottom_toBottomOf="@+id/mapView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/getRoutesList"
-            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="start"
-            android:layout_marginStart="15dp"
-            android:paddingTop="0dp"
-            android:paddingEnd="10dp"
-            android:paddingBottom="0dp"
-            android:text="@string/routes_button"
-            android:textSize="12sp"
-            android:visibility="visible"
-            app:icon="@drawable/ic_routes_dark"
-            app:iconGravity="end"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/getRoutePointsList"
-            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:layout_marginEnd="15dp"
-            android:elevation="-1dp"
-            android:paddingStart="10dp"
-            android:paddingTop="0dp"
-            android:paddingBottom="0dp"
-            android:text="@string/points_button"
-            android:textSize="12sp"
-            android:visibility="visible"
-            app:icon="@drawable/ic_points_dark"
-            app:iconGravity="start"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.rm.rmswitch.RMSwitch
-        android:id="@+id/pointTypeSwitchButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:rotation="90"
-        android:scaleX="1.3"
-        android:scaleY="1.3"
-        android:visibility="invisible"
-        app:checked="true"
-        app:enabled="true"
-        app:forceAspectRatio="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:switchBkgCheckedColor="@color/yellow_dark"
-        app:switchBkgNotCheckedColor="@color/yellow_dark"
-        app:switchDesign="android"
-        app:switchToggleCheckedColor="@color/yellow_light"
-        app:switchToggleCheckedImage="@drawable/ic_pin_route_rotated_dark"
-        app:switchToggleNotCheckedColor="@color/yellow_light"
-        app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated_dark" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/saveRouteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="15dp"
-        android:elevation="2dp"
-        android:paddingStart="20dp"
-        android:text="@string/save_button_disable"
-        android:visibility="invisible"
-        app:icon="@drawable/ic_close"
-        app:iconGravity="start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/parent_container"
