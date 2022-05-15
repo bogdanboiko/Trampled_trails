@@ -5,9 +5,9 @@ import com.example.gh_coursework.ui.route_details.model.RouteTagModel
 
 data class RouteModel(
     val routeId: String,
-    val name: String?,
-    val description: String?,
-    val tagsList: List<RouteTagModel>,
-    val imageList: List<RouteImageModel>,
+    val name: String? = "",
+    val description: String? = "",
+    val tagsList: List<RouteTagModel> = emptyList(),
+    val imageList: List<RouteImageModel> = emptyList(),
     val isPublic: Boolean
 )

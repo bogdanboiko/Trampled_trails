@@ -26,8 +26,8 @@ import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagEntit
 import com.example.gh_coursework.data.database.mapper.route_tag.mapRouteTagsDomainToEntity
 import com.example.gh_coursework.data.datasource.TravelDatasource
 import com.example.gh_coursework.domain.entity.*
-import com.example.gh_coursework.ui.helper.pointTags
-import com.example.gh_coursework.ui.helper.routeTags
+import com.example.gh_coursework.ui.data.pointTags
+import com.example.gh_coursework.ui.data.routeTags
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

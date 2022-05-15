@@ -24,35 +24,36 @@ class ImagesInDetailsAdapter(private val onItemCLick: View.OnClickListener) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
             itemView.setOnClickListener(onItemCLick)
+
             val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f
             circularProgressDrawable.start()
 
             if (!imageModel.isUploaded) {
-                val imageUri = Uri.parse(imageModel.image)
-                if (imageUri.toFile().exists()) {
-                    itemView.context?.contentResolver?.openInputStream(imageUri).use {
-                        val image = Drawable.createFromStream(it, imageUri.toString())
-                        if (image != null) {
-                            itemView.context?.let { it1 ->
-                                Glide.with(it1)
-                                    .load(image)
-                                    .transform(
-                                        MultiTransformation(
-                                            CenterCrop(),
-                                            RoundedCorners(10)
+                Uri.parse(imageModel.image).let { imageUri ->
+                    if (imageUri.toFile().exists()) {
+                        itemView.context?.contentResolver?.openInputStream(imageUri).use { inputStream ->
+                            Drawable.createFromStream(inputStream, imageUri.toString())?.let { image ->
+                                itemView.context?.let { context ->
+                                    Glide.with(context)
+                                        .load(image)
+                                        .transform(
+                                            MultiTransformation(
+                                                CenterCrop(),
+                                                RoundedCorners(10)
+                                            )
                                         )
-                                    )
-                                    .placeholder(circularProgressDrawable)
-                                    .into(binding.pointImage)
+                                        .placeholder(circularProgressDrawable)
+                                        .into(binding.pointImage)
+                                }
                             }
                         }
                     }
                 }
             } else {
-                itemView.context?.let { it1 ->
-                    Glide.with(it1)
+                itemView.context?.let { context ->
+                    Glide.with(context)
                         .load(imageModel.image)
                         .transform(MultiTransformation(CenterCrop(), RoundedCorners(10)))
                         .placeholder(circularProgressDrawable)

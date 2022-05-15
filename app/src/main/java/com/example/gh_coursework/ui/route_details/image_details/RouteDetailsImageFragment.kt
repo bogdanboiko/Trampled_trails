@@ -20,6 +20,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 
 class RouteDetailsImageFragment : Fragment(R.layout.fragment_image_details) {
+
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var binding: FragmentImageDetailsBinding
     private val arguments by navArgs<RouteDetailsImageFragmentArgs>()
@@ -30,7 +31,7 @@ class RouteDetailsImageFragment : Fragment(R.layout.fragment_image_details) {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentImageDetailsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -43,22 +44,22 @@ class RouteDetailsImageFragment : Fragment(R.layout.fragment_image_details) {
 
     private fun configToolbar() {
         binding.deleteImageButton.setOnClickListener {
-            val image = imageAdapter.currentList[layoutManager.findFirstVisibleItemPosition()]
+            imageAdapter.currentList[layoutManager.findFirstVisibleItemPosition()]?.let { image ->
+                if (imageAdapter.currentList.size > 1) {
+                    if (image is ImageModel.PointImageModel) {
+                        viewModel.deletePointImage(image)
+                    } else if (image is ImageModel.RouteImageModel) {
+                        viewModel.deleteRouteImage(image)
+                    }
+                } else {
+                    if (image is ImageModel.PointImageModel) {
+                        viewModel.deletePointImage(image)
+                    } else if (image is ImageModel.RouteImageModel) {
+                        viewModel.deleteRouteImage(image)
+                    }
 
-            if (imageAdapter.currentList.size > 1) {
-                if (image is ImageModel.PointImageModel) {
-                    viewModel.deletePointImage(image)
-                } else if (image is ImageModel.RouteImageModel) {
-                    viewModel.deleteRouteImage(image)
+                    findNavController().popBackStack()
                 }
-            } else {
-                if (image is ImageModel.PointImageModel) {
-                    viewModel.deletePointImage(image)
-                } else if (image is ImageModel.RouteImageModel) {
-                    viewModel.deleteRouteImage(image)
-                }
-
-                findNavController().popBackStack()
             }
         }
 
@@ -70,14 +71,13 @@ class RouteDetailsImageFragment : Fragment(R.layout.fragment_image_details) {
     private fun configRecycler() {
         PagerSnapHelper().attachToRecyclerView(binding.pointImageRecycler)
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
         imageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(
-                positionStart: Int,
-                itemCount: Int
-            ) {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 layoutManager.scrollToPosition(arguments.clickedItemCount)
             }
         })
+
         binding.pointImageRecycler.apply {
             adapter = imageAdapter
             layoutManager = this@RouteDetailsImageFragment.layoutManager

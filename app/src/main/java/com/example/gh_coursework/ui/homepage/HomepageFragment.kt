@@ -53,9 +53,8 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
     private var syncStateCallback: GetSyncStateCallback? = null
     private var syncState: SyncingProgressState = SyncingProgressState.FinishedSync
 
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ) { res ->
+    private val signInLauncher =
+        registerForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
         this.signInResult(res)
     }
 
@@ -85,6 +84,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setUpRecycler()
         configHomepage()
 
@@ -163,7 +163,6 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
     }
 
     private fun signInResult(result: FirebaseAuthUIAuthenticationResult) {
-        val response = result.idpResponse
         if (result.resultCode == ComponentActivity.RESULT_OK) {
             firebaseUser = FirebaseAuth.getInstance().currentUser
             configHomepage()
@@ -181,7 +180,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
             }
             loginCallback?.onSuccessLogin()
         } else {
-            Log.e("MainActivity.kt", "Error logging in " + response?.error?.errorCode)
+            Log.e("MainActivity.kt", "Error logging in " + result.idpResponse?.error?.errorCode)
         }
     }
 
@@ -189,8 +188,8 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
         with(binding) {
             txtUsername.visibility = View.GONE
             homepageRecycler.visibility = View.GONE
-            btnSave.visibility = View.VISIBLE
             editUsername.visibility = View.VISIBLE
+            btnSave.visibility = View.VISIBLE
 
             editUsername.hint = firebaseUser?.displayName.toString()
             editUsername.setOnFocusChangeListener { _, hasFocus ->
@@ -201,19 +200,17 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
             btnSave.setOnClickListener {
                 if (editUsername.text.isBlank()) {
-                    val updatedUser = UserProfileChangeRequest.Builder()
+                    UserProfileChangeRequest.Builder()
                         .setDisplayName("username")
-                        .build()
+                        .build().let { updatedUser -> firebaseUser?.updateProfile(updatedUser) }
 
-                    firebaseUser?.updateProfile(updatedUser)
                     txtUsername.text = "Hello, username!"
                     editUsername.text.clear()
                 } else {
-                    val updatedUser = UserProfileChangeRequest.Builder()
+                    UserProfileChangeRequest.Builder()
                         .setDisplayName(editUsername.text.toString())
-                        .build()
+                        .build().let { updatedUser -> firebaseUser?.updateProfile(updatedUser) }
 
-                    firebaseUser?.updateProfile(updatedUser)
                     txtUsername.text = "Hello, ${editUsername.text}!"
                     editUsername.text.clear()
                 }
@@ -235,6 +232,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
     override fun syncTheme(appTheme: AppTheme) {
         theme = appTheme as MyAppTheme
+
         with(binding) {
             root.setBackgroundColor(theme.colorPrimary(requireContext()))
             txtUsername.setTextColor(theme.colorSecondaryVariant(requireContext()))

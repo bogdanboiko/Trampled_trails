@@ -11,6 +11,19 @@
         android:layout_height="match_parent"
         android:elevation="-3dp" />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupCreatorItems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:constraint_referenced_ids="centralPointer, pointTypeSwitchButton, saveRouteButton" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupButtonsItems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:constraint_referenced_ids="mapRoutePointModSwitcher, homepageButton, buttonsContainer"/>
+
     <ImageButton
         android:id="@+id/mapRoutePointModSwitcher"
         android:layout_width="50dp"
@@ -33,6 +46,45 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/saveRouteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="25dp"
+        android:layout_marginEnd="15dp"
+        android:elevation="2dp"
+        android:paddingStart="20dp"
+        android:text="@string/save_button_disable"
+        android:visibility="invisible"
+        app:icon="@drawable/ic_close"
+        app:iconGravity="start"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.rm.rmswitch.RMSwitch
+        android:id="@+id/pointTypeSwitchButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:rotation="90"
+        android:scaleX="1.3"
+        android:scaleY="1.3"
+        android:visibility="invisible"
+        app:checked="true"
+        app:enabled="true"
+        app:forceAspectRatio="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:switchBkgCheckedColor="@color/yellow_dark"
+        app:switchBkgNotCheckedColor="@color/yellow_dark"
+        app:switchDesign="android"
+        app:switchToggleCheckedColor="@color/yellow_light"
+        app:switchToggleCheckedImage="@drawable/ic_pin_route_rotated_dark"
+        app:switchToggleNotCheckedColor="@color/yellow_light"
+        app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated_dark" />
+
     <ImageView
         android:id="@+id/centralPointer"
         android:layout_width="wrap_content"
@@ -49,36 +101,8 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.5" />
 
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/resetRouteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="10dp"
-        android:layout_marginBottom="75dp"
-        android:paddingStart="20dp"
-        android:paddingEnd="25dp"
-        android:text="@string/reset_button"
-        android:visibility="invisible"
-        app:icon="@drawable/ic_add"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/undoPointCreatingButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
-        android:layout_marginBottom="75dp"
-        android:paddingStart="25dp"
-        android:paddingEnd="20dp"
-        android:text="@string/undo_button"
-        android:visibility="invisible"
-        app:icon="@drawable/ic_undo"
-        app:iconGravity="end"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/buttonsContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="?attr/actionBarSize"
@@ -124,44 +148,34 @@
             app:layout_constraintEnd_toEndOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.rm.rmswitch.RMSwitch
-        android:id="@+id/pointTypeSwitchButton"
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/resetRouteButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:rotation="90"
-        android:scaleX="1.3"
-        android:scaleY="1.3"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="75dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="25dp"
+        android:text="@string/reset_button"
         android:visibility="invisible"
-        app:checked="true"
-        app:enabled="true"
-        app:forceAspectRatio="false"
+        app:icon="@drawable/ic_add"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:switchBkgCheckedColor="@color/yellow_dark"
-        app:switchBkgNotCheckedColor="@color/yellow_dark"
-        app:switchDesign="android"
-        app:switchToggleCheckedColor="@color/yellow_light"
-        app:switchToggleCheckedImage="@drawable/ic_pin_route_rotated_dark"
-        app:switchToggleNotCheckedColor="@color/yellow_light"
-        app:switchToggleNotCheckedImage="@drawable/ic_pin_point_rotated_dark" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-        android:id="@+id/saveRouteButton"
+        android:id="@+id/undoPointCreatingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginTop="25dp"
-        android:layout_marginEnd="15dp"
-        android:elevation="2dp"
-        android:paddingStart="20dp"
-        android:text="@string/save_button_disable"
+        android:layout_marginStart="10dp"
+        android:layout_marginBottom="75dp"
+        android:paddingStart="25dp"
+        android:paddingEnd="20dp"
+        android:text="@string/undo_button"
         android:visibility="invisible"
-        app:icon="@drawable/ic_close"
-        app:iconGravity="start"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:icon="@drawable/ic_undo"
+        app:iconGravity="end"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/parent_container"

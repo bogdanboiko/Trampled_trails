@@ -23,15 +23,12 @@ class PublicRouteViewModel(
     private val removeRouteFromFavouritesUseCase: RemoveRouteFromFavouritesUseCase,
     private val fetchRoutePointsUseCase: FetchRoutePointsFromRemoteUseCase
 ) : ViewModel() {
-    fun fetchTaggedRoutes(tagsFilter: List<String>) = Pager(
-        PagingConfig(pageSize = 10)
-    ) {
+
+    fun fetchTaggedRoutes(tagsFilter: List<String>) = Pager(PagingConfig(pageSize = 10)) {
         PublicTagsPagingSource(query, tagsFilter)
     }.flow.cachedIn(viewModelScope)
 
-    fun fetchFavouriteRoutes(routesIdList: List<String>) = Pager(
-        PagingConfig(pageSize = 10)
-    ) {
+    fun fetchFavouriteRoutes(routesIdList: List<String>) = Pager(PagingConfig(pageSize = 10)) {
         PublicFavouritesPagingSource(
             FirebaseFirestore.getInstance().collection("routes"),
             routesIdList

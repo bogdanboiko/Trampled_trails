@@ -22,9 +22,7 @@ class RouteFilterTagAdapter : ListAdapter<RouteTagModel, RouteFilterTagAdapter.T
         fun bind(tagModel: RouteTagModel) {
             binding.tagCheckbox.apply {
                 text = tagModel.name
-                if (_filterByTagList.contains(tagModel)) {
-                    this.isChecked = true
-                }
+                this.isChecked = _filterByTagList.contains(tagModel)
 
                 this.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {

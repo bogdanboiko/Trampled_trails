@@ -12,33 +12,31 @@ import com.bumptech.glide.Glide
 import com.example.gh_coursework.databinding.ItemImageDetailsBinding
 import com.example.gh_coursework.ui.private_image_details.model.ImageModel
 
-class RouteImageDetailsAdapter : ListAdapter<ImageModel, RouteImageDetailsAdapter.ImageViewHolder>(
-    Diff
-) {
+class RouteImageDetailsAdapter : ListAdapter<ImageModel, RouteImageDetailsAdapter.ImageViewHolder>(Diff) {
 
     inner class ImageViewHolder(private val binding: ItemImageDetailsBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(imageModel: ImageModel) {
 
-            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+            val circularProgressDrawable = CircularProgressDrawable(itemView.context)
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f
             circularProgressDrawable.start()
 
             if (imageModel.isUploaded) {
-                itemView.context?.let { it1 ->
-                    Glide.with(it1)
+                itemView.context?.let { context ->
+                    Glide.with(context)
                         .load(imageModel.image)
                         .placeholder(circularProgressDrawable)
                         .into(binding.pointImage)
                 }
             } else {
                 val imageUri = Uri.parse(imageModel.image)
-                itemView.context?.contentResolver?.openInputStream(imageUri).use {
-                    val image = Drawable.createFromStream(it, imageUri.toString())
-                    if (image != null) {
-                        itemView.context?.let { it1 ->
-                            Glide.with(it1)
+
+                itemView.context?.contentResolver?.openInputStream(imageUri).use { inputStream ->
+                    Drawable.createFromStream(inputStream, imageUri.toString())?.let { image ->
+                        itemView.context?.let { context ->
+                            Glide.with(context)
                                 .load(image)
                                 .placeholder(circularProgressDrawable)
                                 .into(binding.pointImage)

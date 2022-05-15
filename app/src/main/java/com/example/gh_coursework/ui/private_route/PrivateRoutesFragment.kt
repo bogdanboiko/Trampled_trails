@@ -2,7 +2,6 @@ package com.example.gh_coursework.ui.private_route
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.ColorStateList
 import android.location.Location
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,7 +11,7 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.lifecycleScope
@@ -21,7 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
-import com.example.gh_coursework.MapState
+import com.example.gh_coursework.ui.data.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivateRouteBinding
 import com.example.gh_coursework.ui.helper.*
@@ -31,6 +30,8 @@ import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutePointsListCallback
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapter
 import com.example.gh_coursework.ui.private_route.adapter.RoutesListAdapterCallback
+import com.example.gh_coursework.ui.private_route.helper.configPrivateRouteFragmentBottomNavBar
+import com.example.gh_coursework.ui.private_route.helper.syncPrivateRoutesFragmentTheme
 import com.example.gh_coursework.ui.private_route.mapper.mapPrivateRoutePointModelToPoint
 import com.example.gh_coursework.ui.private_route.model.RouteModel
 import com.example.gh_coursework.ui.private_route.model.RoutePointModel
@@ -44,12 +45,9 @@ import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.animation.MapAnimationOptions
-import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
@@ -123,28 +121,28 @@ class PrivateRoutesFragment :
     private lateinit var routeLineApi: MapboxRouteLineApi
     private lateinit var routeLineView: MapboxRouteLineView
     private lateinit var pointAnnotationManager: PointAnnotationManager
-    private var mapState = MutableLiveData(MapState.PRESENTATION)
+    private var mapState: MapState = MapState.PRESENTATION
+        set(value) {
+            when(value) {
+                MapState.CREATOR -> mapModCreator()
+                MapState.PRESENTATION -> mapModPresentation()
+            }
+            field = value
+        }
     private var isRouteSaveable = MutableLiveData(false)
     private val navigationLocationProvider = NavigationLocationProvider()
 
     private val onClickAddDefaultRoutePoint = OnMapClickListener { point ->
-        val newPoint = creatingRouteId?.let {
+        creatingRouteId?.let {
             RoutePointModel(
-                UUID.randomUUID().toString(),
-                "",
-                "",
-                emptyList(),
-                emptyList(),
-                point.longitude(),
-                point.latitude(),
-                it,
-                true,
-                (currentRoutePointsList.size - 1).toLong()
+                x = point.longitude(),
+                y = point.latitude(),
+                routeId = it,
+                isRoutePoint = true,
+                position = (currentRoutePointsList.size - 1).toLong()
             )
-        }
-        if (newPoint != null) {
-            addWaypoint(newPoint)
-        }
+        }?.also { newPoint -> addWaypoint(newPoint) }
+
         configUndoPointCreationButton()
         configResetRouteButton()
 
@@ -152,30 +150,23 @@ class PrivateRoutesFragment :
     }
 
     private val onClickAddAnnotatedRoutePoint = OnMapClickListener { point ->
-        val result = pointAnnotationManager.annotations.find {
+        pointAnnotationManager.annotations.find {
             return@find it.point.latitude() == point.latitude()
                     && it.point.longitude() == point.longitude()
-        }
-
-        if (result == null) {
-            val newPoint = creatingRouteId?.let {
-                RoutePointModel(
-                    UUID.randomUUID().toString(),
-                    "",
-                    "",
-                    emptyList(),
-                    emptyList(),
-                    point.longitude(),
-                    point.latitude(),
-                    it,
-                    false,
-                    (currentRoutePointsList.size - 1).toLong()
-                )
-            }
-
-            if (newPoint != null) {
-                addEmptyAnnotationToMap(newPoint)
-                addWaypoint(newPoint)
+        }.let { pointAnnotation ->
+            if (pointAnnotation == null) {
+                creatingRouteId?.let {
+                    RoutePointModel(
+                        x = point.longitude(),
+                        y = point.latitude(),
+                        routeId = it,
+                        isRoutePoint = false,
+                        position = (currentRoutePointsList.size - 1).toLong()
+                    )
+                }?.also { newPoint ->
+                    addEmptyAnnotationToMap(newPoint)
+                    addWaypoint(newPoint)
+                }
             }
 
             configUndoPointCreationButton()
@@ -198,18 +189,18 @@ class PrivateRoutesFragment :
     private val routesObserver = RoutesObserver { routeUpdateResult ->
         if (routeUpdateResult.routes.isNotEmpty()) {
             // generate route geometries and render them
-            val routeLines = routeUpdateResult.routes.map { RouteLine(it, null) }
-            routeLineApi.setRoutes(
-                routeLines
-            ) { value ->
-                mapboxMap.getStyle()?.apply {
-                    routeLineView.renderRouteDrawData(this, value)
+            routeUpdateResult.routes.map { RouteLine(it, null) }.let { routeLines ->
+                routeLineApi.setRoutes(
+                    routeLines
+                ) { value ->
+                    mapboxMap.getStyle()?.apply {
+                        routeLineView.renderRouteDrawData(this, value)
+                    }
                 }
             }
         } else {
             // remove the route line and route arrow from the map
-            val style = mapboxMap.getStyle()
-            if (style != null) {
+            mapboxMap.getStyle()?.let { style ->
                 routeLineApi.clearRouteLine { value ->
                     routeLineView.renderClearRouteLineValue(
                         style,
@@ -228,26 +219,24 @@ class PrivateRoutesFragment :
         }
 
         override fun onNewLocationMatcherResult(locationMatcherResult: LocationMatcherResult) {
-            val enhancedLocation = locationMatcherResult.enhancedLocation
-            navigationLocationProvider.changePosition(
-                location = enhancedLocation,
-                keyPoints = locationMatcherResult.keyPoints,
-            )
+            locationMatcherResult.enhancedLocation.let { enhancedLocation ->
+                navigationLocationProvider.changePosition(
+                    location = enhancedLocation,
+                    keyPoints = locationMatcherResult.keyPoints,
+                )
 
-            if (!firstLocationUpdateReceived) {
-                firstLocationUpdateReceived = true
-                moveCameraTo(enhancedLocation)
+                if (!firstLocationUpdateReceived) {
+                    firstLocationUpdateReceived = true
+                    moveCameraTo(enhancedLocation)
+                }
             }
         }
 
         private fun moveCameraTo(location: Location) {
-            val mapAnimationOptions = MapAnimationOptions.Builder().duration(0).build()
-            binding.mapView.camera.easeTo(
-                CameraOptions.Builder()
-                    .center(Point.fromLngLat(location.longitude, location.latitude))
-                    .zoom(15.0)
-                    .build(),
-                mapAnimationOptions
+            eraseCameraToPoint(
+                location.longitude,
+                location.latitude,
+                binding.mapView
             )
         }
     }
@@ -277,9 +266,8 @@ class PrivateRoutesFragment :
 
         configMap()
         configMapStateSwitcher()
-        switchMapMod()
         configBottomNavBar()
-        onNavigateToPrivatePointButtonClickListener()
+        onNavigateToPrivatePointsButtonClickListener()
         onNavigateToHomepageButtonClickListener()
         configSaveRouteButton()
         setUpBottomSheetsRecyclers()
@@ -295,11 +283,8 @@ class PrivateRoutesFragment :
         fetchRoutes()
 
         setFragmentResultListener(RouteFilterByTagDialogFragment.REQUEST_KEY) { key, bundle ->
-            val tagArray = bundle.getParcelableArray("tags")
-            if (tagArray != null) {
-                filteredTags = tagArray.toList() as List<RouteTagModel>
-                if (tagArray.isEmpty()) {
-
+            bundle.getParcelableArray("tags")?.toList()?.let { tagList ->
+                if (tagList.isEmpty()) {
                     binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
                         context?.resources?.getString(R.string.placeholder_private_routes_empty_list)
                 }
@@ -318,7 +303,7 @@ class PrivateRoutesFragment :
         mapboxNavigation.registerLocationObserver(locationObserver)
 
         if (this::lastSeenCoordinate.isInitialized) {
-            eraseCameraToPoint(lastSeenCoordinate.longitude(), lastSeenCoordinate.latitude())
+            eraseCameraToPoint(lastSeenCoordinate.longitude(), lastSeenCoordinate.latitude(), binding.mapView)
         }
     }
 
@@ -333,106 +318,10 @@ class PrivateRoutesFragment :
         mapboxNavigation.onDestroy()
     }
 
+    //sync app theme
     override fun syncTheme(appTheme: AppTheme) {
         theme = appTheme as MyAppTheme
-        val colorStates = ColorStateList(
-            arrayOf(
-                intArrayOf(-android.R.attr.state_checked),
-                intArrayOf(android.R.attr.state_checked)
-            ), intArrayOf(
-                theme.colorSecondaryVariant(requireContext()),
-                theme.colorOnSecondary(requireContext())
-            )
-        )
-
-        with(binding) {
-            if (theme.id() == 0) {
-                mapRoutePointModSwitcher.setImageResource(R.drawable.ic_routes_light)
-                homepageButton.setImageResource(R.drawable.ic_home_light)
-
-                pointTypeSwitchButton.setSwitchToggleCheckedDrawableRes(R.drawable.ic_pin_route_rotated_light)
-                pointTypeSwitchButton.setSwitchToggleNotCheckedDrawableRes(R.drawable.ic_pin_point_rotated_light)
-            } else {
-                mapRoutePointModSwitcher.setImageResource(R.drawable.ic_routes_dark)
-                homepageButton.setImageResource(R.drawable.ic_home_dark)
-
-                pointTypeSwitchButton.setSwitchToggleCheckedDrawableRes(R.drawable.ic_pin_route_rotated_dark)
-                pointTypeSwitchButton.setSwitchToggleNotCheckedDrawableRes(R.drawable.ic_pin_point_rotated_dark)
-            }
-
-            saveRouteButton.backgroundTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            createButton.backgroundTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-
-            resetRouteButton.backgroundTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            undoPointCreatingButton.backgroundTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-
-            pointTypeSwitchButton.switchBkgCheckedColor =
-                theme.colorSecondaryVariant(requireContext())
-            pointTypeSwitchButton.switchBkgNotCheckedColor =
-                theme.colorSecondaryVariant(requireContext())
-            pointTypeSwitchButton.switchToggleCheckedColor = theme.colorSecondary(requireContext())
-            pointTypeSwitchButton.switchToggleNotCheckedColor =
-                theme.colorSecondary(requireContext())
-
-            DrawableCompat.wrap(getRoutesList.background)
-                .setTint(theme.colorOnPrimary(requireContext()))
-            DrawableCompat.wrap(getRoutePointsList.background)
-                .setTint(theme.colorOnPrimary(requireContext()))
-            getRoutesList.iconTint = ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            getRoutesList.setTextColor(theme.colorPrimaryVariant(requireContext()))
-            getRoutePointsList.iconTint =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            getRoutePointsList.setTextColor(theme.colorPrimaryVariant(requireContext()))
-
-            DrawableCompat.wrap(bottomAppBar.background)
-                .setTint(theme.colorPrimary(requireContext()))
-            bottomNavigationView.itemIconTintList = colorStates
-            bottomNavigationView.itemTextColor = colorStates
-
-            bottomSheetDialogRoutes.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogRoutes.routeFilterByTagButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogRoutes.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(
-                    requireContext()
-                )
-            )
-
-            bottomSheetDialogRoutePoints.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogRoutePoints.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(
-                    requireContext()
-                )
-            )
-
-            bottomSheetDialogRouteDetails.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogRouteDetails.routeDetailsDeleteButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogRouteDetails.routeDetailsEditButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogRouteDetails.btnChangeRouteAccess.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(requireContext())
-            )
-
-            bottomSheetDialogPointDetails.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogPointDetails.pointDetailsDeleteButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogPointDetails.pointDetailsEditButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogPointDetails.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(requireContext())
-            )
-        }
+        syncPrivateRoutesFragmentTheme(theme, binding, requireContext())
     }
 
     private fun configImageRecyclers() {
@@ -459,110 +348,90 @@ class PrivateRoutesFragment :
         binding.mapView.compass.enabled = false
 
         pointAnnotationManager = binding.mapView.annotations.createPointAnnotationManager()
+        pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
     }
 
     private fun configMapStateSwitcher() {
         binding.createButton.setOnClickListener {
-            if (mapState.value == MapState.CREATOR) {
+            if (mapState == MapState.CREATOR) {
                 executeOnScreenCenterClick()
             } else {
-                mapState.value = MapState.CREATOR
+                mapState = MapState.CREATOR
             }
         }
     }
 
     private fun executeOnScreenCenterClick() {
-        val clickEvent = createOnMapClickEvent(
+        createOnMapClickEvent(
             Pair(
                 resources.displayMetrics.widthPixels / 2,
                 resources.displayMetrics.heightPixels / 2
             )
-        )
-        binding.mapView.dispatchTouchEvent(clickEvent.first)
-        binding.mapView.dispatchTouchEvent(clickEvent.second)
+        ).also { clickEvent ->
+            binding.mapView.dispatchTouchEvent(clickEvent.first)
+            binding.mapView.dispatchTouchEvent(clickEvent.second)
+        }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun switchMapMod() {
-        mapState.observe(viewLifecycleOwner) {
-            with(binding) {
-                if (it == MapState.CREATOR) {
-                    creatingRouteId = UUID.randomUUID().toString()
-                    setEmptyRoute()
-                    pointAnnotationManager.deleteAll()
-                    pointAnnotationManager.removeClickListener(onAnnotatedPointClickEvent)
+    private fun mapModCreator() {
+        with(binding) {
+            creatingRouteId = UUID.randomUUID().toString()
+            setEmptyRoute()
+            pointAnnotationManager.deleteAll()
+            pointAnnotationManager.removeClickListener(onAnnotatedPointClickEvent)
 
-                    centralPointer.visibility = View.VISIBLE
-                    pointTypeSwitchButton.visibility = View.VISIBLE
-                    saveRouteButton.visibility = View.VISIBLE
+            groupCreatorItems.isVisible = true
+            groupButtonsItems.isVisible = false
 
-                    mapRoutePointModSwitcher.visibility = View.INVISIBLE
-                    homepageButton.visibility = View.INVISIBLE
-                    getRoutePointsList.visibility = View.INVISIBLE
-                    getRoutesList.visibility = View.INVISIBLE
+            routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            routePointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
-                    routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    routePointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                    pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            switchOnMapClickListener(pointTypeSwitchButton.isChecked)
 
-                    switchOnMapClickListener(pointTypeSwitchButton.isChecked)
-
-                    pointTypeSwitchButton.addSwitchObserver { _, isChecked ->
-                        switchOnMapClickListener(isChecked)
-                    }
-
-                    createButton.setImageDrawable(
-                        context?.getDrawable(
-                            R.drawable.ic_confirm
-                        )
-                    )
-
-                } else if (it == MapState.PRESENTATION) {
-                    creatingRouteId = null
-                    mapRoutePointModSwitcher.visibility = View.VISIBLE
-                    homepageButton.visibility = View.VISIBLE
-                    getRoutePointsList.visibility = View.VISIBLE
-                    getRoutesList.visibility = View.VISIBLE
-
-                    centralPointer.visibility = View.INVISIBLE
-                    undoPointCreatingButton.visibility = View.INVISIBLE
-                    resetRouteButton.visibility = View.INVISIBLE
-                    pointTypeSwitchButton.visibility = View.INVISIBLE
-                    saveRouteButton.visibility = View.INVISIBLE
-
-                    mapboxMap.removeOnMapClickListener(onClickAddDefaultRoutePoint)
-                    mapboxMap.removeOnMapClickListener(onClickAddAnnotatedRoutePoint)
-
-                    pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
-
-                    createButton.setImageDrawable(
-                        context?.getDrawable(
-                            R.drawable.ic_add
-                        )
-                    )
-                }
+            pointTypeSwitchButton.addSwitchObserver { _, isChecked ->
+                switchOnMapClickListener(isChecked)
             }
+
+            createButton.setImageDrawable(
+                context?.getDrawable(
+                    R.drawable.ic_confirm
+                )
+            )
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun mapModPresentation() {
+        with(binding) {
+            creatingRouteId = null
+
+            groupCreatorItems.isVisible = false
+            groupButtonsItems.isVisible = true
+
+            undoPointCreatingButton.visibility = View.INVISIBLE
+            resetRouteButton.visibility = View.INVISIBLE
+
+            mapboxMap.removeOnMapClickListener(onClickAddDefaultRoutePoint)
+            mapboxMap.removeOnMapClickListener(onClickAddAnnotatedRoutePoint)
+
+            pointAnnotationManager.addClickListener(onAnnotatedPointClickEvent)
+
+            createButton.setImageDrawable(
+                context?.getDrawable(
+                    R.drawable.ic_add
+                )
+            )
         }
     }
 
     private fun configBottomNavBar() {
-        binding.bottomNavigationView.menu.getItem(2).isChecked = true
-        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            if (internetCheckCallback?.isInternetAvailable() == true) {
-                findNavController().navigate(
-                    PrivateRoutesFragmentDirections.actionPrivateRoutesFragmentToPublicRoutesFragment("route")
-                )
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    R.string.no_internet_connection,
-                    Toast.LENGTH_SHORT
-                ).show()
+        internetCheckCallback?.isInternetAvailable()?.let { isAvailable -> view?.let { view ->
+                configPrivateRouteFragmentBottomNavBar(isAvailable, binding, requireContext(), view)
+                }
             }
-
-            return@setOnMenuItemClickListener true
-        }
     }
 
     private fun switchOnMapClickListener(isChecked: Boolean) {
@@ -589,7 +458,7 @@ class PrivateRoutesFragment :
         }
     }
 
-    private fun onNavigateToPrivatePointButtonClickListener() {
+    private fun onNavigateToPrivatePointsButtonClickListener() {
         binding.mapRoutePointModSwitcher.setOnClickListener {
             findNavController().navigate(
                 PrivateRoutesFragmentDirections
@@ -611,37 +480,35 @@ class PrivateRoutesFragment :
 
 
     private fun configSaveRouteButton() {
-        isRouteSaveable.observe(viewLifecycleOwner) {
-            if (it) {
+        isRouteSaveable.observe(viewLifecycleOwner) { isSaveable ->
+            if (isSaveable) {
                 binding.saveRouteButton.text = getString(R.string.save_button_save)
                 binding.saveRouteButton.icon =
-                    view?.context?.let { it1 ->
+                    view?.context?.let { context ->
                         AppCompatResources.getDrawable(
-                            it1,
+                            context,
                             R.drawable.ic_confirm
                         )
                     }
 
                 binding.saveRouteButton.setOnClickListener {
                     saveRoute()
-                    mapState.value = MapState.PRESENTATION
-                    binding.saveRouteButton.visibility = View.INVISIBLE
+                    mapState = MapState.PRESENTATION
                     isRouteSaveable.value = false
                 }
             } else {
                 binding.saveRouteButton.text = getString(R.string.save_button_disable)
                 binding.saveRouteButton.icon =
-                    view?.context?.let { it1 ->
+                    view?.context?.let { context ->
                         AppCompatResources.getDrawable(
-                            it1,
+                            context,
                             R.drawable.ic_close
                         )
                     }
 
                 binding.saveRouteButton.setOnClickListener {
                     resetCurrentRoute()
-                    mapState.value = MapState.PRESENTATION
-                    binding.saveRouteButton.visibility = View.INVISIBLE
+                    mapState = MapState.PRESENTATION
                 }
             }
         }
@@ -649,26 +516,21 @@ class PrivateRoutesFragment :
 
     private fun saveRoute() {
         if (creatingRouteCoordinatesList.size > 1) {
-            val route = creatingRouteId?.let {
+            creatingRouteId?.let {
                 RouteModel(
-                    it,
-                    "",
-                    "",
-                    emptyList(),
-                    emptyList(),
-                    false
+                    routeId = it,
+                    isPublic = false
                 )
-            }
-
-            if (route != null) {
+            }?.let { route ->
                 viewModelPrivate.addRoute(route, creatingRouteCoordinatesList.map { it.copy() })
             }
+
             creatingRouteCoordinatesList.clear()
         }
     }
 
     private fun configUndoPointCreationButton() {
-        if (mapState.value == MapState.CREATOR && creatingRouteCoordinatesList.size > 0) {
+        if (mapState == MapState.CREATOR && creatingRouteCoordinatesList.size > 0) {
             binding.undoPointCreatingButton.apply {
                 show()
                 setOnClickListener {
@@ -683,7 +545,7 @@ class PrivateRoutesFragment :
     }
 
     private fun configResetRouteButton() {
-        if (mapState.value == MapState.CREATOR && creatingRouteCoordinatesList.size > 1) {
+        if (mapState == MapState.CREATOR && creatingRouteCoordinatesList.size > 1) {
             binding.resetRouteButton.apply {
                 show()
                 setOnClickListener {
@@ -733,15 +595,16 @@ class PrivateRoutesFragment :
     }
 
     private fun setEmptyRoute() {
-        val routeLines = emptyList<DirectionsRoute>().map { RouteLine(it, null) }
-
-        routeLineApi.setRoutes(routeLines) { value ->
-            mapboxMap.getStyle()?.apply {
-                routeLineView.renderRouteDrawData(this, value)
+        emptyList<DirectionsRoute>().map { RouteLine(it, null) }.let { routeLines ->
+            routeLineApi.setRoutes(routeLines) { value ->
+                mapboxMap.getStyle()?.apply {
+                    routeLineView.renderRouteDrawData(this, value)
+                }
             }
         }
     }
 
+    //bottom sheets set up start
     private fun setUpBottomSheetsRecyclers() {
         binding.bottomSheetDialogRoutes.routesRecyclerView.apply {
             adapter = routesListAdapter
@@ -855,6 +718,7 @@ class PrivateRoutesFragment :
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
+    //bottom sheets set up end
 
     private fun initMapboxNavigation() {
         mapboxNavigation = MapboxNavigationProvider.create(
@@ -911,6 +775,7 @@ class PrivateRoutesFragment :
                     } else {
                         rebuildRoute(filteredRoutes.last())
                     }
+
                     binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
                         View.GONE
                 } else if (filteredRoutes.isEmpty()) {
@@ -925,6 +790,7 @@ class PrivateRoutesFragment :
         }
     }
 
+    //called from RoutesListAdapter when user clicked on item
     override fun onRouteItemClick(route: RouteModel) {
         rebuildRoute(route)
         focusedRoute = route
@@ -950,7 +816,8 @@ class PrivateRoutesFragment :
                         fetchAnnotatedRoutePoints()
                         eraseCameraToPoint(
                             currentRoutePointsList[0].x,
-                            currentRoutePointsList[0].y
+                            currentRoutePointsList[0].y,
+                            binding.mapView
                         )
                     }
                 }
@@ -1157,11 +1024,11 @@ class PrivateRoutesFragment :
     }
 
     private fun setRoute(routes: List<DirectionsRoute>) {
-        val routeLines = routes.map { RouteLine(it, null) }
-
-        routeLineApi.setRoutes(routeLines) { value ->
-            mapboxMap.getStyle()?.apply {
-                routeLineView.renderRouteDrawData(this, value)
+        routes.map { RouteLine(it, null) }.let { routeLines ->
+            routeLineApi.setRoutes(routeLines) { value ->
+                mapboxMap.getStyle()?.apply {
+                    routeLineView.renderRouteDrawData(this, value)
+                }
             }
         }
     }
@@ -1190,21 +1057,19 @@ class PrivateRoutesFragment :
         }
     }
 
+    //called from RoutePointsListAdapter when user clicked on item
     override fun onPointItemClick(pointId: String) {
-        val pointPreview = currentRoutePointsList.find {
+        currentRoutePointsList.find {
             it.pointId == pointId
-        }
+        }?.let { pointPreview -> eraseCameraToPoint(pointPreview.x, pointPreview.y, binding.mapView) }
 
-        pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
         routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 
     private fun loadAnnotatedPointData(annotation: PointAnnotation) {
         annotation.getData()?.asString?.let { pointId ->
-            val point = currentRoutePointsList.find { it.pointId == pointId }
-            point?.x?.let { eraseCameraToPoint(it, point.y) }
-
-            if (point != null) {
+            currentRoutePointsList.find { it.pointId == pointId }?.let { point ->
+                eraseCameraToPoint(point.x, point.y, binding.mapView)
                 preparePointDetailsDialog(annotation, point)
             }
         }
@@ -1423,14 +1288,5 @@ class PrivateRoutesFragment :
     private fun deleteRoute(route: RouteModel) {
         resetCurrentRoute()
         viewModelPrivate.deleteRoute(route)
-    }
-
-    private fun eraseCameraToPoint(x: Double, y: Double) {
-        binding.mapView.camera.easeTo(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(x, y))
-                .zoom(14.0)
-                .build()
-        )
     }
 }

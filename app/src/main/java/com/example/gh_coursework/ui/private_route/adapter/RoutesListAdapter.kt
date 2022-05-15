@@ -42,6 +42,7 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: RouteModel) {
+
             val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f
@@ -63,8 +64,9 @@ class RoutesListAdapter(val callback: RoutesListAdapterCallback) :
                         .placeholder(circularProgressDrawable)
                         .transform(RoundedCorners(10))
                         .into(imgMapImage)
-                } else if (item.imageList.isNotEmpty()) {
+                } else {
                     val imageLink = item.imageList[0]
+
                     if (imageLink.isUploaded) {
                         Glide.with(itemView)
                             .load(imageLink.image)

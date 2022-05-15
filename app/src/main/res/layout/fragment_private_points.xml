@@ -14,6 +14,19 @@
         android:elevation="-3dp"
         mapbox:mapbox_cameraZoom="11.0"/>
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupCreatorItems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        app:constraint_referenced_ids="centralPointer, cancelButton" />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/groupButtonsItems"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:constraint_referenced_ids="mapRoutePointModSwitcher, homepageButton, getPointsList" />
+
     <ImageButton
         android:id="@+id/mapRoutePointModSwitcher"
         android:layout_width="50dp"
@@ -84,7 +97,6 @@
         app:layout_constraintBottom_toTopOf="@+id/centerGuideline"
         mapbox:srcCompat="@drawable/ic_pin_point_dark" />
 
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/centerGuideline"
         android:layout_width="0dp"
@@ -120,7 +132,7 @@
             </com.google.android.material.bottomappbar.BottomAppBar>
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab"
+                android:id="@+id/createButton"
                 android:layout_width="75dp"
                 android:layout_height="75dp"
                 android:contentDescription="@string/app_name"

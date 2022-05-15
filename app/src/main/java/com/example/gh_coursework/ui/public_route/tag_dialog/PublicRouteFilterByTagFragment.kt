@@ -11,7 +11,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.gh_coursework.databinding.DialogFilterRoutesByTagsBinding
-import com.example.gh_coursework.ui.helper.routeTags
+import com.example.gh_coursework.ui.data.routeTags
 import com.example.gh_coursework.ui.public_route.adapter.PublicRouteFilterByTagAdapter
 import kotlinx.coroutines.launch
 

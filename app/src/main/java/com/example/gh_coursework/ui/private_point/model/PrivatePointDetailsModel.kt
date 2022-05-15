@@ -7,9 +7,9 @@ data class PrivatePointDetailsModel(
     val pointId: String,
     val x: Double,
     val y: Double,
-    val imageList: List<PointImageModel>,
-    val tagList: List<PointTagModel>,
-    val caption: String,
-    val description: String,
-    val routeId: String?
+    val imageList: List<PointImageModel> = emptyList(),
+    val tagList: List<PointTagModel> = emptyList(),
+    val caption: String = "",
+    val description: String = "",
+    val routeId: String? = ""
 )

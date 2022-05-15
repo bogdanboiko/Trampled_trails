@@ -25,8 +25,6 @@ class RouteFilterByTagDialogFragment : DialogFragment() {
     private val tagAdapter = RouteFilterTagAdapter()
     private val arguments by navArgs<RouteFilterByTagDialogFragmentArgs>()
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,6 +38,7 @@ class RouteFilterByTagDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         configTagRecycler()
         configView()
+
         dialog?.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT

@@ -23,9 +23,7 @@ class PointFilterTagAdapter :
         fun bind(tagModel: PointTagModel) {
             binding.tagCheckbox.apply {
                 text = tagModel.name
-                if (_filterByTagList.contains(tagModel)) {
-                    this.isChecked = true
-                }
+                this.isChecked = _filterByTagList.contains(tagModel)
 
                 this.setOnCheckedChangeListener { _, isChecked ->
                     if (isChecked) {

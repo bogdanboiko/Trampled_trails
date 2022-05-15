@@ -35,6 +35,7 @@ class TagDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         configTagRecycler()
         configView()
+
         dialog?.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT

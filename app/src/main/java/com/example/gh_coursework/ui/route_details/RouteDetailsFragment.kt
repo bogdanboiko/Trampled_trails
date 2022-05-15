@@ -122,23 +122,23 @@ class RouteDetailsFragment : ThemeFragment() {
             viewLifecycleOwner.lifecycleScope.launch {
                 viewModel.route.combine(viewModel.images) { route, images ->
                     RouteCompleteModel(route, images)
-                }.collect {
-                    routeCaptionText.setText(it.route.name)
-                    routeDescriptionText.setText(it.route.description)
+                }.collect { route ->
+                    val routeImages = mutableListOf<ImageModel>()
 
-                    if (it.route.name?.isEmpty() == true && it.route.description?.isEmpty() == true) {
+                    routeCaptionText.setText(route.route.name)
+                    routeDescriptionText.setText(route.route.description)
+
+                    if (route.route.name?.isEmpty() == true && route.route.description?.isEmpty() == true) {
                         emptyDataPlaceholder.visibility = View.VISIBLE
                     } else {
                         emptyDataPlaceholder.visibility = View.GONE
                     }
 
-                    val routeImages = mutableListOf<ImageModel>()
-
-                    it.pointsImagesList.forEach { image ->
+                    route.pointsImagesList.forEach { image ->
                         routeImages.addAll(image.imagesList)
                     }
 
-                    routeImages.addAll(it.route.imageList)
+                    routeImages.addAll(route.route.imageList)
 
                     if (routeImages.isNotEmpty()) {
                         imageAdapter.submitList(routeImages)
@@ -147,7 +147,7 @@ class RouteDetailsFragment : ThemeFragment() {
                         imageRecycler.visibility = View.GONE
                     }
 
-                    configConfirmButton(it.route.isPublic)
+                    configConfirmButton(route.route.isPublic)
                 }
             }
         }

@@ -55,16 +55,17 @@ class ImageDetailsFragment : ThemeFragment() {
 
     private fun configToolbar() {
         binding.deleteImageButton.setOnClickListener {
-            val imageData = imageAdapter.currentList[layoutManager.findFirstVisibleItemPosition()]
-            val imageFile = File(URI.create(imageData.image))
-
-            if (imageFile.exists() && imageAdapter.currentList.size > 1) {
-                imageFile.delete()
-                viewModel.deletePointImage(imageData)
-            } else {
-                imageFile.delete()
-                viewModel.deletePointImage(imageData)
-                findNavController().popBackStack()
+            imageAdapter.currentList[layoutManager.findFirstVisibleItemPosition()].let { imageData ->
+                File(URI.create(imageData.image)).let { imageFile ->
+                    if (imageFile.exists() && imageAdapter.currentList.size > 1) {
+                        imageFile.delete()
+                        viewModel.deletePointImage(imageData)
+                    } else {
+                        imageFile.delete()
+                        viewModel.deletePointImage(imageData)
+                        findNavController().popBackStack()
+                    }
+                }
             }
         }
 
@@ -76,6 +77,7 @@ class ImageDetailsFragment : ThemeFragment() {
     private fun configRecycler() {
         PagerSnapHelper().attachToRecyclerView(binding.pointImageRecycler)
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+
         imageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(
                 positionStart: Int,
@@ -84,6 +86,7 @@ class ImageDetailsFragment : ThemeFragment() {
                 layoutManager.scrollToPosition(arguments.clickedItemCount)
             }
         })
+
         binding.pointImageRecycler.apply {
             adapter = imageAdapter
             layoutManager = this@ImageDetailsFragment.layoutManager

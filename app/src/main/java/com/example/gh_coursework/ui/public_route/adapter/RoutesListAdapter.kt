@@ -38,7 +38,8 @@ class RoutesListAdapter(private val callback: RoutesListAdapterCallback) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: PublicRouteModel) {
-            val circularProgressDrawable =  CircularProgressDrawable(itemView.context)
+
+            val circularProgressDrawable = CircularProgressDrawable(itemView.context)
             circularProgressDrawable.strokeWidth = 5f
             circularProgressDrawable.centerRadius = 30f
             circularProgressDrawable.start()
@@ -50,7 +51,6 @@ class RoutesListAdapter(private val callback: RoutesListAdapterCallback) :
                 if (item.name.isEmpty() && item.description.isEmpty()) {
                     emptyDataPlaceholder.visibility = View.VISIBLE
                 } else {
-
                     emptyDataPlaceholder.visibility = View.INVISIBLE
                 }
 

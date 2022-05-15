@@ -12,7 +12,6 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -23,10 +22,11 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.R
-import com.example.gh_coursework.data.remote.entity.PublicFavouriteEntity
 import com.example.gh_coursework.databinding.FragmentPublicRouteBinding
 import com.example.gh_coursework.ui.helper.*
 import com.example.gh_coursework.ui.public_route.adapter.*
+import com.example.gh_coursework.ui.public_route.helper.configPublicFragmentBottomNavBar
+import com.example.gh_coursework.ui.public_route.helper.syncPublicFragmentTheme
 import com.example.gh_coursework.ui.public_route.model.PublicRouteModel
 import com.example.gh_coursework.ui.public_route.model.RoutePointModel
 import com.example.gh_coursework.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment
@@ -38,12 +38,9 @@ import com.mapbox.api.directions.v5.DirectionsCriteria.PROFILE_WALKING
 import com.mapbox.api.directions.v5.models.DirectionsRoute
 import com.mapbox.api.directions.v5.models.RouteOptions
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxExperimental
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.animation.MapAnimationOptions
-import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
@@ -135,18 +132,16 @@ class PublicRoutesFragment :
     private val routesObserver = RoutesObserver { routeUpdateResult ->
         if (routeUpdateResult.routes.isNotEmpty()) {
             // generate route geometries and render them
-            val routeLines = routeUpdateResult.routes.map { RouteLine(it, null) }
-            routeLineApi.setRoutes(
-                routeLines
-            ) { value ->
-                mapboxMap.getStyle()?.apply {
-                    routeLineView.renderRouteDrawData(this, value)
+            routeUpdateResult.routes.map { RouteLine(it, null) }.let { routeLines ->
+                routeLineApi.setRoutes(routeLines) { value ->
+                    mapboxMap.getStyle()?.apply {
+                        routeLineView.renderRouteDrawData(this, value)
+                    }
                 }
             }
         } else {
             // remove the route line and route arrow from the map
-            val style = mapboxMap.getStyle()
-            if (style != null) {
+            mapboxMap.getStyle()?.let { style ->
                 routeLineApi.clearRouteLine { value ->
                     routeLineView.renderClearRouteLineValue(
                         style,
@@ -165,27 +160,17 @@ class PublicRoutesFragment :
         }
 
         override fun onNewLocationMatcherResult(locationMatcherResult: LocationMatcherResult) {
-            val enhancedLocation = locationMatcherResult.enhancedLocation
-            navigationLocationProvider.changePosition(
-                location = enhancedLocation,
-                keyPoints = locationMatcherResult.keyPoints,
-            )
+            locationMatcherResult.enhancedLocation.let { enhancedLocation ->
+                navigationLocationProvider.changePosition(
+                    location = enhancedLocation,
+                    keyPoints = locationMatcherResult.keyPoints,
+                )
 
-            if (!firstLocationUpdateReceived) {
-                firstLocationUpdateReceived = true
-                moveCameraTo(enhancedLocation)
+                if (!firstLocationUpdateReceived) {
+                    firstLocationUpdateReceived = true
+                    eraseCameraToPoint(enhancedLocation.longitude, enhancedLocation.latitude, binding.mapView)
+                }
             }
-        }
-
-        private fun moveCameraTo(location: Location) {
-            val mapAnimationOptions = MapAnimationOptions.Builder().duration(0).build()
-            binding.mapView.camera.easeTo(
-                CameraOptions.Builder()
-                    .center(Point.fromLngLat(location.longitude, location.latitude))
-                    .zoom(15.0)
-                    .build(),
-                mapAnimationOptions
-            )
         }
     }
 
@@ -204,8 +189,8 @@ class PublicRoutesFragment :
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+
         binding = FragmentPublicRouteBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -231,10 +216,8 @@ class PublicRoutesFragment :
         fetchRoutes()
 
         setFragmentResultListener(PublicRouteFilterByTagFragment.REQUEST_KEY) { _, bundle ->
-            val tagArray = bundle.getStringArray("tags")
-            if (tagArray != null) {
-                tagsFilter = tagArray.toList()
-                if (tagArray.isEmpty()) {
+            bundle.getStringArray("tags")?.toList()?.let { tagsList ->
+                if (tagsList.isEmpty()) {
                     binding.bottomSheetDialogRoutes.emptyDataPlaceholder.text =
                         context?.resources?.getString(R.string.placeholder_private_routes_empty_list)
                 }
@@ -263,103 +246,25 @@ class PublicRoutesFragment :
         mapboxNavigation.onDestroy()
     }
 
+    //sync app theme
     override fun syncTheme(appTheme: AppTheme) {
         theme = appTheme as MyAppTheme
-        val colorStates = ColorStateList(
-            arrayOf(
-                intArrayOf(-android.R.attr.state_checked),
-                intArrayOf(android.R.attr.state_checked)
-            ), intArrayOf(
-                theme.colorSecondaryVariant(requireContext()),
-                theme.colorOnSecondary(requireContext())
-            )
-        )
-
-        with(binding) {
-            if (theme.id() == 0) {
-                homepageButton.setImageResource(R.drawable.ic_home_light)
-            } else {
-                homepageButton.setImageResource(R.drawable.ic_home_dark)
-            }
-
-            DrawableCompat.wrap(getRoutesList.background)
-                .setTint(theme.colorOnPrimary(requireContext()))
-            DrawableCompat.wrap(getRoutePointsList.background)
-                .setTint(theme.colorOnPrimary(requireContext()))
-            getRoutesList.iconTint = ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            getRoutesList.setTextColor(theme.colorPrimaryVariant(requireContext()))
-            getRoutePointsList.iconTint =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            getRoutePointsList.setTextColor(theme.colorPrimaryVariant(requireContext()))
-
-            DrawableCompat.wrap(bottomAppBar.background)
-                .setTint(theme.colorPrimary(requireContext()))
-            bottomNavigationView.itemIconTintList = colorStates
-            bottomNavigationView.itemTextColor = colorStates
-
-            bottomSheetDialogRoutes.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogRoutes.routeFilterByTagButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogRoutes.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(
-                    requireContext()
-                )
-            )
-
-            bottomSheetDialogRoutePoints.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogRoutePoints.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(
-                    requireContext()
-                )
-            )
-
-            bottomSheetDialogRouteDetails.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogRouteDetails.routeDetailsAddToFavouriteButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondaryVariant(requireContext()))
-            bottomSheetDialogRouteDetails.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(requireContext())
-            )
-
-            bottomSheetDialogPointDetails.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogPointDetails.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(requireContext())
-            )
-        }
+        syncPublicFragmentTheme(theme, binding, requireContext())
     }
 
     private fun configBottomNavBar() {
-        binding.bottomNavigationView.menu.getItem(0).isChecked = true
-        binding.bottomNavigationView.menu.getItem(2).setOnMenuItemClickListener {
-            if (arguments.popUpTo == "point") {
-                findNavController().navigate(
-                    PublicRoutesFragmentDirections.actionPublicRouteFragmentToPrivatePointFragment()
-                )
-            } else if (arguments.popUpTo == "route") {
-                findNavController().navigate(
-                    PublicRoutesFragmentDirections.actionPublicRouteFragmentToPrivateRouteFragment()
-                )
-            }
-
-            return@setOnMenuItemClickListener true
-        }
+        view?.let { configPublicFragmentBottomNavBar(arguments, binding, it) }
     }
 
     private fun fetchSavedPublicRoutes() {
         if (internetCheckCallback?.isInternetAvailable() == true) {
             viewLifecycleOwner.lifecycleScope.launch {
-
-                favourites =
-                    getUserIdCallback?.let {
+                favourites = getUserIdCallback?.let {
                         viewModelPublic.getFavouriteRoutes(it.getUserId()).first()
                     } as MutableList<String>
             }
         } else {
-            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -400,9 +305,11 @@ class PublicRoutesFragment :
         }
     }
 
+    //bottom sheets config start
     private fun configBottomSheetDialogs() {
         getRoutesDialog()
         getRoutePointsDialog()
+
         binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility = View.GONE
         binding.bottomSheetDialogRoutePoints.emptyDataPlaceholder.text =
             resources.getText(R.string.placeholder_public_route_points)
@@ -544,6 +451,7 @@ class PublicRoutesFragment :
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
+    //bottom sheets config end
 
     private fun onNavigateToHomepageButtonClickListener() {
         binding.homepageButton.setOnClickListener {
@@ -622,6 +530,7 @@ class PublicRoutesFragment :
         }
     }
 
+    //called from RoutesListAdapter when user clicked on item
     override fun onRouteItemClick(publicRoute: PublicRouteModel) {
         if (internetCheckCallback?.isInternetAvailable() == true) {
             rebuildRoute(publicRoute)
@@ -656,7 +565,8 @@ class PublicRoutesFragment :
                         fetchAnnotatedRoutePoints()
                         eraseCameraToPoint(
                             currentRoutePointsList[0].x,
-                            currentRoutePointsList[0].y
+                            currentRoutePointsList[0].y,
+                            binding.mapView
                         )
                     }
                 }
@@ -763,25 +673,25 @@ class PublicRoutesFragment :
     }
 
     private fun addAnnotationToMap(point: RoutePointModel) {
-        val pointIcon: Int = if (theme.id() == 0) {
+        if (theme.id() == 0) {
             R.drawable.ic_pin_point_light
         } else {
             R.drawable.ic_pin_point_dark
-        }
-
-        activity?.applicationContext?.let {
-            convertDrawableToBitmap(
-                AppCompatResources.getDrawable(
-                    it,
-                    pointIcon
-                )
-            )?.let { image ->
-                pointAnnotationManager.create(
-                    createAnnotationPoint(
-                        image,
-                        Point.fromLngLat(point.x, point.y)
-                    ).withData(JsonPrimitive(point.pointId))
-                )
+        }.let { pointIcon ->
+            activity?.applicationContext?.let {
+                convertDrawableToBitmap(
+                    AppCompatResources.getDrawable(
+                        it,
+                        pointIcon
+                    )
+                )?.let { image ->
+                    pointAnnotationManager.create(
+                        createAnnotationPoint(
+                            image,
+                            Point.fromLngLat(point.x, point.y)
+                        ).withData(JsonPrimitive(point.pointId))
+                    )
+                }
             }
         }
     }
@@ -800,42 +710,38 @@ class PublicRoutesFragment :
     }
 
     private fun setRoute(routes: List<DirectionsRoute>) {
-        val routeLines = routes.map { RouteLine(it, null) }
-
-        routeLineApi.setRoutes(routeLines) { value ->
-            mapboxMap.getStyle()?.apply {
-                routeLineView.renderRouteDrawData(this, value)
+        routes.map { RouteLine(it, null) }.let { routeLines ->
+            routeLineApi.setRoutes(routeLines) { value ->
+                mapboxMap.getStyle()?.apply {
+                    routeLineView.renderRouteDrawData(this, value)
+                }
             }
         }
     }
 
+    //called from RoutePointsListAdapter when user clicked on item
     override fun onPointItemClick(pointId: String) {
         if (internetCheckCallback?.isInternetAvailable() == true) {
-            val pointPreview = currentRoutePointsList.find {
-                it.pointId == pointId
+            currentRoutePointsList.find { it.pointId == pointId }?.let { pointPreview ->
+                eraseCameraToPoint(pointPreview.x, pointPreview.y, binding.mapView)
+                routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
             }
-
-            pointPreview?.let { eraseCameraToPoint(pointPreview.x, pointPreview.y) }
-            routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         } else {
-            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(requireContext(), R.string.no_internet_connection, Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun loadAnnotatedPointData(annotation: PointAnnotation) {
         annotation.getData()?.asString?.let { pointId ->
-            val point = currentRoutePointsList.find { it.pointId == pointId }
-
-            if (point != null) {
+            currentRoutePointsList.find { it.pointId == pointId }?.let { point ->
+                eraseCameraToPoint(point.x, point.y, binding.mapView)
                 preparePointDetailsDialog(point)
             }
         }
     }
 
-    private fun preparePointDetailsDialog(
-        point: RoutePointModel
-    ) {
+    private fun preparePointDetailsDialog(point: RoutePointModel) {
+
         binding.bottomSheetDialogPointDetails.apply {
             if (point.caption.isEmpty() && point.description.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
@@ -958,14 +864,5 @@ class PublicRoutesFragment :
 
             routeImagesPreviewAdapter.submitList(publicRoute.imageList)
         }
-    }
-
-    private fun eraseCameraToPoint(x: Double, y: Double) {
-        binding.mapView.camera.easeTo(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(x, y))
-                .zoom(14.0)
-                .build()
-        )
     }
 }
