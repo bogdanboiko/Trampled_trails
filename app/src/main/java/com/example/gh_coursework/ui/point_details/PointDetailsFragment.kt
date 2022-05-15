@@ -34,11 +34,15 @@ import java.io.FileOutputStream
 import java.util.*
 
 class PointDetailsFragment : ThemeFragment() {
-    private lateinit var layoutManager: LinearLayoutManager
-    private val arguments by navArgs<PointDetailsFragmentArgs>()
-    private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
+
     private lateinit var binding: FragmentPointDetailsBinding
     private lateinit var theme: MyAppTheme
+
+    private lateinit var layoutManager: LinearLayoutManager
+
+    private val arguments by navArgs<PointDetailsFragmentArgs>()
+    private val viewModel: PointDetailsViewModel by viewModel { parametersOf(arguments.pointId) }
+
     private val imageAdapter = ImagesInDetailsAdapter {
         findNavController().navigate(
             PointDetailsFragmentDirections.actionPointDetailsFragmentToPrivateImageDetails(
@@ -51,9 +55,7 @@ class PointDetailsFragment : ThemeFragment() {
     private val imageTakerLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data
-                val imageList = data?.clipData
-                if (imageList != null) {
+                result.data?.clipData?.let { imageList ->
                     val imageUriList = mutableListOf<PointImageModel>()
 
                     for (i in 0 until imageList.itemCount) {
@@ -61,12 +63,7 @@ class PointDetailsFragment : ThemeFragment() {
                     }
 
                     viewModel.addPointImageList(imageUriList)
-                } else {
-                    val imageUri = data?.data
 
-                    if (imageUri != null) {
-                        viewModel.addPointImageList(listOf(createPointImageModel(imageUri)))
-                    }
                 }
             }
         }
@@ -116,18 +113,19 @@ class PointDetailsFragment : ThemeFragment() {
     private fun configData() {
         with(binding) {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.pointDetails.collect {
-                    if (it != null) {
-                        pointCaptionText.setText(it.caption)
-                        pointDescriptionText.setText(it.description)
-                        imageAdapter.submitList(it.imageList)
-                        if (it.caption.isEmpty() && it.description.isEmpty()) {
+                viewModel.pointDetails.collect { pointDetailsModel ->
+                    if (pointDetailsModel != null) {
+                        pointCaptionText.setText(pointDetailsModel.caption)
+                        pointDescriptionText.setText(pointDetailsModel.description)
+                        imageAdapter.submitList(pointDetailsModel.imageList)
+
+                        if (pointDetailsModel.caption.isEmpty() && pointDetailsModel.description.isEmpty()) {
                             emptyDataPlaceholder.visibility = View.VISIBLE
                         } else {
                             emptyDataPlaceholder.visibility = View.INVISIBLE
                         }
 
-                        if (it.imageList.isNotEmpty()) {
+                        if (pointDetailsModel.imageList.isNotEmpty()) {
                             imageRecycler.visibility = View.VISIBLE
                         } else {
                             imageRecycler.visibility = View.GONE
@@ -145,17 +143,17 @@ class PointDetailsFragment : ThemeFragment() {
                 pointDetailsEditButton.visibility = View.VISIBLE
                 pointDetailsTagButton.visibility = View.VISIBLE
                 pointImageAddButton.visibility = View.VISIBLE
+
                 pointCaptionText.isEnabled = false
                 pointDescriptionText.isEnabled = false
                 pointCaptionText.hint = ""
                 pointDescriptionText.hint = ""
+
                 viewModel.addPointDetails(
                     PointDetailsModel(
-                        arguments.pointId,
-                        emptyList(),
-                        emptyList(),
-                        pointCaptionText.text.toString(),
-                        pointDescriptionText.text.toString()
+                        pointId = arguments.pointId,
+                        caption = pointCaptionText.text.toString(),
+                        description = pointDescriptionText.text.toString()
                     )
                 )
             }
@@ -180,6 +178,7 @@ class PointDetailsFragment : ThemeFragment() {
                 confirmEditButton.visibility = View.VISIBLE
                 pointDetailsTagButton.visibility = View.GONE
                 pointImageAddButton.visibility = View.GONE
+
                 pointCaptionText.isEnabled = true
                 pointDescriptionText.isEnabled = true
                 pointCaptionText.hint = resources.getString(R.string.hint_caption)
@@ -187,16 +186,17 @@ class PointDetailsFragment : ThemeFragment() {
             }
 
             pointImageAddButton.setOnClickListener {
-                val transitionToGallery = Intent()
-                transitionToGallery.type = "image/*"
-                transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
-                transitionToGallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                imageTakerLauncher.launch(
-                    Intent.createChooser(
-                        transitionToGallery,
-                        "Select pictures"
+                Intent().let { transitionToGallery ->
+                    transitionToGallery.type = "image/*"
+                    transitionToGallery.action = Intent.ACTION_OPEN_DOCUMENT
+                    transitionToGallery.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    imageTakerLauncher.launch(
+                        Intent.createChooser(
+                            transitionToGallery,
+                            "Select pictures"
+                        )
                     )
-                )
+                }
             }
 
             backImageButton.setOnClickListener {
@@ -207,18 +207,19 @@ class PointDetailsFragment : ThemeFragment() {
 
     private fun createPointImageModel(imageUri: Uri): PointImageModel {
         context?.contentResolver?.openInputStream(imageUri).use {
-            val image = Drawable.createFromStream(it, imageUri.toString())
-            return PointImageModel(
-                arguments.pointId,
-                saveToCacheAndGetUri(
-                    image.toBitmap(
-                        (image.intrinsicWidth * 0.9).toInt(),
-                        (image.intrinsicHeight * 0.9).toInt()
-                    ),
-                    Date().time.toString()
-                ).toString(),
-                false
-            )
+            Drawable.createFromStream(it, imageUri.toString()).let { image ->
+                return PointImageModel(
+                    arguments.pointId,
+                    saveToCacheAndGetUri(
+                        image.toBitmap(
+                            (image.intrinsicWidth * 0.9).toInt(),
+                            (image.intrinsicHeight * 0.9).toInt()
+                        ),
+                        Date().time.toString()
+                    ).toString(),
+                    false
+                )
+            }
         }
     }
 
