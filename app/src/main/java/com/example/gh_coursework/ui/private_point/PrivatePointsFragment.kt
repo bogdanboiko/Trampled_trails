@@ -2,7 +2,6 @@ package com.example.gh_coursework.ui.private_point
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -23,27 +22,23 @@ import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.gh_coursework.ui.data.MapState
 import com.example.gh_coursework.R
 import com.example.gh_coursework.databinding.FragmentPrivatePointsBinding
-import com.example.gh_coursework.ui.helper.InternetCheckCallback
-import com.example.gh_coursework.ui.helper.convertDrawableToBitmap
-import com.example.gh_coursework.ui.helper.createAnnotationPoint
-import com.example.gh_coursework.ui.helper.createOnMapClickEvent
+import com.example.gh_coursework.ui.helper.*
 import com.example.gh_coursework.ui.homepage.GetSyncStateCallback
 import com.example.gh_coursework.ui.homepage.data.SyncingProgressState
 import com.example.gh_coursework.ui.point_details.model.PointTagModel
 import com.example.gh_coursework.ui.private_image_details.adapter.ImagesPreviewAdapter
 import com.example.gh_coursework.ui.private_point.adapter.PointsListAdapter
 import com.example.gh_coursework.ui.private_point.adapter.PointsListCallback
+import com.example.gh_coursework.ui.private_point.helper.configPrivatePointsFragmentBottomNavBar
+import com.example.gh_coursework.ui.private_point.helper.syncPrivatePointsFragmentTheme
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
-import com.example.gh_coursework.ui.private_point.model.PrivatePointPreviewModel
 import com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment
 import com.example.gh_coursework.ui.themes.MyAppTheme
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.gson.JsonPrimitive
 import com.mapbox.geojson.Point
-import com.mapbox.maps.CameraOptions
 import com.mapbox.maps.MapboxMap
 import com.mapbox.maps.Style
-import com.mapbox.maps.plugin.animation.camera
 import com.mapbox.maps.plugin.annotation.annotations
 import com.mapbox.maps.plugin.annotation.generated.OnPointAnnotationClickListener
 import com.mapbox.maps.plugin.annotation.generated.PointAnnotation
@@ -59,6 +54,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
+
     private lateinit var binding: FragmentPrivatePointsBinding
     private lateinit var theme: MyAppTheme
 
@@ -81,22 +77,27 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private lateinit var mapboxMap: MapboxMap
     private lateinit var pointAnnotationManager: PointAnnotationManager
     private var mapState: MapState = MapState.PRESENTATION
+        set(value) {
+            when(value) {
+                MapState.CREATOR -> mapModCreator()
+                MapState.PRESENTATION -> mapModPresentation()
+            }
+            field = value
+        }
     private var syncStateCallback: GetSyncStateCallback? = null
 
     private val onMapClickListener = OnMapClickListener { point ->
-        val result = pointAnnotationManager.annotations.find {
+        pointAnnotationManager.annotations.find {
             return@find it.point.latitude() == point.latitude()
                     && it.point.longitude() == point.longitude()
-        }
-
-        if (result == null) {
-            val newPoint = PrivatePointPreviewModel(
-                UUID.randomUUID().toString(),
-                point.longitude(),
-                point.latitude(),
-                false
-            )
-            viewModel.addPoint(newPoint)
+        }.let { pointAnnotation ->
+            if (pointAnnotation == null) {
+                PrivatePointDetailsModel(
+                    pointId = UUID.randomUUID().toString(),
+                    x = point.longitude(),
+                    y = point.latitude()
+                ).also { newPoint -> viewModel.addPoint(newPoint)}
+            }
         }
 
         return@OnMapClickListener true
@@ -134,9 +135,9 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
         configMap()
         configBottomNavBar()
-        configMapSwitcherButton()
+        onNavigateToPrivateRoutesButtonClickListener()
         configMapModSwitcher()
-        configCancelButton()
+        configSaveButton()
         configBottomSheetDialog()
         onNavigateToHomepageButtonClickListener()
         fetchPoints()
@@ -153,11 +154,8 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
 
         setFragmentResultListener(PointFilterByTagDialogFragment.REQUEST_KEY) { key, bundle ->
-            val tagArray = bundle.getParcelableArray("tags")
-            if (tagArray != null) {
-                checkedTagList = tagArray.toList() as List<PointTagModel>
-
-                if (tagArray.isEmpty()) {
+            bundle.getParcelableArray("tags")?.toList()?.let { tagList ->
+                if (tagList.isEmpty()) {
                     binding.bottomSheetDialogPoints.emptyDataPlaceholder.text =
                         context?.resources?.getString(R.string.placeholder_private_points_list_empty)
                 }
@@ -172,69 +170,15 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
                     requireActivity().finishAffinity()
                 }
             }
+
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner, callback)
     }
 
+    //sync app theme
     override fun syncTheme(appTheme: AppTheme) {
         theme = appTheme as MyAppTheme
-        val colorStates = ColorStateList(
-            arrayOf(
-                intArrayOf(-android.R.attr.state_checked),
-                intArrayOf(android.R.attr.state_checked)
-            ), intArrayOf(
-                theme.colorSecondaryVariant(requireContext()),
-                theme.colorOnSecondary(requireContext())
-            )
-        )
 
-        with(binding) {
-            if (theme.id() == 0) {
-                mapRoutePointModSwitcher.setImageResource(R.drawable.ic_points_light)
-                homepageButton.setImageResource(R.drawable.ic_home_light)
-                centralPointer.setImageResource(R.drawable.ic_pin_point_light)
-            } else {
-                mapRoutePointModSwitcher.setImageResource(R.drawable.ic_points_dark)
-                homepageButton.setImageResource(R.drawable.ic_home_dark)
-                centralPointer.setImageResource(R.drawable.ic_pin_point_dark)
-            }
-
-            cancelButton.backgroundTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            fab.backgroundTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-
-            DrawableCompat.wrap(getPointsList.background)
-                .setTint(theme.colorOnPrimary(requireContext()))
-            getPointsList.iconTint = ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            getPointsList.setTextColor(theme.colorPrimaryVariant(requireContext()))
-
-            DrawableCompat.wrap(bottomAppBar.background)
-                .setTint(theme.colorPrimary(requireContext()))
-            bottomNavigationView.itemIconTintList = colorStates
-            bottomNavigationView.itemTextColor = colorStates
-
-            pointDetailsBottomSheetDialogLayout.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            pointDetailsBottomSheetDialogLayout.pointDetailsEditButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            pointDetailsBottomSheetDialogLayout.pointDetailsDeleteButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            pointDetailsBottomSheetDialogLayout.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(
-                    requireContext()
-                )
-            )
-
-            bottomSheetDialogPoints.root.backgroundTintList =
-                ColorStateList.valueOf(theme.colorPrimary(requireContext()))
-            bottomSheetDialogPoints.pointFilterByTagButton.imageTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            bottomSheetDialogPoints.emptyDataPlaceholder.setTextColor(
-                theme.colorSecondaryVariant(
-                    requireContext()
-                )
-            )
-        }
+        syncPrivatePointsFragmentTheme(theme, binding, requireContext())
     }
 
     private fun configMap() {
@@ -249,28 +193,13 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     }
 
     private fun configBottomNavBar() {
-        binding.bottomNavigationView.menu.getItem(2).isChecked = true
-        binding.bottomNavigationView.menu.getItem(0).setOnMenuItemClickListener {
-            if (internetCheckCallback?.isInternetAvailable() == true) {
-                findNavController().navigate(
-                    PrivatePointsFragmentDirections.actionPrivatePointsFragmentToPublicRoutesFragment(
-                        "point"
-                    )
-                )
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    R.string.no_internet_connection,
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
+        internetCheckCallback?.isInternetAvailable()?.let { isAvailable -> view?.let { view ->
+            configPrivatePointsFragmentBottomNavBar(isAvailable, binding, requireContext(), view)
             }
-
-            return@setOnMenuItemClickListener true
         }
     }
 
-    private fun configMapSwitcherButton() {
+    private fun onNavigateToPrivateRoutesButtonClickListener() {
         binding.mapRoutePointModSwitcher.setOnClickListener {
             findNavController().navigate(
                 PrivatePointsFragmentDirections
@@ -279,54 +208,58 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         }
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
     private fun configMapModSwitcher() {
-        binding.fab.setOnClickListener {
+        binding.createButton.setOnClickListener {
             if (mapState == MapState.CREATOR) {
                 executeClickAtPoint()
             } else {
-                with(binding) {
-                    mapRoutePointModSwitcher.visibility = View.INVISIBLE
-                    homepageButton.visibility = View.INVISIBLE
-                    getPointsList.visibility = View.INVISIBLE
-                    centralPointer.visibility = View.VISIBLE
-                    cancelButton.visibility = View.VISIBLE
-                    fab.setImageDrawable(
-                        context?.getDrawable(
-                            R.drawable.ic_confirm
-                        )
-                    )
-                }
-
-                mapboxMap.addOnMapClickListener(onMapClickListener)
-                pointAnnotationManager.removeClickListener(onPointClickEvent)
                 mapState = MapState.CREATOR
             }
         }
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
-    private fun configCancelButton() {
-        binding.cancelButton.setOnClickListener {
-            with(binding) {
-                binding.mapRoutePointModSwitcher.visibility = View.VISIBLE
-                binding.homepageButton.visibility = View.VISIBLE
-                binding.getPointsList.visibility = View.VISIBLE
-                centralPointer.visibility = View.INVISIBLE
-                cancelButton.visibility = View.INVISIBLE
-                fab.setImageDrawable(
-                    context?.getDrawable(
-                        R.drawable.ic_add
-                    )
-                )
-            }
+    private fun mapModCreator() {
+        with(binding) {
+            groupButtonsItems.isVisible = false
+            groupCreatorItems.isVisible = true
 
-            mapboxMap.removeOnMapClickListener(onMapClickListener)
-            pointAnnotationManager.addClickListener(onPointClickEvent)
+            createButton.setImageDrawable(
+                context?.getDrawable(
+                    R.drawable.ic_confirm
+                )
+            )
+        }
+
+        mapboxMap.addOnMapClickListener(onMapClickListener)
+        pointAnnotationManager.removeClickListener(onPointClickEvent)
+
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    private fun mapModPresentation() {
+        with(binding) {
+            groupButtonsItems.isVisible = true
+            groupCreatorItems.isVisible = false
+
+            createButton.setImageDrawable(
+                context?.getDrawable(
+                    R.drawable.ic_add
+                )
+            )
+        }
+
+        mapboxMap.removeOnMapClickListener(onMapClickListener)
+        pointAnnotationManager.addClickListener(onPointClickEvent)
+    }
+
+    private fun configSaveButton() {
+        binding.cancelButton.setOnClickListener {
             mapState = MapState.PRESENTATION
         }
     }
 
+    //bottom sheets set up start
     private fun configBottomSheetDialog() {
         PagerSnapHelper().attachToRecyclerView(binding.pointDetailsBottomSheetDialogLayout.imageRecycler)
 
@@ -375,6 +308,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
             pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         }
     }
+    //bottom sheets set up end
 
     private fun onNavigateToHomepageButtonClickListener() {
         binding.homepageButton.setOnClickListener {
@@ -430,14 +364,15 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     }
 
     private fun executeClickAtPoint() {
-        val clickEvent = createOnMapClickEvent(
+        createOnMapClickEvent(
             Pair(
                 resources.displayMetrics.widthPixels / 2,
                 resources.displayMetrics.heightPixels / 2
             )
-        )
-        binding.mapView.dispatchTouchEvent(clickEvent.first)
-        binding.mapView.dispatchTouchEvent(clickEvent.second)
+        ).also { clickEvent ->
+            binding.mapView.dispatchTouchEvent(clickEvent.first)
+            binding.mapView.dispatchTouchEvent(clickEvent.second)
+        }
     }
 
     private fun addAnnotationToMap(point: PrivatePointDetailsModel) {
@@ -466,10 +401,8 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
     private fun loadPointDetailsData(annotation: PointAnnotation) {
         annotation.getData()?.asString?.let { pointId ->
-            val point = pointCoordinates.find { it.pointId == pointId }
-            point?.x?.let { eraseCameraToPoint(it, point.y) }
-
-            if (point != null) {
+            pointCoordinates.find { it.pointId == pointId }?.let { point ->
+                eraseCameraToPoint(point.x, point.y, binding.mapView)
                 preparePointDetailsDialog(annotation, point)
             }
         }
@@ -548,17 +481,9 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     }
 }
 
+    //called from PointsListAdapter when user clicked on item
     override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
-        eraseCameraToPoint(pointDetails.x, pointDetails.y)
+        eraseCameraToPoint(pointDetails.x, pointDetails.y, binding.mapView)
         pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
-
-    private fun eraseCameraToPoint(x: Double, y: Double) {
-        binding.mapView.camera.easeTo(
-            CameraOptions.Builder()
-                .center(Point.fromLngLat(x, y))
-                .zoom(14.0)
-                .build()
-        )
     }
 }

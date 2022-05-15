@@ -9,7 +9,6 @@ import com.example.gh_coursework.ui.private_point.mapper.mapPointDomainToModel
 import com.example.gh_coursework.ui.private_point.mapper.mapPointModelToDomain
 import com.example.gh_coursework.ui.private_point.mapper.mapPrivatePointDetailsModelToPointDomain
 import com.example.gh_coursework.ui.private_point.model.PrivatePointDetailsModel
-import com.example.gh_coursework.ui.private_point.model.PrivatePointPreviewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -21,7 +20,7 @@ class PointViewModel(
     val points =
         getAllPointsDetailsDetailsUseCase.invoke().map { pointList -> pointList.map(::mapPointDomainToModel) }
 
-    fun addPoint(point: PrivatePointPreviewModel) {
+    fun addPoint(point: PrivatePointDetailsModel) {
         viewModelScope.launch {
             addPointPreviewWithDetailsUseCase.invoke(mapPointModelToDomain(point))
         }

@@ -57,9 +57,7 @@ class PointsListAdapter(val callback: PointsListCallback) :
                         .placeholder(imgMapImage.drawable)
                         .transform(RoundedCorners(10))
                         .into(imgMapImage)
-                }
-
-                if (item.imageList.isNotEmpty()) {
+                } else {
                     val imageLink = item.imageList[0]
 
                     if (imageLink.isUploaded) {

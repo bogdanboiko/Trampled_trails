@@ -25,8 +25,6 @@ class PointFilterByTagDialogFragment : DialogFragment() {
     private val tagAdapter = PointFilterTagAdapter()
     private val arguments by navArgs<PointFilterByTagDialogFragmentArgs>()
 
-
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -40,6 +38,7 @@ class PointFilterByTagDialogFragment : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         configTagRecycler()
         configView()
+
         dialog?.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
