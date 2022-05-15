@@ -377,7 +377,7 @@ class PublicRoutesFragment :
                     }
                 }
             } else {
-                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.GONE
+                binding.bottomSheetDialogRoutes.routeFilterByFavouriteButton.visibility = View.INVISIBLE
             }
         }
 
@@ -778,7 +778,7 @@ class PublicRoutesFragment :
             isRouteFavourite = favourites.contains(publicRoute.routeId)
 
             if (FirebaseAuth.getInstance().currentUser == null) {
-                routeDetailsAddToFavouriteButton.visibility = View.GONE
+                routeDetailsAddToFavouriteButton.visibility = View.INVISIBLE
             } else {
                 routeDetailsAddToFavouriteButton.visibility = View.VISIBLE
             }
