@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/public_"
+        android:icon="@drawable/ic_public"
+        android:title="@string/bottom_nav_menu_public"
+        android:checked="false"/>
+
+    <item
+        android:id="@+id/empty_item"
+        android:enabled="false"
+        android:title="" />
+
+    <item
+        android:id="@+id/private_"
+        android:icon="@drawable/ic_lock"
+        android:title="@string/bottom_nav_menu_private"
+        android:checked="true"/>
+</menu>

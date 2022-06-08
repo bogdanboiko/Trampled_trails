@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/privatePointsFragment">
+
+    <!--Points-->
+    <fragment
+        android:id="@+id/privatePointsFragment"
+        android:name="com.example.gh_coursework.ui.private_point.PrivatePointsFragment"
+        android:label="fragment_private_points"
+        tools:layout="@layout/fragment_private_points">
+        <action
+            android:id="@+id/action_privatePointsFragment_to_privateRoutesFragment"
+            app:destination="@id/privateRoutesFragment"
+            app:popUpTo="@id/privatePointsFragment"/>
+        <action
+            android:id="@+id/action_privatePointsFragment_to_pointDetailsFragment"
+            app:destination="@id/pointDetailsFragment"
+            app:popUpTo="@id/privatePointsFragment"/>
+        <action
+            android:id="@+id/action_privatePointsFragment_to_privateImageDetails"
+            app:destination="@id/privateImageDetails"
+            app:popUpTo="@id/privatePointsFragment"/>
+        <action
+            android:id="@+id/action_privatePointsFragment_to_homepageFragment"
+            app:destination="@id/homepageFragment"
+            app:popUpTo="@id/privatePointsFragment"/>
+      <action
+            android:id="@+id/action_privatePointsFragment_to_publicRoutesFragment"
+            app:destination="@id/publicRouteFragment"
+            app:popUpTo="@id/privatePointsFragment"/>
+        <action
+            android:id="@+id/action_privatePointsFragment_to_pointFilterByTagsDialogFragment"
+            app:destination="@id/pointFilterByTagsDialogFragment"
+            app:popUpTo="@id/privatePointsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/pointDetailsFragment"
+        android:name="com.example.gh_coursework.ui.point_details.PointDetailsFragment"
+        android:label="fragment_point_details"
+        tools:layout="@layout/fragment_point_details">
+        <action
+            android:id="@+id/action_privateDetailsFragment_to_pointTagDialogFragment"
+            app:destination="@id/pointTagsDialogFragment" />
+        <argument
+            android:name="pointId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_pointDetailsFragment_to_privateImageDetails"
+            app:destination="@id/privateImageDetails"
+            app:popUpTo="@id/pointDetailsFragment"/>
+    </fragment>
+    <dialog
+        android:id="@+id/pointTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogFragment"
+        android:label="TagDialog">
+        <argument
+            android:name="pointId"
+            app:argType="string" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/pointFilterByTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment"
+        android:label="FilterByTagDialog">
+        <argument
+            android:name="checkedTags"
+            app:argType="com.example.gh_coursework.ui.point_details.model.PointTagModel[]" />
+    </dialog>
+
+    <fragment
+        android:id="@+id/privateImageDetails"
+        android:name="com.example.gh_coursework.ui.private_image_details.ImageDetailsFragment"
+        android:label="image_details_fragment"
+        tools:layout="@layout/fragment_image_details">
+        <argument
+            android:name="pointId"
+            app:argType="string" />
+        <argument android:name="clickedItemCount"
+            app:argType="integer" />
+    </fragment>
+
+    <!--Routes-->
+    <fragment
+        android:id="@+id/privateRoutesFragment"
+        android:name="com.example.gh_coursework.ui.private_route.PrivateRoutesFragment"
+        android:label="fragment_private_routes"
+        tools:layout="@layout/fragment_private_route">
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_privatePointsFragment"
+            app:destination="@id/privatePointsFragment" />
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_routeDetailsFragment"
+            app:destination="@id/routeDetailsFragment"
+            app:popUpTo="@id/privateRoutesFragment"/>
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_privateRouteImageDetails"
+            app:destination="@id/privateRouteImageDetails"
+            app:popUpTo="@id/privateRoutesFragment"/>
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_pointDetailsFragment"
+            app:destination="@id/pointDetailsFragment"
+            app:popUpTo="@id/privateRoutesFragment"/>
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_privatePointImageDetails"
+            app:destination="@id/privateImageDetails"
+            app:popUpTo="@id/privateRoutesFragment"/>
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_homepageFragment"
+            app:destination="@id/homepageFragment"
+            app:popUpTo="@id/privateRoutesFragment"/>
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_publicRoutesFragment"
+            app:destination="@id/publicRouteFragment"
+            app:popUpTo="@id/privateRoutesFragment"/>
+        <action
+            android:id="@+id/action_privateRoutesFragment_to_routeFilterByTagsDialogFragment"
+            app:destination="@id/routeFilterByTagsDialogFragment"
+            app:popUpTo="@id/privateRoutesFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/routeDetailsFragment"
+        android:name="com.example.gh_coursework.ui.route_details.RouteDetailsFragment"
+        android:label="fragment_route_details"
+        tools:layout="@layout/fragment_route_details">
+        <action
+            android:id="@+id/action_privateDetailsFragment_to_routeTagDialogFragment"
+            app:destination="@id/routeTagsDialogFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="routeId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_routeDetailsFragment_to_privateRouteImageDetails"
+            app:destination="@id/privateRouteImageDetails"
+            app:popUpTo="@id/routeDetailsFragment"/>
+    </fragment>
+
+    <dialog
+        android:id="@+id/routeFilterByTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment"
+        android:label="FilterByTagDialog">
+        <argument
+            android:name="checkedTags"
+            app:argType="com.example.gh_coursework.ui.route_details.model.RouteTagModel[]" />
+    </dialog>
+
+    <dialog
+        android:id="@+id/routeTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.route_details.tag_dialog.RouteTagDialogFragment"
+        android:label="TagDialog">
+        <argument
+            android:name="routeId"
+            app:argType="string" />
+    </dialog>
+
+    <fragment
+        android:id="@+id/privateRouteImageDetails"
+        android:name="com.example.gh_coursework.ui.route_details.image_details.RouteDetailsImageFragment"
+        android:label="image_details_fragment"
+        tools:layout="@layout/fragment_image_details">
+        <argument
+            android:name="routeId"
+            app:argType="string" />
+        <argument android:name="clickedItemCount"
+            app:argType="integer" />
+    </fragment>
+
+    <!--Home-->
+    <fragment
+        android:id="@+id/homepageFragment"
+        android:name="com.example.gh_coursework.ui.homepage.HomepageFragment"
+        android:label="fragment_homepage"
+        tools:layout="@layout/fragment_homepage">
+    </fragment>
+  
+    <!--Public-->
+    <fragment
+        android:id="@+id/publicRouteFragment"
+        android:name="com.example.gh_coursework.ui.public_route.PublicRoutesFragment"
+        android:label="public_routes_fragment"
+        tools:layout="@layout/fragment_public_route">
+        <action
+            android:id="@+id/action_publicRouteFragment_to_privateRouteFragment"
+            app:destination="@id/privateRoutesFragment"
+            app:popUpTo="@id/publicRouteFragment"/>
+        <action
+            android:id="@+id/action_publicRouteFragment_to_privatePointFragment"
+            app:destination="@id/privatePointsFragment"
+            app:popUpTo="@id/publicRouteFragment"/>
+        <action
+            android:id="@+id/action_publicRouteFragment_to_publicImageFragment"
+            app:destination="@id/publicImageFragment"
+            app:popUpTo="@id/publicRouteFragment" />
+        <action
+            android:id="@+id/action_publicRouteFragment_to_publicRouteFilterByTagsDialogFragment"
+            app:destination="@id/publicRouteFilterByTagsDialogFragment"
+            app:popUpTo="@id/publicRouteFragment" />
+        <action
+            android:id="@+id/action_publicRouteFragment_to_homepageFragment"
+            app:destination="@id/homepageFragment"
+            app:popUpTo="@id/publicRouteFragment" />
+        <argument
+            android:name="popUpTo"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/publicImageFragment"
+        android:name="com.example.gh_coursework.ui.public_route.image_details.PublicRouteDetailsImageFragment"
+        android:label="public_image_fragment"
+        tools:layout="@layout/fragment_public_image_details">
+
+        <argument
+            android:name="imageList"
+            app:argType="string[]" />
+        <argument android:name="clickedItemCount"
+            app:argType="integer" />
+    </fragment>
+
+    <dialog
+        android:id="@+id/publicRouteFilterByTagsDialogFragment"
+        android:name="com.example.gh_coursework.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment"
+        android:label="PublicRouteFilterByTagDialog">
+        <argument
+            android:name="checkedTags"
+            app:argType="string[]" />
+    </dialog>
+</navigation>
