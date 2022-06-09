@@ -56,6 +56,9 @@ fun syncPublicFragmentTheme(theme: MyAppTheme, binding: FragmentPublicRouteBindi
 
         bottomSheetDialogRouteDetails.root.backgroundTintList =
             ColorStateList.valueOf(theme.colorPrimary(context))
+        bottomSheetDialogRouteDetails.routeDistance.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
         bottomSheetDialogRouteDetails.routeDetailsAddToFavouriteButton.imageTintList =
             ColorStateList.valueOf(theme.colorSecondaryVariant(context))
         bottomSheetDialogRouteDetails.routeCaptionText.setTextColor(

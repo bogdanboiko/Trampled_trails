@@ -67,7 +67,7 @@
         android:label="FilterByTagDialog">
         <argument
             android:name="checkedTags"
-            app:argType="com.example.gh_coursework.ui.point_details.model.PointTagModel[]" />
+            app:argType="com.example.trampled_trails.ui.point_details.model.PointTagModel[]" />
     </dialog>
 
     <fragment
@@ -145,7 +145,7 @@
         android:label="FilterByTagDialog">
         <argument
             android:name="checkedTags"
-            app:argType="com.example.gh_coursework.ui.route_details.model.RouteTagModel[]" />
+            app:argType="com.example.trampled_trails.ui.route_details.model.RouteTagModel[]" />
     </dialog>
 
     <dialog

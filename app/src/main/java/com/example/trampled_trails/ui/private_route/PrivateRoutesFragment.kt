@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -74,11 +75,14 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
+import com.mapbox.turf.TurfMeasurement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.DecimalFormat
 import java.util.*
+import java.util.zip.DeflaterOutputStream
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PrivateRoutesFragment :
@@ -798,6 +802,7 @@ class PrivateRoutesFragment :
     }
 
     private fun rebuildRoute(route: RouteModel) {
+        val pointsCoordinatesList = mutableListOf<Point>()
         focusedRoute = route
 
         if (this::routePointsJob.isInitialized) {
@@ -812,6 +817,10 @@ class PrivateRoutesFragment :
                         currentRoutePointsList =
                             pointsList.map { it.copy() } as MutableList<RoutePointModel>
 
+                        currentRoutePointsList.forEach {
+                            pointsCoordinatesList.add(Point.fromLngLat(it.x, it.y))
+                        }
+
                         buildRouteFromList(currentRoutePointsList.map(::mapPrivateRoutePointModelToPoint))
                         fetchAnnotatedRoutePoints()
                         eraseCameraToPoint(
@@ -819,10 +828,13 @@ class PrivateRoutesFragment :
                             currentRoutePointsList[0].y,
                             binding.mapView
                         )
+                        focusedRoute.distance = getRouteDistance(pointsCoordinatesList)
                     }
                 }
         }
     }
+
+
 
     private fun buildRouteFromList(coordinatesList: List<Point>) {
         mapboxNavigation.requestRoutes(
@@ -1167,12 +1179,15 @@ class PrivateRoutesFragment :
         isPublic = route.isPublic
 
         binding.bottomSheetDialogRouteDetails.apply {
+
+            //is route data is empty
             if (route.name?.isEmpty() == true && route.description?.isEmpty() == true && route.tagsList.isEmpty()) {
                 emptyDataPlaceholder.visibility = View.VISIBLE
             } else {
                 emptyDataPlaceholder.visibility = View.GONE
             }
 
+            routeDistance.text = getString(R.string.route_distance, route.distance)
             routeCaptionText.text = route.name
             routeDescriptionText.text = route.description
 

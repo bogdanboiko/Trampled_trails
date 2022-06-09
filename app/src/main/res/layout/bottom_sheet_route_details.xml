@@ -18,17 +18,6 @@
         app:layout_constraintBottom_toTopOf="@id/nestedScroll"/>
 
     <ImageButton
-        android:id="@+id/routeDetailsEditButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/transparent"
-        android:backgroundTint="@color/black"
-        android:padding="20dp"
-        android:src="@drawable/ic_edit"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageButton
         android:id="@+id/btnChangeRouteAccess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -37,6 +26,39 @@
         android:padding="20dp"
         android:src="@drawable/ic_upload"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/routeDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textAlignment="textStart"
+        app:layout_constraintBottom_toBottomOf="@+id/btnChangeRouteAccess"
+        app:layout_constraintStart_toEndOf="@+id/btnChangeRouteAccess"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/routeDetailsDeleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:background="@color/transparent"
+        android:padding="20dp"
+        android:src="@drawable/ic_delete"
+        app:layout_constraintEnd_toStartOf="@id/routeDetailsEditButton"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/routeDetailsEditButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:backgroundTint="@color/black"
+        android:padding="20dp"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -51,17 +73,6 @@
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="@id/nestedScroll" />
-
-    <ImageButton
-        android:id="@+id/routeDetailsDeleteButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:background="@color/transparent"
-        android:padding="20dp"
-        android:src="@drawable/ic_delete"
-        app:layout_constraintEnd_toStartOf="@id/routeDetailsEditButton"
-        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nestedScroll"

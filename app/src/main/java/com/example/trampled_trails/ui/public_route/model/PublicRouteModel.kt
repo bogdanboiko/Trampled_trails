@@ -7,5 +7,6 @@ data class PublicRouteModel(
     val tagsList: List<String>,
     val imageList: List<String>,
     val userId: String,
+    var distance: String,
     val isPublic: Boolean
 )
