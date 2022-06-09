@@ -67,6 +67,7 @@ class PublicTagsPagingSource(
                             (it.get("tagsList") ?: emptyList<String>()) as List<String>,
                             (it.get("imageList") ?: emptyList<String>()) as List<String>,
                             it.getString("userId")!!,
+                            "",
                             true
                         )
                     )

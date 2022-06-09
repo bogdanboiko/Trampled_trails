@@ -543,6 +543,7 @@ class PublicRoutesFragment :
     }
 
     private fun rebuildRoute(publicRoute: PublicRouteModel) {
+        val pointsCoordinatesList = mutableListOf<Point>()
         focusedPublicRoute = publicRoute
 
         if (this::routePointsJob.isInitialized) {
@@ -556,6 +557,10 @@ class PublicRoutesFragment :
                         currentRoutePointsList =
                             pointsList.map { it.copy() } as MutableList<RoutePointModel>
 
+                        currentRoutePointsList.forEach {
+                            pointsCoordinatesList.add(Point.fromLngLat(it.x, it.y))
+                        }
+
                         buildRouteFromList(currentRoutePointsList.map {
                             Point.fromLngLat(
                                 it.x,
@@ -568,6 +573,8 @@ class PublicRoutesFragment :
                             currentRoutePointsList[0].y,
                             binding.mapView
                         )
+
+                        focusedPublicRoute.distance = getRouteDistance(pointsCoordinatesList)
                     }
                 }
         }
@@ -828,6 +835,8 @@ class PublicRoutesFragment :
             }
 
             emptyDataPlaceholder.visibility = View.GONE
+
+            routeDistance.text = getString(R.string.route_distance, publicRoute.distance)
             routeCaptionText.text = publicRoute.name
             routeDescriptionText.text = publicRoute.description
 

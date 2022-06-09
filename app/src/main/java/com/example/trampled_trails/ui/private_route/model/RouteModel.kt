@@ -9,5 +9,6 @@ data class RouteModel(
     val description: String? = "",
     val tagsList: List<RouteTagModel> = emptyList(),
     val imageList: List<RouteImageModel> = emptyList(),
+    var distance: String = "",
     val isPublic: Boolean
 )

@@ -84,6 +84,9 @@ fun syncPrivateRoutesFragmentTheme(theme: MyAppTheme, binding: FragmentPrivateRo
             ColorStateList.valueOf(theme.colorPrimary(context))
         bottomSheetDialogRouteDetails.routeDetailsDeleteButton.imageTintList =
             ColorStateList.valueOf(theme.colorSecondaryVariant(context))
+        bottomSheetDialogRouteDetails.routeDistance.setTextColor(
+            theme.colorSecondaryVariant(context)
+        )
         bottomSheetDialogRouteDetails.routeDetailsEditButton.imageTintList =
             ColorStateList.valueOf(theme.colorSecondaryVariant(context))
         bottomSheetDialogRouteDetails.btnChangeRouteAccess.imageTintList =
