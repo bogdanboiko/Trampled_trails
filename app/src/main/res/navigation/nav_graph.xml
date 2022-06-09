@@ -8,7 +8,7 @@
     <!--Points-->
     <fragment
         android:id="@+id/privatePointsFragment"
-        android:name="com.example.gh_coursework.ui.private_point.PrivatePointsFragment"
+        android:name="com.example.trampled_trails.ui.private_point.PrivatePointsFragment"
         android:label="fragment_private_points"
         tools:layout="@layout/fragment_private_points">
         <action
@@ -38,7 +38,7 @@
     </fragment>
     <fragment
         android:id="@+id/pointDetailsFragment"
-        android:name="com.example.gh_coursework.ui.point_details.PointDetailsFragment"
+        android:name="com.example.trampled_trails.ui.point_details.PointDetailsFragment"
         android:label="fragment_point_details"
         tools:layout="@layout/fragment_point_details">
         <action
@@ -54,7 +54,7 @@
     </fragment>
     <dialog
         android:id="@+id/pointTagsDialogFragment"
-        android:name="com.example.gh_coursework.ui.point_details.tag_dialog.TagDialogFragment"
+        android:name="com.example.trampled_trails.ui.point_details.tag_dialog.TagDialogFragment"
         android:label="TagDialog">
         <argument
             android:name="pointId"
@@ -63,7 +63,7 @@
 
     <dialog
         android:id="@+id/pointFilterByTagsDialogFragment"
-        android:name="com.example.gh_coursework.ui.private_point.tag_dialog.PointFilterByTagDialogFragment"
+        android:name="com.example.trampled_trails.ui.private_point.tag_dialog.PointFilterByTagDialogFragment"
         android:label="FilterByTagDialog">
         <argument
             android:name="checkedTags"
@@ -72,7 +72,7 @@
 
     <fragment
         android:id="@+id/privateImageDetails"
-        android:name="com.example.gh_coursework.ui.private_image_details.ImageDetailsFragment"
+        android:name="com.example.trampled_trails.ui.private_image_details.ImageDetailsFragment"
         android:label="image_details_fragment"
         tools:layout="@layout/fragment_image_details">
         <argument
@@ -85,7 +85,7 @@
     <!--Routes-->
     <fragment
         android:id="@+id/privateRoutesFragment"
-        android:name="com.example.gh_coursework.ui.private_route.PrivateRoutesFragment"
+        android:name="com.example.trampled_trails.ui.private_route.PrivateRoutesFragment"
         android:label="fragment_private_routes"
         tools:layout="@layout/fragment_private_route">
         <action
@@ -123,7 +123,7 @@
 
     <fragment
         android:id="@+id/routeDetailsFragment"
-        android:name="com.example.gh_coursework.ui.route_details.RouteDetailsFragment"
+        android:name="com.example.trampled_trails.ui.route_details.RouteDetailsFragment"
         android:label="fragment_route_details"
         tools:layout="@layout/fragment_route_details">
         <action
@@ -141,7 +141,7 @@
 
     <dialog
         android:id="@+id/routeFilterByTagsDialogFragment"
-        android:name="com.example.gh_coursework.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment"
+        android:name="com.example.trampled_trails.ui.private_route.tag_dialog.RouteFilterByTagDialogFragment"
         android:label="FilterByTagDialog">
         <argument
             android:name="checkedTags"
@@ -150,7 +150,7 @@
 
     <dialog
         android:id="@+id/routeTagsDialogFragment"
-        android:name="com.example.gh_coursework.ui.route_details.tag_dialog.RouteTagDialogFragment"
+        android:name="com.example.trampled_trails.ui.route_details.tag_dialog.RouteTagDialogFragment"
         android:label="TagDialog">
         <argument
             android:name="routeId"
@@ -159,7 +159,7 @@
 
     <fragment
         android:id="@+id/privateRouteImageDetails"
-        android:name="com.example.gh_coursework.ui.route_details.image_details.RouteDetailsImageFragment"
+        android:name="com.example.trampled_trails.ui.route_details.image_details.RouteDetailsImageFragment"
         android:label="image_details_fragment"
         tools:layout="@layout/fragment_image_details">
         <argument
@@ -172,7 +172,7 @@
     <!--Home-->
     <fragment
         android:id="@+id/homepageFragment"
-        android:name="com.example.gh_coursework.ui.homepage.HomepageFragment"
+        android:name="com.example.trampled_trails.ui.homepage.HomepageFragment"
         android:label="fragment_homepage"
         tools:layout="@layout/fragment_homepage">
     </fragment>
@@ -180,7 +180,7 @@
     <!--Public-->
     <fragment
         android:id="@+id/publicRouteFragment"
-        android:name="com.example.gh_coursework.ui.public_route.PublicRoutesFragment"
+        android:name="com.example.trampled_trails.ui.public_route.PublicRoutesFragment"
         android:label="public_routes_fragment"
         tools:layout="@layout/fragment_public_route">
         <action
@@ -210,7 +210,7 @@
 
     <fragment
         android:id="@+id/publicImageFragment"
-        android:name="com.example.gh_coursework.ui.public_route.image_details.PublicRouteDetailsImageFragment"
+        android:name="com.example.trampled_trails.ui.public_route.image_details.PublicRouteDetailsImageFragment"
         android:label="public_image_fragment"
         tools:layout="@layout/fragment_public_image_details">
 
@@ -223,7 +223,7 @@
 
     <dialog
         android:id="@+id/publicRouteFilterByTagsDialogFragment"
-        android:name="com.example.gh_coursework.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment"
+        android:name="com.example.trampled_trails.ui.public_route.tag_dialog.PublicRouteFilterByTagFragment"
         android:label="PublicRouteFilterByTagDialog">
         <argument
             android:name="checkedTags"
