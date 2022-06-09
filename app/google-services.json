@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "380237413037",
-    "project_id": "gh-coursework-f4257",
-    "storage_bucket": "gh-coursework-f4257.appspot.com"
+    "project_number": "659669829295",
+    "project_id": "trampled-trails",
+    "storage_bucket": "trampled-trails.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:380237413037:android:da12645e71180e78112424",
+        "mobilesdk_app_id": "1:659669829295:android:f9d1185fa5f585ea8e765a",
         "android_client_info": {
-          "package_name": "com.example.gh_coursework"
+          "package_name": "com.example.trampled_trails"
         }
       },
       "oauth_client": [
         {
-          "client_id": "380237413037-2akgosnv3mgifogk95m4t9u2250pkvvp.apps.googleusercontent.com",
+          "client_id": "659669829295-g7hoktupc00f2ok9fdmftvsjlgorchq5.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.gh_coursework",
+            "package_name": "com.example.trampled_trails",
             "certificate_hash": "dc838f7568a890f19a571e80d8a433e840caf15e"
           }
         },
         {
-          "client_id": "380237413037-0fvf3i1me25bj808bvoqdjd45nskk5im.apps.googleusercontent.com",
+          "client_id": "659669829295-ugestk72bdosk1mc039se9d44lcsetp1.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCchrNMIwPzDsPDMjlMIDzA_4-N_vrfyY4"
+          "current_key": "AIzaSyA8ZcLi8vN7XYA1z5jaHIvBfWZ4Xav7liU"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "380237413037-0fvf3i1me25bj808bvoqdjd45nskk5im.apps.googleusercontent.com",
+              "client_id": "659669829295-ugestk72bdosk1mc039se9d44lcsetp1.apps.googleusercontent.com",
               "client_type": 3
             }
           ]
