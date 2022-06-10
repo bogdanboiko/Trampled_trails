@@ -532,9 +532,11 @@ class PrivateRoutesFragment :
 
             creatingRouteCoordinatesList.clear()
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                getUserIdCallback?.getUserId()?.let { userId ->
-                    viewModelMain.syncDataWithFirebase(userId)
+            if (internetCheckCallback?.isInternetAvailable() == true) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    getUserIdCallback?.getUserId()?.let { userId ->
+                        viewModelMain.syncDataWithFirebase(userId)
+                    }
                 }
             }
         }

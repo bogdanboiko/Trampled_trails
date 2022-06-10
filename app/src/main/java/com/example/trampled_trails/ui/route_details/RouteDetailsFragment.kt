@@ -25,6 +25,7 @@ import com.example.trampled_trails.ActivityViewModel
 import com.example.trampled_trails.R
 import com.example.trampled_trails.databinding.FragmentRouteDetailsBinding
 import com.example.trampled_trails.ui.helper.GetUserIdCallback
+import com.example.trampled_trails.ui.helper.InternetCheckCallback
 import com.example.trampled_trails.ui.private_image_details.adapter.ImagesInDetailsAdapter
 import com.example.trampled_trails.ui.private_image_details.model.ImageModel
 import com.example.trampled_trails.ui.private_image_details.model.ImageModel.RouteImageModel
@@ -50,6 +51,7 @@ class RouteDetailsFragment : ThemeFragment() {
     private val viewModel: RouteDetailsViewModel by viewModel { parametersOf(arguments.routeId) }
 
     private var getUserIdCallback: GetUserIdCallback? = null
+    private var internetCheckCallback: InternetCheckCallback? = null
 
     private val imageAdapter = ImagesInDetailsAdapter {
         findNavController().navigate(
@@ -87,12 +89,14 @@ class RouteDetailsFragment : ThemeFragment() {
         super.onAttach(context)
 
         getUserIdCallback = context as? GetUserIdCallback
+        internetCheckCallback = context as? InternetCheckCallback
     }
 
     override fun onDetach() {
         super.onDetach()
 
         getUserIdCallback = null
+        internetCheckCallback = null
     }
 
     override fun onCreateView(
@@ -195,9 +199,11 @@ class RouteDetailsFragment : ThemeFragment() {
                     )
                 )
 
-                viewLifecycleOwner.lifecycleScope.launch {
-                    getUserIdCallback?.getUserId()?.let { userId ->
-                        viewModelMain.syncDataWithFirebase(userId)
+                if (internetCheckCallback?.isInternetAvailable() == true) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        getUserIdCallback?.getUserId()?.let { userId ->
+                            viewModelMain.syncDataWithFirebase(userId)
+                        }
                     }
                 }
             }
