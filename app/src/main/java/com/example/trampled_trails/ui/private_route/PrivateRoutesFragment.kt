@@ -535,7 +535,8 @@ class PrivateRoutesFragment :
             if (internetCheckCallback?.isInternetAvailable() == true) {
                 viewLifecycleOwner.lifecycleScope.launch {
                     getUserIdCallback?.getUserId()?.let { userId ->
-                        viewModelMain.syncDataWithFirebase(userId)
+                        viewModelMain.uploadPoints(userId)
+                        viewModelMain.uploadRoutes(userId)
                     }
                 }
             }
@@ -1303,6 +1304,13 @@ class PrivateRoutesFragment :
                     ).show()
                 } else {
                     deleteRoute(route)
+
+                    if (internetCheckCallback?.isInternetAvailable() == true) {
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            viewModelMain.deleteRemotePoints()
+                            viewModelMain.deleteRemoteRoutes()
+                        }
+                    }
 
                     routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }

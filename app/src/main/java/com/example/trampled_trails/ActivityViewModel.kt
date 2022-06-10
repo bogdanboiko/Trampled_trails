@@ -69,7 +69,7 @@ class ActivityViewModel(
         deleteImagesFromFirestoreUseCase(getDeletedImagesUseCase.invoke().first())
     }
 
-    private suspend fun deleteRemotePoints() {
+    suspend fun deleteRemotePoints() {
         val deletedPoints = deletedPoints.first()
 
         if (deletedPoints.isNotEmpty()) {
@@ -79,7 +79,7 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun deleteRemoteRoutes() {
+    suspend fun deleteRemoteRoutes() {
         val deletedRoutes = deletedRoutes.first()
 
         if (deletedRoutes.isNotEmpty()) {
@@ -101,11 +101,11 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun uploadPoints(userId: String) {
+    suspend fun uploadPoints(userId: String) {
         uploadPointsUseCase.invoke(getPointsListUseCase.invoke().first(), userId)
     }
 
-    private suspend fun uploadRoutes(userId: String) {
+    suspend fun uploadRoutes(userId: String) {
         getRoutesListUseCase.invoke().first().forEach { route ->
             uploadRouteUseCase.invoke(
                 route,
