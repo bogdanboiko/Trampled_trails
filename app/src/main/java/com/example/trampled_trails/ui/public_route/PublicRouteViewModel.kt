@@ -7,17 +7,18 @@ import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import com.example.trampled_trails.data.remote.paging_source.PublicFavouritesPagingSource
 import com.example.trampled_trails.data.remote.paging_source.PublicTagsPagingSource
-import com.example.trampled_trails.domain.usecase.public.*
+import com.example.trampled_trails.domain.usecase.public.AddRouteToFavouritesUseCase
+import com.example.trampled_trails.domain.usecase.public.FetchRoutePointsFromRemoteUseCase
+import com.example.trampled_trails.domain.usecase.public.GetUserFavouriteRoutesUseCase
+import com.example.trampled_trails.domain.usecase.public.RemoveRouteFromFavouritesUseCase
 import com.example.trampled_trails.ui.public_route.mapper.mapRoutePointDomainToModel
 import com.example.trampled_trails.ui.public_route.model.RoutePointModel
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class PublicRouteViewModel(
-    private val query: Query,
     private val getUserFavouriteRoutesUseCase: GetUserFavouriteRoutesUseCase,
     private val addRouteToFavouritesUseCase: AddRouteToFavouritesUseCase,
     private val removeRouteFromFavouritesUseCase: RemoveRouteFromFavouritesUseCase,
@@ -25,7 +26,12 @@ class PublicRouteViewModel(
 ) : ViewModel() {
 
     fun fetchTaggedRoutes(tagsFilter: List<String>) = Pager(PagingConfig(pageSize = 10)) {
-        PublicTagsPagingSource(query, tagsFilter)
+        PublicTagsPagingSource(
+            FirebaseFirestore.getInstance()
+                .collection("routes").whereEqualTo("public", true)
+                .limit(10),
+            tagsFilter
+        )
     }.flow.cachedIn(viewModelScope)
 
     fun fetchFavouriteRoutes(routesIdList: List<String>) = Pager(PagingConfig(pageSize = 10)) {

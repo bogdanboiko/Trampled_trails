@@ -53,7 +53,7 @@ class ActivityViewModel(
             clearDeletedPointsTable()
             clearDeletedRoutesTable()
             clearDeletedImagesTable()
-            uploadRoute(userId)
+            uploadRoutes(userId)
             uploadPoints(userId)
             fetchRoutes(userId)
             fetchPoints(userId)
@@ -105,7 +105,7 @@ class ActivityViewModel(
         uploadPointsUseCase.invoke(getPointsListUseCase.invoke().first(), userId)
     }
 
-    private suspend fun uploadRoute(userId: String) {
+    private suspend fun uploadRoutes(userId: String) {
         getRoutesListUseCase.invoke().first().forEach { route ->
             uploadRouteUseCase.invoke(
                 route,
@@ -120,8 +120,8 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun fetchRoutes(id: String) {
-        getUserRouteListUseCase.invoke(id).collect { routesToSave ->
+    private suspend fun fetchRoutes(userId: String) {
+        getUserRouteListUseCase.invoke(userId).collect { routesToSave ->
             routesToSave.forEach { route ->
                 savePublicRouteToPrivateUseCase.invoke(route)
             }

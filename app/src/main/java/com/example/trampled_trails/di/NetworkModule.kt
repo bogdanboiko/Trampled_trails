@@ -1,6 +1,5 @@
 package com.example.trampled_trails.di
 
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
@@ -13,9 +12,5 @@ val networkModule = module {
 
     single {
         FirebaseStorage.getInstance()
-    }
-
-    single {
-        get<FirebaseFirestore>().collection("routes").whereEqualTo("public", true).limit(10)
     }
 }
