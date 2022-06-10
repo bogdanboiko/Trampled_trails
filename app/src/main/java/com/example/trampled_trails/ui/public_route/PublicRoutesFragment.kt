@@ -201,7 +201,7 @@ class PublicRoutesFragment :
 
         configMap()
         configBottomNavBar()
-        fetchSavedPublicRoutes()
+        fetchFavouritePublicRoutes()
         setUpBottomSheetsRecyclers()
         configImageRecyclers()
         configBottomSheetDialogs()
@@ -256,7 +256,7 @@ class PublicRoutesFragment :
         view?.let { configPublicFragmentBottomNavBar(arguments, binding, it) }
     }
 
-    private fun fetchSavedPublicRoutes() {
+    private fun fetchFavouritePublicRoutes() {
         if (internetCheckCallback?.isInternetAvailable() == true) {
             viewLifecycleOwner.lifecycleScope.launch {
                 favourites = getUserIdCallback?.let {
@@ -505,6 +505,7 @@ class PublicRoutesFragment :
                 getUserIdCallback?.getUserId()
                     ?.let { userId ->
                         viewModelPublic.getFavouriteRoutes(userId).collect {
+
                             if (it.isNotEmpty()) {
                                 binding.bottomSheetDialogRoutes.emptyDataPlaceholder.visibility =
                                     View.GONE
@@ -819,7 +820,7 @@ class PublicRoutesFragment :
                     }
 
                     runBlocking {
-                        fetchSavedPublicRoutes()
+                        fetchFavouritePublicRoutes()
                         if (isSortedByFavourites) {
                             delay(500)
                             fetchFavouriteRoutes()

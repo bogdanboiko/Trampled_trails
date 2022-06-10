@@ -3,15 +3,15 @@ package com.example.trampled_trails.ui.public_route.helper
 import android.content.Context
 import android.content.res.ColorStateList
 import androidx.core.graphics.drawable.DrawableCompat
-import com.example.trampled_trails.R
+import android.R
 import com.example.trampled_trails.databinding.FragmentPublicRouteBinding
 import com.example.trampled_trails.ui.themes.MyAppTheme
 
 fun syncPublicFragmentTheme(theme: MyAppTheme, binding: FragmentPublicRouteBinding, context: Context) {
     val colorStates = ColorStateList(
         arrayOf(
-            intArrayOf(-R.attr.checked),
-            intArrayOf(R.attr.checked)
+            intArrayOf(-R.attr.state_checked),
+            intArrayOf(R.attr.state_checked)
         ), intArrayOf(
             theme.colorSecondaryVariant(context),
             theme.colorOnSecondary(context)

@@ -53,7 +53,7 @@ class ActivityViewModel(
             clearDeletedPointsTable()
             clearDeletedRoutesTable()
             clearDeletedImagesTable()
-            uploadRoute(userId)
+            uploadRoutes(userId)
             uploadPoints(userId)
             fetchRoutes(userId)
             fetchPoints(userId)
@@ -69,7 +69,7 @@ class ActivityViewModel(
         deleteImagesFromFirestoreUseCase(getDeletedImagesUseCase.invoke().first())
     }
 
-    private suspend fun deleteRemotePoints() {
+    suspend fun deleteRemotePoints() {
         val deletedPoints = deletedPoints.first()
 
         if (deletedPoints.isNotEmpty()) {
@@ -79,7 +79,7 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun deleteRemoteRoutes() {
+    suspend fun deleteRemoteRoutes() {
         val deletedRoutes = deletedRoutes.first()
 
         if (deletedRoutes.isNotEmpty()) {
@@ -101,11 +101,11 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun uploadPoints(userId: String) {
+    suspend fun uploadPoints(userId: String) {
         uploadPointsUseCase.invoke(getPointsListUseCase.invoke().first(), userId)
     }
 
-    private suspend fun uploadRoute(userId: String) {
+    suspend fun uploadRoutes(userId: String) {
         getRoutesListUseCase.invoke().first().forEach { route ->
             uploadRouteUseCase.invoke(
                 route,
@@ -120,8 +120,8 @@ class ActivityViewModel(
         }
     }
 
-    private suspend fun fetchRoutes(id: String) {
-        getUserRouteListUseCase.invoke(id).collect { routesToSave ->
+    private suspend fun fetchRoutes(userId: String) {
+        getUserRouteListUseCase.invoke(userId).collect { routesToSave ->
             routesToSave.forEach { route ->
                 savePublicRouteToPrivateUseCase.invoke(route)
             }

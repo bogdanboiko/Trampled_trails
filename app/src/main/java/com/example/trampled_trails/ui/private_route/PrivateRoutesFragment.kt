@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
+import com.example.trampled_trails.ActivityViewModel
 import com.example.trampled_trails.ui.data.MapState
 import com.example.trampled_trails.R
 import com.example.trampled_trails.databinding.FragmentPrivateRouteBinding
@@ -75,14 +75,11 @@ import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineApi
 import com.mapbox.navigation.ui.maps.route.line.api.MapboxRouteLineView
 import com.mapbox.navigation.ui.maps.route.line.model.MapboxRouteLineOptions
 import com.mapbox.navigation.ui.maps.route.line.model.RouteLine
-import com.mapbox.turf.TurfMeasurement
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.text.DecimalFormat
 import java.util.*
-import java.util.zip.DeflaterOutputStream
 
 @OptIn(ExperimentalPreviewMapboxNavigationAPI::class)
 class PrivateRoutesFragment :
@@ -102,8 +99,10 @@ class PrivateRoutesFragment :
     private val routesListAdapter = RoutesListAdapter(this as RoutesListAdapterCallback)
     private val pointsListAdapter = RoutePointsListAdapter(this as RoutePointsListCallback)
 
+    private val viewModelMain: ActivityViewModel by viewModel()
     private val viewModelPrivate: PrivateRouteViewModel by viewModel()
     private var internetCheckCallback: InternetCheckCallback? = null
+    private var getUserIdCallback: GetUserIdCallback? = null
 
     private var isPublic = false
     private var currentRoutePointsList = mutableListOf<RoutePointModel>()
@@ -249,12 +248,14 @@ class PrivateRoutesFragment :
         super.onAttach(context)
 
         internetCheckCallback = context as? InternetCheckCallback
+        getUserIdCallback = context as? GetUserIdCallback
     }
 
     override fun onDetach() {
         super.onDetach()
 
         internetCheckCallback = null
+        getUserIdCallback = null
     }
 
     override fun onCreateView(
@@ -530,6 +531,15 @@ class PrivateRoutesFragment :
             }
 
             creatingRouteCoordinatesList.clear()
+
+            if (internetCheckCallback?.isInternetAvailable() == true) {
+                viewLifecycleOwner.lifecycleScope.launch {
+                    getUserIdCallback?.getUserId()?.let { userId ->
+                        viewModelMain.uploadPoints(userId)
+                        viewModelMain.uploadRoutes(userId)
+                    }
+                }
+            }
         }
     }
 
@@ -1234,6 +1244,7 @@ class PrivateRoutesFragment :
                         isPublic = false
                     } else {
                         val user = FirebaseAuth.getInstance().currentUser
+
                         if (user != null) {
                             if (route.name.isNullOrEmpty() || route.description.isNullOrEmpty()) {
                                 Toast.makeText(
@@ -1293,6 +1304,13 @@ class PrivateRoutesFragment :
                     ).show()
                 } else {
                     deleteRoute(route)
+
+                    if (internetCheckCallback?.isInternetAvailable() == true) {
+                        viewLifecycleOwner.lifecycleScope.launch {
+                            viewModelMain.deleteRemotePoints()
+                            viewModelMain.deleteRemoteRoutes()
+                        }
+                    }
 
                     routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                 }

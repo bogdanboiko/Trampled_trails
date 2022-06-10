@@ -1,6 +1,7 @@
 package com.example.trampled_trails.ui.route_details
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -20,8 +21,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import com.dolatkia.animatedThemeManager.AppTheme
 import com.dolatkia.animatedThemeManager.ThemeFragment
+import com.example.trampled_trails.ActivityViewModel
 import com.example.trampled_trails.R
 import com.example.trampled_trails.databinding.FragmentRouteDetailsBinding
+import com.example.trampled_trails.ui.helper.GetUserIdCallback
+import com.example.trampled_trails.ui.helper.InternetCheckCallback
 import com.example.trampled_trails.ui.private_image_details.adapter.ImagesInDetailsAdapter
 import com.example.trampled_trails.ui.private_image_details.model.ImageModel
 import com.example.trampled_trails.ui.private_image_details.model.ImageModel.RouteImageModel
@@ -41,8 +45,14 @@ class RouteDetailsFragment : ThemeFragment() {
     private lateinit var binding: FragmentRouteDetailsBinding
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var theme: MyAppTheme
+
     private val arguments by navArgs<RouteDetailsFragmentArgs>()
+    private val viewModelMain: ActivityViewModel by viewModel()
     private val viewModel: RouteDetailsViewModel by viewModel { parametersOf(arguments.routeId) }
+
+    private var getUserIdCallback: GetUserIdCallback? = null
+    private var internetCheckCallback: InternetCheckCallback? = null
+
     private val imageAdapter = ImagesInDetailsAdapter {
         findNavController().navigate(
             RouteDetailsFragmentDirections.actionRouteDetailsFragmentToPrivateRouteImageDetails(
@@ -74,6 +84,20 @@ class RouteDetailsFragment : ThemeFragment() {
                 }
             }
         }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        getUserIdCallback = context as? GetUserIdCallback
+        internetCheckCallback = context as? InternetCheckCallback
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+
+        getUserIdCallback = null
+        internetCheckCallback = null
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -174,6 +198,15 @@ class RouteDetailsFragment : ThemeFragment() {
                         isPublic
                     )
                 )
+
+                if (internetCheckCallback?.isInternetAvailable() == true) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        getUserIdCallback?.getUserId()?.let { userId ->
+                            viewModelMain.uploadPoints(userId)
+                            viewModelMain.uploadRoutes(userId)
+                        }
+                    }
+                }
             }
         }
     }

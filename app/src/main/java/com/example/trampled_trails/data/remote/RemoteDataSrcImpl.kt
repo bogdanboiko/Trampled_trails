@@ -97,7 +97,6 @@ class RemoteDataSrcImpl(
         points.forEachIndexed { index, point ->
             val pointDocRef =
                 db.collection("points").document(point.pointId)
-            Log.e("e", point.tagsList.toString())
             Tasks.await(pointDocRef.set(
                 mapPointDomainToPublicPointEntity(
                     point,
@@ -178,7 +177,7 @@ class RemoteDataSrcImpl(
     override fun deleteImagesFromFirebase(images: List<String>) {
         images.forEach {
             storage.getReferenceFromUrl(it).delete().addOnSuccessListener {
-                Log.e("e", "Image deleted from remote")
+                Log.e("", "Image deleted from remote")
             }
         }
     }

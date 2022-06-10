@@ -10,7 +10,7 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('C:\\Users\\pashk\\StudioProjects\\gh_coursework\\coursework.jks')
+            storeFile file('C:\\Users\\pashk\\StudioProjects\\Trampled Trails\\coursework.jks')
             storePassword 'courseworkgkhb'
             keyPassword 'courseworkgkhb'
             keyAlias 'debugkey'
