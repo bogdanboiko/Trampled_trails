@@ -72,7 +72,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private var checkedTagList = emptyList<PointTagModel>()
 
     private lateinit var pointDetailsBottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var pointsListBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var pointsBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     private lateinit var mapboxMap: MapboxMap
     private lateinit var pointAnnotationManager: PointAnnotationManager
@@ -115,6 +115,8 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private val onPointClickEvent = OnPointAnnotationClickListener { annotation ->
         getPointDetailsDialog(annotation)
 
+        pointsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
         true
     }
 
@@ -136,6 +138,9 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentPrivatePointsBinding.inflate(inflater, container, false)
+
+        binding.bottomSheetDialogPoints.root.layoutParams.height = resources.displayMetrics.heightPixels / 3
+
         return binding.root
     }
 
@@ -224,6 +229,7 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
                 executeClickAtPoint()
             } else {
                 mapState = MapState.CREATOR
+
                 binding.cancelButton.text = context?.resources?.getString(R.string.save_button_disable)
                 binding.cancelButton.icon =
                     view?.context?.let { context ->
@@ -286,8 +292,8 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
         pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         pointsLayoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        pointsListBottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
-        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        pointsBottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetDialogPoints.pointsBottomSheetDialog)
+        pointsBottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         getPointsDialog()
     }
@@ -300,10 +306,10 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
 
         binding.getPointsList.setOnClickListener {
             pointDetailsBottomSheetBehavior.peekHeight = 0
-            pointsListBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+            pointsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
 
-            if (pointsListBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            if (pointsBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                pointsBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
 
@@ -319,11 +325,11 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     private fun getPointDetailsDialog(annotation: PointAnnotation) {
         loadPointDetailsData(annotation)
 
-        pointsListBottomSheetBehavior.peekHeight = 0
+        pointsBottomSheetBehavior.peekHeight = 0
         pointDetailsBottomSheetBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
 
         if (pointDetailsBottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            pointDetailsBottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
         }
     }
     //bottom sheets set up end
@@ -502,6 +508,6 @@ class PrivatePointsFragment : ThemeFragment(), PointsListCallback {
     //called from PointsListAdapter when user clicked on item
     override fun onPointItemClick(pointDetails: PrivatePointDetailsModel) {
         eraseCameraToPoint(pointDetails.x, pointDetails.y, binding.mapView)
-        pointsListBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        pointsBottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
     }
 }
