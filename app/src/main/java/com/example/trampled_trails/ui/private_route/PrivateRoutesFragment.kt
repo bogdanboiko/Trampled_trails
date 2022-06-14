@@ -661,11 +661,14 @@ class PrivateRoutesFragment :
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
             routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
+            routesDialogBehavior.isDraggable = false
 
             if (routesDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            } else {
-                routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
+
+            binding.bottomSheetDialogRoutes.root.setOnClickListener {
+                routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             }
         }
 
