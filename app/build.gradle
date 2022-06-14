@@ -10,7 +10,7 @@ plugins {
 android {
     signingConfigs {
         debug {
-            storeFile file('C:\\Users\\pashk\\StudioProjects\\gh_coursework\\coursework.jks')
+            storeFile file('C:\\Users\\pashk\\StudioProjects\\Trampled Trails\\coursework.jks')
             storePassword 'courseworkgkhb'
             keyPassword 'courseworkgkhb'
             keyAlias 'debugkey'
@@ -20,7 +20,7 @@ android {
     buildToolsVersion "31.0.0"
 
     defaultConfig {
-        applicationId "com.example.gh_coursework"
+        applicationId "com.example.trampled_trails"
         minSdkVersion 21
         targetSdkVersion 32
         versionCode 1

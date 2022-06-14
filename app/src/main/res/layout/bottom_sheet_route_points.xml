@@ -3,10 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/routePointsBottomSheetDialog"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="0dp"
     android:background="@color/gray"
     android:orientation="vertical"
-    android:paddingBottom="70dp"
+    android:paddingBottom="60dp"
+    android:paddingTop="20dp"
     app:behavior_hideable="true"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Gh_Coursework</string>
+    <string name="app_name">Trampled Trails</string>
 
     <string name="mapbox_access_token">pk.eyJ1IjoiZ2hjb3Vyc2V3b3JrIiwiYSI6ImNsMWYzMmlyZTAwYnMzZW8wYmxnbmxuaGMifQ.rjWVPxd3LzssJi3d4PjqJQ</string>
 
@@ -52,6 +52,7 @@
     <string name="placeholder_private_route_item_empty">Text data is empty. Press flag icon than edit to start filling the data</string>
     <string name="placeholder_fill_route_data">Caption or details of publishing route are empty! Fill data before publishing</string>
     <string name="placeholder_sign_in_before_publishing_route">Sign in pressing the homepage button before publishing route!</string>
+    <string name="route_distance">Distance: %1$skm</string>
 
     <string name="placeholder_private_points_list_empty">Points list is empty. Create your first point by pressing + button!</string>
     <string name="placeholder_private_no_point_found_by_tags">There is no points found by that tags filter</string>

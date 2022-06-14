@@ -17,6 +17,18 @@
         app:layout_constraintTop_toBottomOf="@id/routeDetailsAddToFavouriteButton"
         app:layout_constraintBottom_toTopOf="@id/nestedScroll"/>
 
+    <TextView
+        android:id="@+id/routeDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toBottomOf="@+id/routeDetailsAddToFavouriteButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <ImageButton
         android:id="@+id/routeDetailsAddToFavouriteButton"
         android:layout_width="wrap_content"
