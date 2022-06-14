@@ -262,6 +262,10 @@ class PrivateRoutesFragment :
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentPrivateRouteBinding.inflate(inflater, container, false)
+
+        binding.bottomSheetDialogRoutes.root.layoutParams.height = resources.displayMetrics.heightPixels / 3
+        binding.bottomSheetDialogRoutePoints.root.layoutParams.height = resources.displayMetrics.heightPixels / 3
+
         return binding.root
     }
 
@@ -635,19 +639,15 @@ class PrivateRoutesFragment :
 
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
-        routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         routePointsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutePoints.routePointsBottomSheetDialog)
-        routePointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         routeDetailsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRouteDetails.routeBottomSheetDialog)
-        routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         pointDetailsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogPointDetails.pointBottomSheetDialog)
-        pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     private fun getRoutesDialog() {
@@ -661,14 +661,9 @@ class PrivateRoutesFragment :
             pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
             routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-            routesDialogBehavior.isDraggable = false
 
             if (routesDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            }
-
-            binding.bottomSheetDialogRoutes.root.setOnClickListener {
-                routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                routesDialogBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
 
@@ -694,7 +689,7 @@ class PrivateRoutesFragment :
             routePointsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
 
             if (routePointsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                routePointsDialogBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }

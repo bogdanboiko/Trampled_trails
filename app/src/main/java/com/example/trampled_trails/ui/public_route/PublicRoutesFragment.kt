@@ -192,6 +192,10 @@ class PublicRoutesFragment :
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         binding = FragmentPublicRouteBinding.inflate(inflater, container, false)
+
+        binding.bottomSheetDialogRoutes.root.layoutParams.height = resources.displayMetrics.heightPixels / 3
+        binding.bottomSheetDialogRoutePoints.root.layoutParams.height = resources.displayMetrics.heightPixels / 3
+
         return binding.root
     }
 
@@ -315,23 +319,15 @@ class PublicRoutesFragment :
             resources.getText(R.string.placeholder_public_route_points)
         routesDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutes.routesBottomSheetDialog)
-        routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        routesDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         routePointsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRoutePoints.routePointsBottomSheetDialog)
-        routePointsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        routePointsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         routeDetailsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogRouteDetails.routeBottomSheetDialog)
-        routeDetailsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        routeDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
         pointDetailsDialogBehavior =
             BottomSheetBehavior.from(binding.bottomSheetDialogPointDetails.pointBottomSheetDialog)
-        pointDetailsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
-        pointDetailsDialogBehavior.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
     @SuppressLint("ResourceAsColor")
@@ -349,9 +345,7 @@ class PublicRoutesFragment :
             routesDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
 
             if (routesDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            } else {
-                routesDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                routesDialogBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
 
             if (FirebaseAuth.getInstance().currentUser != null) {
@@ -403,9 +397,7 @@ class PublicRoutesFragment :
             routePointsDialogBehavior.peekHeight = resources.displayMetrics.heightPixels / 3
 
             if (routePointsDialogBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
-                routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            } else {
-                routePointsDialogBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                routePointsDialogBehavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }
