@@ -60,4 +60,7 @@
 
     <string name="placeholder_private_data_is_empty">Text data is empty. Press edit button to start filling the data</string>
     <string name="placeholder_public_data_is_empty">Text data is empty</string>
+
+    <string name="homepage_username_empty">Hello, username!</string>
+    <string name="homepage_username">Hello, %1$s!</string>
 </resources>
