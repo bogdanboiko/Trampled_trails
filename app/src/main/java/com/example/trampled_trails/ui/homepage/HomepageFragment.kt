@@ -2,7 +2,6 @@ package com.example.trampled_trails.ui.homepage
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,6 +22,7 @@ import com.dolatkia.animatedThemeManager.ThemeFragment
 import com.example.trampled_trails.R
 import com.example.trampled_trails.databinding.FragmentHomepageBinding
 import com.example.trampled_trails.ui.homepage.data.SyncingProgressState
+import com.example.trampled_trails.ui.homepage.helper.syncHomepageFragmentTheme
 import com.example.trampled_trails.ui.themes.MyAppTheme
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
@@ -55,8 +55,8 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
     private val signInLauncher =
         registerForActivityResult(FirebaseAuthUIActivityResultContract()) { res ->
-        this.signInResult(res)
-    }
+            this.signInResult(res)
+        }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -90,10 +90,10 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
 
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-               when (syncState) {
-                   is SyncingProgressState.FinishedSync -> findNavController().popBackStack()
-                   else -> return
-               }
+                when (syncState) {
+                    is SyncingProgressState.FinishedSync -> findNavController().popBackStack()
+                    else -> return
+                }
             }
         }
 
@@ -110,19 +110,33 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
     }
 
     private fun configHomepage() {
-        val circularProgressDrawable =  CircularProgressDrawable(binding.root.context)
+        val circularProgressDrawable = CircularProgressDrawable(binding.root.context)
         circularProgressDrawable.strokeWidth = 5f
         circularProgressDrawable.centerRadius = 30f
         circularProgressDrawable.start()
 
         with(binding) {
             if (firebaseUser != null) {
+                firebaseUser?.let { user ->
+                    Glide.with(requireActivity())
+                        .load(user.photoUrl)
+                        .placeholder(circularProgressDrawable)
+                        .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                        .into(binding.imgUserIcon)
+                }
+
                 txtUsername.visibility = View.VISIBLE
                 homepageRecycler.visibility = View.VISIBLE
                 btnSingIn.visibility = View.GONE
 
-                txtUsername.text = "Hello, ${firebaseUser?.displayName}!"
+                txtUsername.text = getString(R.string.homepage_username, firebaseUser?.displayName)
             } else {
+                Glide.with(requireActivity())
+                    .load(R.drawable.ic_user)
+                    .placeholder(circularProgressDrawable)
+                    .transform(MultiTransformation(CenterCrop(), CircleCrop()))
+                    .into(binding.imgUserIcon)
+
                 txtUsername.visibility = View.GONE
                 homepageRecycler.visibility = View.GONE
                 btnSingIn.visibility = View.VISIBLE
@@ -132,11 +146,7 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
                 }
             }
 
-            Glide.with(requireActivity())
-                .load(R.drawable.ic_user)
-                .placeholder(circularProgressDrawable)
-                .transform(MultiTransformation(CenterCrop(), CircleCrop()))
-                .into(binding.imgUserIcon)
+
         }
     }
 
@@ -204,14 +214,14 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
                         .setDisplayName("username")
                         .build().let { updatedUser -> firebaseUser?.updateProfile(updatedUser) }
 
-                    txtUsername.text = "Hello, username!"
+                    txtUsername.text = getString(R.string.homepage_username_empty)
                     editUsername.text.clear()
                 } else {
                     UserProfileChangeRequest.Builder()
                         .setDisplayName(editUsername.text.toString())
                         .build().let { updatedUser -> firebaseUser?.updateProfile(updatedUser) }
 
-                    txtUsername.text = "Hello, ${editUsername.text}!"
+                    txtUsername.text = getString(R.string.homepage_username, editUsername.text)
                     editUsername.text.clear()
                 }
 
@@ -233,12 +243,6 @@ class HomepageFragment : ThemeFragment(), HomepageCallback {
     override fun syncTheme(appTheme: AppTheme) {
         theme = appTheme as MyAppTheme
 
-        with(binding) {
-            root.setBackgroundColor(theme.colorPrimary(requireContext()))
-            txtUsername.setTextColor(theme.colorSecondaryVariant(requireContext()))
-            progressBar.dataSyncProgressBar.indeterminateTintList =
-                ColorStateList.valueOf(theme.colorSecondary(requireContext()))
-            progressBar.txtProgressBar.setTextColor(theme.colorSecondaryVariant(requireContext()))
-        }
+        syncHomepageFragmentTheme(theme, binding, requireContext())
     }
 }
